@@ -70,3 +70,17 @@ async function panggil(nama, ...args) {
   }
   throw buatGalat('GALAT', 'Respons server tidak valid. Muat ulang halaman.');
 }
+
+/**
+ * Data halaman pertama (ambilAwal) diminta sedini mungkin, sebelum app.js
+ * (±400 KB) selesai diunduh & dijalankan. muatPublik() memakainya sekali;
+ * "Coba Lagi" setelahnya selalu membuat permintaan baru.
+ */
+let awalDini = urlApiSiap() ? panggil('ambilAwal') : null;
+if (awalDini) awalDini.catch(() => { /* galat ditangani di muatPublik() */ });
+
+function ambilAwalDini() {
+  const p = awalDini || panggil('ambilAwal');
+  awalDini = null;
+  return p;
+}

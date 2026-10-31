@@ -671,7 +671,7 @@ async function muatPublik() {
   const lokal = Simpan.get(KONST.KUNCI_PUBLIK);
   if (lokal && lokal.t && Date.now() - lokal.t < 7 * 864e5) terapkanData(lokal);
   try {
-    terapkanData(await panggil('ambilAwal'));
+    terapkanData(await ambilAwalDini());
   } catch (e) {
     if (!S.beranda) renderGalatMuat();
     else toast('Mode luring', 'Menampilkan data tersimpan. ' + e.message, 'info');
@@ -1842,13 +1842,6 @@ RENDER.tentang = function (el) {
             <div class="relative w-full h-[360px] rounded-xl overflow-hidden shadow-inner group bg-surface-container">
               ${urlPeta(t) ? `<div class="bingkai-media absolute inset-0"><iframe src="${esc(urlPeta(t))}" title="Peta lokasi Kost AB6" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>`
                 : `<div class="absolute inset-0 flex items-center justify-center text-outline-variant">${ikon('map', 'text-[64px]')}</div>`}
-              <div class="absolute inset-0 pointer-events-none flex items-center justify-center">
-                <div class="p-3 bg-surface-container-lowest/95 backdrop-blur-md rounded-xl shadow-md flex items-center gap-3 pointer-events-auto transform hover:scale-105 transition-transform">
-                  <div class="w-10 h-10 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-bold text-sm">AB6</div>
-                  <div><h5 class="font-headline-sm text-label-md text-on-surface">Kost AB6 Yogyakarta</h5><p class="font-body-sm text-body-sm text-on-surface-variant">${esc(String(k.alamat || '').split(',')[0])}</p></div>
-                  <a href="${esc(linkPeta)}" target="_blank" rel="noopener noreferrer" title="Navigasi ke Kost AB6" aria-label="Navigasi ke Kost AB6" class="p-2 bg-surface-subtle rounded-lg text-primary hover:bg-primary-fixed transition-colors ml-1">${ikon('directions', 'text-[18px]')}</a>
-                </div>
-              </div>
               ${koor.teks ? `<div class="absolute bottom-3 left-3 bg-surface-container-lowest/90 px-2.5 py-1 rounded text-body-sm text-on-surface-variant font-label-md shadow-sm">Koordinat Presisi: ${esc(koor.teks)}</div>` : ''}
             </div>
           </div>
@@ -3947,7 +3940,7 @@ function htmlFormKamar() {
       </div>`)}
   </form>
 
-  <div class="fixed bottom-0 left-0 lg:left-[240px] right-0 z-30 bg-surface-page/95 backdrop-blur-md shadow-[0_-4px_16px_rgba(10,37,64,0.08)] px-space-md lg:px-space-lg py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
+  <div class="fixed bottom-0 left-0 lg:left-[240px] right-0 z-30 bg-surface-page/95 shadow-[0_-4px_16px_rgba(10,37,64,0.08)] px-space-md lg:px-space-lg py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
     <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-secondary-fixed text-secondary flex items-center justify-center shrink-0">${ikon('check_circle', 'text-[18px]')}</span>
       <div class="flex flex-col"><span class="font-label-md text-label-md text-on-surface">Semua perubahan tersimpan secara lokal</span><span id="fk-status-draf" class="font-body-sm text-[11px] text-on-surface-variant">${fk.disimpanPada ? 'Terakhir disimpan ' + fTgl(fk.disimpanPada, 'jam') : 'Draf otomatis aktif'}</span></div></div>
     <div class="flex items-center gap-3 w-full sm:w-auto">
@@ -5016,7 +5009,7 @@ RENDER['admin-pengaturan'] = function (el, param) {
     </div>
   </div>
   </form>
-  <div class="fixed bottom-0 left-0 lg:left-[240px] right-0 z-30 bg-surface-page/95 backdrop-blur-md shadow-[0_-4px_16px_rgba(10,37,64,0.08)] px-space-md lg:px-space-lg py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
+  <div class="fixed bottom-0 left-0 lg:left-[240px] right-0 z-30 bg-surface-page/95 shadow-[0_-4px_16px_rgba(10,37,64,0.08)] px-space-md lg:px-space-lg py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
     <span class="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant">${ikon('check_circle', 'text-[18px] text-status-available')}<span id="set-status">${S.kotor ? 'Ada perubahan yang belum disimpan' : 'Terakhir disimpan: <strong class="text-on-surface">' + (S.adm.set.terakhir ? fHariIni(S.adm.set.terakhir) : '—') + '</strong>'}</span></span>
     <div class="flex items-center gap-3 w-full sm:w-auto">
       <button type="button" data-aksi="set-reset" class="${KELAS.tombolKedua} flex-1 sm:flex-none">Reset ke Default</button>
@@ -5219,7 +5212,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) kirim
 setInterval(() => { if (S.rute.nama === 'beranda') kirimStatBanner(); }, 120000);
 
 /** Penanda versi frontend — muncul di konsol agar mudah memastikan versi terbaru sudah terpasang */
-const VERSI_FRONTEND = '2.0.0';
+const VERSI_FRONTEND = '2.1.0';
 
 function mulaiAplikasi() {
   console.info('[Kost AB6] Frontend v' + VERSI_FRONTEND + ' siap');

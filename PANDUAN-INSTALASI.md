@@ -178,7 +178,7 @@ Tunggu 1–2 menit, muat ulang halaman Settings → muncul **"Your site is live 
 ## Bagian C — Uji situs baru
 
 1. Buka `https://USERNAME.github.io/kost-ab6/` → Beranda, Kamar, Testimoni, Tentang Kami tampil berisi data.
-2. Tekan **F12** → tab **Console** → harus ada `[Kost AB6] Frontend v2.0.0 siap` dan **tidak ada** pesan merah selain peringatan Tailwind (`cdn.tailwindcss.com should not be used in production` — normal).
+2. Tekan **F12** → tab **Console** → harus ada `[Kost AB6] Frontend v2.1.0 siap` (atau versi lebih baru) dan **tidak ada** pesan merah.
 3. Klik ikon 👤 → login dengan akun admin **yang sama seperti sebelumnya**. Login dari situs lama tidak ikut terbawa (beda domain), jadi wajib login ulang sekali.
 4. Uji satu perubahan kecil di panel admin (misalnya ubah status satu kamar) → pastikan tersimpan di Spreadsheet.
 5. Uji formulir testimoni publik (opsional) → cek email notifikasi.
@@ -219,6 +219,8 @@ git push
 ```
 
 Situs diperbarui dalam 1–2 menit. Masih tampil versi lama → **Ctrl+Shift+R**.
+
+> **Tampilan (Tailwind) sudah dikompilasi** ke `css/tailwind.css`, tidak lagi dirakit di browser (lebih cepat). Jika kelak menambah kelas Tailwind baru di `index.html` atau `js/app.js`, bangkitkan ulang berkas itu dengan alat di `migrasi-api\alat-dev\` (lihat `BACA-SAYA.md` di sana) sebelum `git push`.
 
 **Backend** (`Kode.gs`) — setelah mengubah kode: **Terapkan** → **Kelola deployment** → pilih deployment **API v2.0.0** → ✏️ → **Versi: Versi baru** → **Terapkan**. URL `/exec` tetap sama, `js/config.js` tidak perlu diubah.
 
