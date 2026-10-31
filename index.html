@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kost AB6</title>
+  <meta name="description" content="Kost AB6 — hunian kost modern, tenang, dan strategis di Yogyakarta untuk mahasiswa dan profesional muda. Cek ketersediaan kamar dan hubungi kami via WhatsApp.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231565c0'/%3E%3Ctext x='16' y='21' font-family='Arial' font-size='13' font-weight='700' fill='white' text-anchor='middle'%3EAB6%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" rel="stylesheet">
+  <!-- Tailwind Play CDN v3 dipatok versinya (PRD §6.7) -->
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script>
+    // Konfigurasi token desain — disalin dari code.html Stitch (primary-fixed diperbaiki: '#d6e3ff')
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'secondary-fixed-dim': '#59de9b', 'inverse-primary': '#a9c7ff', 'secondary-fixed': '#78fbb6',
+            'primary-fixed-dim': '#a9c7ff', 'on-error': '#ffffff', 'on-surface': '#1c1b1b', 'surface-bright': '#fcf9f8',
+            'surface': '#fcf9f8', 'on-tertiary': '#ffffff', 'on-secondary-fixed-variant': '#005232', 'background': '#fcf9f8',
+            'on-tertiary-fixed': '#001c37', 'primary-container': '#1565c0', 'on-error-container': '#93000a',
+            'on-primary-container': '#dae5ff', 'on-primary-fixed-variant': '#00468c', 'tertiary-fixed-dim': '#b0c8eb',
+            'on-primary': '#ffffff', 'on-background': '#1c1b1b', 'surface-container-highest': '#e5e2e1',
+            'on-tertiary-fixed-variant': '#314865', 'tertiary-fixed': '#d2e4ff', 'surface-variant': '#e5e2e1',
+            'surface-container-high': '#eae7e7', 'on-tertiary-container': '#d7e6ff', 'surface-container-low': '#f6f3f2',
+            'gradient-mid': '#00E676', 'tertiary-container': '#516886', 'on-primary-fixed': '#001b3d', 'primary': '#004d99',
+            'gradient-start': '#0B6B5C', 'secondary-container': '#75f8b3', 'tertiary': '#39506d', 'error-container': '#ffdad6',
+            'status-available': '#00A86B', 'surface-subtle': '#F5F7F8', 'on-secondary-container': '#007147',
+            'outline': '#727783', 'status-occupied': '#D32F2F', 'on-secondary': '#ffffff', 'surface-container-lowest': '#ffffff',
+            'on-secondary-fixed': '#002111', 'error': '#ba1a1a', 'surface-dim': '#dcd9d9', 'outline-variant': '#c2c6d4',
+            'secondary': '#006d43', 'border-subtle': '#E2E8F0', 'inverse-surface': '#313030', 'surface-tint': '#005db7',
+            'gradient-end': '#7FDBFF', 'inverse-on-surface': '#f3f0ef', 'surface-page': '#FFFFFF', 'whatsapp-green': '#25D366',
+            'primary-fixed': '#d6e3ff', 'surface-container': '#f0eded', 'on-surface-variant': '#424752'
+          },
+          borderRadius: { DEFAULT: '0.25rem', lg: '0.5rem', xl: '0.75rem', full: '9999px' },
+          spacing: {
+            'space-sm': '0.5rem', 'space-xl': '2.5rem', 'gutter-mobile': '1rem', 'space-lg': '1.5rem', 'space-xs': '0.25rem',
+            'margin-mobile': '1rem', 'gutter': '1.5rem', 'space-md': '1rem', 'margin': '2rem'
+          },
+          fontFamily: {
+            'table-data': ['Inter'], 'headline-sm': ['Plus Jakarta Sans'], 'body-lg': ['Inter'], 'body-md': ['Inter'],
+            'headline-lg': ['Plus Jakarta Sans'], 'display-hero-mobile': ['Plus Jakarta Sans'], 'label-md': ['Plus Jakarta Sans'],
+            'headline-md': ['Plus Jakarta Sans'], 'label-numeric': ['Plus Jakarta Sans'], 'body-sm': ['Inter'],
+            'headline-lg-mobile': ['Plus Jakarta Sans'], 'display-hero': ['Plus Jakarta Sans']
+          },
+          fontSize: {
+            'table-data': ['13px', { lineHeight: '20px', fontWeight: '400' }],
+            'headline-sm': ['18px', { lineHeight: '24px', fontWeight: '600' }],
+            'body-lg': ['16px', { lineHeight: '26px', fontWeight: '400' }],
+            'body-md': ['14px', { lineHeight: '22px', fontWeight: '400' }],
+            'headline-lg': ['32px', { lineHeight: '40px', fontWeight: '700' }],
+            'display-hero-mobile': ['32px', { lineHeight: '40px', fontWeight: '700' }],
+            'label-md': ['13px', { lineHeight: '16px', fontWeight: '600' }],
+            'headline-md': ['22px', { lineHeight: '28px', fontWeight: '600' }],
+            'label-numeric': ['20px', { lineHeight: '24px', fontWeight: '700' }],
+            'body-sm': ['12px', { lineHeight: '18px', fontWeight: '400' }],
+            'headline-lg-mobile': ['24px', { lineHeight: '32px', fontWeight: '600' }],
+            'display-hero': ['48px', { lineHeight: '56px', fontWeight: '700' }]
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-surface font-body-md text-on-surface antialiased selection:bg-primary selection:text-on-primary">
+  <a href="#konten-utama" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[1300] focus:bg-surface-page focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-md">Lewati ke konten utama</a>
+
+  <!-- ═══════════════ LAPISAN PUBLIK ═══════════════ -->
+  <div id="lapisan-publik">
+    <header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/95 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
+      <div class="h-[72px] max-w-[1280px] mx-auto px-margin-mobile md:px-margin flex items-center justify-between">
+        <a href="#" data-nav="beranda" class="flex items-center gap-space-sm md:gap-space-md" aria-label="Kost AB6 — Beranda">
+          <span id="logo-publik" class="h-8 flex items-center"></span>
+          <span class="font-headline-sm text-headline-sm text-on-surface tracking-tight hover:text-primary transition-colors">Kost AB6</span>
+        </a>
+        <nav class="hidden md:flex items-center gap-space-lg h-full" aria-label="Menu utama">
+          <a href="#" data-nav="beranda" data-menu-publik="beranda" class="relative flex items-center h-full">Beranda</a>
+          <a href="#" data-nav="kamar" data-menu-publik="kamar" class="relative flex items-center h-full">Kamar</a>
+          <a href="#" data-nav="testimoni" data-menu-publik="testimoni" class="relative flex items-center h-full">Testimoni</a>
+          <a href="#" data-nav="tentang" data-menu-publik="tentang" class="relative flex items-center h-full">Tentang Kami</a>
+        </nav>
+        <div class="flex items-center gap-space-sm md:gap-space-md">
+          <a href="#" data-aksi="cek-ketersediaan" class="hidden md:inline-flex items-center justify-center px-space-md py-space-sm rounded-full bg-primary-container text-on-primary font-headline-sm text-body-md shadow-sm hover:opacity-95 transition-all">Cek Ketersediaan</a>
+          <button type="button" data-aksi="ke-admin" aria-label="Masuk panel pengelola" class="w-11 h-11 -m-1.5 flex items-center justify-center rounded-full group">
+            <span class="w-8 h-8 rounded-full bg-primary flex items-center justify-center group-hover:bg-primary-container transition-colors"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></span>
+          </button>
+          <button type="button" data-aksi="buka-menu-hp" aria-label="Buka menu" aria-expanded="false" aria-controls="laci-hp" class="md:hidden w-11 h-11 -mr-2 flex items-center justify-center rounded-lg text-on-surface hover:bg-surface-container transition-colors">
+            <span class="material-symbols-outlined text-[26px]">menu</span>
+          </button>
+        </div>
+      </div>
+      <div class="h-[4px] w-full bg-gradient-to-r from-gradient-start via-gradient-mid to-gradient-end"></div>
+    </header>
+
+    <!-- Laci menu ponsel (tidak ada di desain; memakai token yang sama) -->
+    <div id="laci-hp" class="fixed inset-0 z-[1050]" role="dialog" aria-modal="true" aria-label="Menu navigasi" hidden>
+      <div class="absolute inset-0 bg-[#0A2540]/60 backdrop-blur-sm latar-masuk" data-aksi="tutup-menu-hp"></div>
+      <nav class="absolute right-0 top-0 h-full w-[80%] max-w-[320px] bg-surface-container-lowest shadow-xl flex flex-col laci-kanan-masuk">
+        <div class="h-[72px] px-space-md flex items-center justify-between">
+          <span class="font-headline-sm text-headline-sm text-on-surface tracking-tight">Kost AB6</span>
+          <button type="button" data-aksi="tutup-menu-hp" aria-label="Tutup menu" class="w-11 h-11 flex items-center justify-center rounded-lg hover:bg-surface-container">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <div class="h-[3px] w-full bg-gradient-to-r from-gradient-start via-gradient-mid to-gradient-end"></div>
+        <div class="flex flex-col p-space-md gap-1">
+          <a href="#" data-nav="beranda" data-menu-hp="beranda" class="flex items-center gap-3 px-3 py-3 rounded-lg font-headline-sm text-body-lg"><span class="material-symbols-outlined text-[20px]">home</span>Beranda</a>
+          <a href="#" data-nav="kamar" data-menu-hp="kamar" class="flex items-center gap-3 px-3 py-3 rounded-lg font-headline-sm text-body-lg"><span class="material-symbols-outlined text-[20px]">bed</span>Kamar</a>
+          <a href="#" data-nav="testimoni" data-menu-hp="testimoni" class="flex items-center gap-3 px-3 py-3 rounded-lg font-headline-sm text-body-lg"><span class="material-symbols-outlined text-[20px]">rate_review</span>Testimoni</a>
+          <a href="#" data-nav="tentang" data-menu-hp="tentang" class="flex items-center gap-3 px-3 py-3 rounded-lg font-headline-sm text-body-lg"><span class="material-symbols-outlined text-[20px]">apartment</span>Tentang Kami</a>
+        </div>
+        <div class="mt-auto p-space-md flex flex-col gap-space-sm">
+          <a href="#" data-aksi="cek-ketersediaan" class="inline-flex items-center justify-center h-12 rounded-full bg-primary-container text-on-primary font-headline-sm text-body-md shadow-sm">Cek Ketersediaan</a>
+          <a href="#" data-aksi="ke-admin" class="inline-flex items-center justify-center gap-2 h-11 rounded-full text-on-surface-variant font-label-md text-label-md hover:bg-surface-container"><span class="material-symbols-outlined text-[18px]">lock</span>Admin Login</a>
+        </div>
+      </nav>
+    </div>
+
+    <main id="konten-utama" class="w-full pt-[72px] bg-surface min-h-[calc(100vh-72px)]">
+      <section id="hal-beranda" class="halaman" data-halaman="beranda" hidden></section>
+      <section id="hal-kamar" class="halaman" data-halaman="kamar" hidden></section>
+      <section id="hal-detail" class="halaman" data-halaman="detail" hidden></section>
+      <section id="hal-testimoni" class="halaman" data-halaman="testimoni" hidden>
+        <div id="testi-atas"></div>
+        <div id="testi-daftar"></div>
+        <div id="testi-form"></div>
+      </section>
+      <section id="hal-tentang" class="halaman" data-halaman="tentang" hidden></section>
+      <section id="hal-404" class="halaman" data-halaman="404" hidden></section>
+    </main>
+
+    <a id="wa-melayang" href="#" target="_blank" rel="noopener noreferrer" aria-label="Hubungi via WhatsApp" class="fixed bottom-space-lg right-space-lg z-[1000] w-14 h-14 rounded-full bg-whatsapp-green text-on-primary flex items-center justify-center shadow-[0_16px_36px_-6px_rgba(10,37,64,0.16)] hover:scale-105 active:scale-95 transition-transform"><span class="material-symbols-outlined text-[28px]">chat</span></a>
+
+    <footer class="w-full bg-[#0A2540] text-on-primary relative">
+      <div class="h-[4px] w-full bg-gradient-to-r from-gradient-start via-gradient-mid to-gradient-end"></div>
+      <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin py-space-xl">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-space-xl">
+          <div class="space-y-space-md">
+            <div class="flex items-center gap-space-sm"><span class="font-headline-md text-headline-md font-bold tracking-tight text-on-primary">Kost AB6</span></div>
+            <p class="font-body-md text-body-md text-surface-container-high leading-relaxed">Hunian modern, tenang, dan strategis dengan fasilitas premium standar editorial modern untuk mahasiswa dan profesional muda.</p>
+          </div>
+          <div class="space-y-space-sm">
+            <h3 class="font-headline-sm text-headline-sm text-on-primary">Navigasi Cepat</h3>
+            <ul class="space-y-space-xs font-body-md text-body-md">
+              <li class="py-0.5"><a href="#" data-nav="beranda" class="text-surface-container-high hover:text-secondary-fixed transition-colors">Beranda</a></li>
+              <li class="py-0.5"><a href="#" data-nav="kamar" class="text-surface-container-high hover:text-secondary-fixed transition-colors">Daftar Kamar</a></li>
+              <li class="py-0.5"><a href="#" data-nav="testimoni" class="text-surface-container-high hover:text-secondary-fixed transition-colors">Testimoni Penghuni</a></li>
+              <li class="py-0.5"><a href="#" data-nav="tentang" class="text-surface-container-high hover:text-secondary-fixed transition-colors">Tentang Kost AB6</a></li>
+            </ul>
+          </div>
+          <div class="space-y-space-sm">
+            <h3 class="font-headline-sm text-headline-sm text-on-primary">Kontak Kami</h3>
+            <div class="space-y-space-xs font-body-md text-body-md text-surface-container-high">
+              <p class="flex items-center gap-space-sm py-0.5"><span class="material-symbols-outlined text-[18px] text-secondary-fixed">location_on</span><span id="ftr-alamat">Jl. Anggrek No. 6, Yogyakarta</span></p>
+              <p class="flex items-center gap-space-sm py-0.5"><span class="material-symbols-outlined text-[18px] text-secondary-fixed">call</span><a id="ftr-wa" href="#" target="_blank" rel="noopener noreferrer" class="hover:text-secondary-fixed transition-colors">+62 812-3456-7890</a></p>
+              <p class="flex items-center gap-space-sm py-0.5"><span class="material-symbols-outlined text-[18px] text-secondary-fixed">mail</span><a id="ftr-email" href="mailto:info@kostab6.id" target="_blank" rel="noopener noreferrer" class="hover:text-secondary-fixed transition-colors">info@kostab6.id</a></p>
+            </div>
+          </div>
+          <div class="space-y-space-sm">
+            <h3 class="font-headline-sm text-headline-sm text-on-primary">Akses Manajemen</h3>
+            <p class="font-body-md text-body-md text-surface-container-high">Portal pengelolaan operasional dan pemeliharaan kamar bagi pengelola.</p>
+            <div class="pt-space-xs"><a href="#" data-aksi="ke-admin" class="inline-flex items-center gap-space-xs font-label-md text-label-md text-outline-variant hover:text-on-primary transition-colors"><span class="material-symbols-outlined text-[16px]">lock</span><span>Admin Login</span></a></div>
+          </div>
+        </div>
+        <div class="mt-space-xl pt-space-lg flex flex-col sm:flex-row items-center justify-between gap-space-md font-body-sm text-body-sm text-outline-variant">
+          <p>© <span class="tahun-berjalan">2026</span> Kost AB6. Seluruh hak cipta dilindungi.</p>
+          <p class="text-outline-variant">Modern Indonesian Living &amp; Hospitality</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ═══════════════ LAPISAN LOGIN ═══════════════ -->
+  <div id="lapisan-login" class="bg-surface-subtle" hidden>
+    <main class="min-h-screen w-full flex items-center justify-center p-space-md">
+      <div class="flex flex-col w-full items-center justify-center relative overflow-hidden py-10 px-4">
+        <div class="absolute -top-32 -left-20 w-96 h-96 rounded-full bg-gradient-to-br from-primary/10 via-secondary/10 to-transparent blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-32 -right-20 w-96 h-96 rounded-full bg-gradient-to-tl from-gradient-end/20 via-gradient-mid/10 to-transparent blur-3xl pointer-events-none"></div>
+        <div class="w-full max-w-[420px] flex flex-col items-start mb-6 z-10">
+          <a href="#" data-nav="beranda" class="inline-flex items-center gap-2 font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-200 group">
+            <span class="material-symbols-outlined text-[18px] group-hover:-translate-x-1 transition-transform duration-200">arrow_back</span>
+            <span>Kembali ke Halaman Utama</span>
+          </a>
+        </div>
+        <div class="w-full max-w-[420px] bg-surface-page rounded-2xl shadow-xl p-8 relative z-10 flex flex-col gap-6 overflow-hidden">
+          <div class="h-1.5 -mt-8 -mx-8 rounded-t-2xl bg-gradient-to-r from-gradient-start via-gradient-mid to-gradient-end mb-2"></div>
+          <div class="flex flex-col items-start gap-3">
+            <div class="flex items-center justify-between w-full">
+              <div class="flex items-center gap-2.5">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-container to-secondary flex items-center justify-center text-on-primary shadow-sm"><span class="material-symbols-outlined text-[24px]">apartment</span></div>
+                <div class="flex flex-col">
+                  <span class="font-headline-sm text-headline-sm text-on-surface tracking-tight leading-none">Kost AB6</span>
+                  <span class="font-body-sm text-body-sm text-outline leading-tight mt-0.5">Residence Living</span>
+                </div>
+              </div>
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-tertiary-fixed/60 text-on-tertiary-fixed font-label-md text-[11px] uppercase tracking-wider"><span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>Internal</span>
+            </div>
+            <div class="flex flex-col gap-1 mt-2">
+              <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface font-bold tracking-tight">Login Pengelola</h1>
+              <p class="font-body-md text-body-md text-on-surface-variant">Masuk dengan kredensial pengelola untuk mengelola kamar, testimoni, dan konten kost.</p>
+            </div>
+          </div>
+          <div id="login-galat" class="flex items-start gap-3 p-3.5 rounded-xl bg-error-container text-on-error-container" role="alert" hidden>
+            <span class="material-symbols-outlined text-error text-[20px] shrink-0 mt-0.5">error</span>
+            <div id="login-galat-teks" class="flex-1 font-body-sm text-body-sm leading-snug">Nama pengguna atau kata sandi salah.</div>
+            <button type="button" data-aksi="tutup-galat-login" aria-label="Tutup pesan" class="text-on-error-container hover:opacity-75 shrink-0"><span class="material-symbols-outlined text-[16px]">close</span></button>
+          </div>
+          <form class="flex flex-col gap-4" data-kirim="login" novalidate>
+            <div class="flex flex-col gap-1.5">
+              <label class="font-label-md text-label-md text-on-surface" for="login-pengguna">Nama Pengguna / Email</label>
+              <div class="relative flex items-center">
+                <span class="material-symbols-outlined absolute left-3.5 text-outline text-[20px] pointer-events-none">alternate_email</span>
+                <input id="login-pengguna" type="text" autocomplete="username" required placeholder="admin@kostab6.id" class="w-full pl-11 pr-4 py-2.5 bg-surface-container-low rounded-xl font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-page focus:shadow-md transition-all duration-200">
+              </div>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="font-label-md text-label-md text-on-surface" for="login-sandi">Kata Sandi</label>
+              <div class="relative flex items-center">
+                <span class="material-symbols-outlined absolute left-3.5 text-outline text-[20px] pointer-events-none">lock</span>
+                <input id="login-sandi" type="password" autocomplete="current-password" required placeholder="••••••••••••" class="w-full pl-11 pr-11 py-2.5 bg-surface-container-low rounded-xl font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-page focus:shadow-md transition-all duration-200">
+                <button type="button" data-aksi="toggle-sandi" data-target="login-sandi" aria-label="Tampilkan kata sandi" class="absolute right-2 text-outline hover:text-on-surface w-9 h-9 flex items-center justify-center transition-colors"><span class="material-symbols-outlined text-[20px]">visibility</span></button>
+              </div>
+            </div>
+            <div class="flex items-center justify-between mt-1">
+              <label class="flex items-center gap-2 cursor-pointer select-none">
+                <input id="login-ingat" type="checkbox" class="w-4 h-4 rounded text-primary focus:ring-0 accent-primary cursor-pointer">
+                <span class="font-body-sm text-body-sm text-on-surface-variant">Ingat saya</span>
+              </label>
+              <a href="#" data-aksi="lupa-sandi" class="font-label-md text-label-md text-primary hover:text-primary-container transition-colors">Lupa Kata Sandi?</a>
+            </div>
+            <button id="login-tombol" type="submit" class="w-full mt-2 h-11 bg-primary-container hover:bg-primary text-on-primary font-label-md text-label-md rounded-xl shadow-md hover:shadow-lg flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.99]">
+              <span>Masuk ke Dashboard</span><span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+            </button>
+          </form>
+          <div class="pt-4 mt-2 flex items-center justify-center gap-2 text-outline bg-surface-subtle/80 py-2.5 px-3 rounded-lg">
+            <span class="material-symbols-outlined text-[16px] text-status-available">verified_user</span>
+            <span class="font-body-sm text-[11px] leading-tight text-center">Dilindungi sesi terenkripsi Google Workspace Script Properties</span>
+          </div>
+        </div>
+        <div class="mt-8 text-center text-outline font-body-sm text-body-sm z-10">© <span class="tahun-berjalan">2026</span> Kost AB6 Management System. All rights reserved.</div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ═══════════════ LAPISAN ADMIN ═══════════════ -->
+  <div id="lapisan-admin" class="bg-surface-subtle min-h-screen" hidden>
+    <div id="latar-sidebar" class="fixed inset-0 z-[45] bg-[#0A2540]/60 backdrop-blur-sm lg:hidden" data-aksi="tutup-sidebar" hidden></div>
+    <aside id="sidebar-admin" class="fixed left-0 top-0 h-full w-[240px] bg-[#0A2540] z-50 flex flex-col justify-between select-none shadow-[0_1px_8px_rgba(0,0,0,0.12)] -translate-x-full lg:translate-x-0 transition-transform duration-200" aria-label="Menu panel admin">
+      <div class="flex flex-col">
+        <div class="h-16 px-space-md flex items-center justify-between border-b border-[#14324f]">
+          <div class="flex items-center gap-space-xs">
+            <span class="font-headline-sm text-headline-sm text-on-primary tracking-tight">Kost AB6</span>
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-primary-container text-on-primary">Admin</span>
+          </div>
+          <span id="titik-sistem" class="h-2 w-2 rounded-full bg-gradient-mid" title="Sistem terhubung"></span>
+        </div>
+        <nav class="flex flex-col py-space-sm">
+          <a href="#" data-nav="admin-dashboard" data-menu-admin="admin-dashboard" class="flex items-center gap-space-xs px-space-md py-3"><span class="material-symbols-outlined text-[20px]">dashboard</span><span>Dashboard</span></a>
+          <a href="#" data-nav="admin-konten" data-menu-admin="admin-konten" class="flex items-center gap-space-xs px-space-md py-3"><span class="material-symbols-outlined text-[20px]">article</span><span>Konten</span></a>
+          <a href="#" data-nav="admin-kamar" data-menu-admin="admin-kamar" class="flex items-center gap-space-xs px-space-md py-3"><span class="material-symbols-outlined text-[20px]">bed</span><span>Kamar</span></a>
+          <a href="#" data-nav="admin-testimoni" data-menu-admin="admin-testimoni" class="flex items-center justify-between px-space-md py-3"><span class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-[20px]">rate_review</span><span>Testimoni</span></span><span id="lencana-testimoni" class="px-1.5 py-0.5 rounded-full text-[11px] font-bold bg-secondary text-on-secondary min-w-[20px] text-center" hidden>0</span></a>
+          <a href="#" data-nav="admin-laporan" data-menu-admin="admin-laporan" class="flex items-center gap-space-xs px-space-md py-3"><span class="material-symbols-outlined text-[20px]">assessment</span><span>Laporan</span></a>
+          <a href="#" data-nav="admin-pengaturan" data-menu-admin="admin-pengaturan" class="flex items-center gap-space-xs px-space-md py-3"><span class="material-symbols-outlined text-[20px]">settings</span><span>Pengaturan</span></a>
+        </nav>
+      </div>
+      <div class="p-space-md flex flex-col gap-space-xs border-t border-[#14324f]">
+        <a href="#" data-nav="beranda" class="flex items-center justify-between px-3 py-2 rounded-lg font-label-md text-label-md text-outline-variant hover:bg-[#14324f] hover:text-on-primary transition-colors"><span>Lihat Situs Publik</span><span class="material-symbols-outlined text-[18px]">open_in_new</span></a>
+        <a href="#" data-aksi="keluar" class="flex items-center gap-2 px-3 py-2 rounded-lg font-label-md text-label-md text-error hover:bg-error-container hover:text-on-error-container transition-colors"><span class="material-symbols-outlined text-[18px]">logout</span><span>Keluar</span></a>
+      </div>
+    </aside>
+
+    <div class="lg:pl-[240px]">
+      <header class="fixed top-0 left-0 lg:left-[240px] right-0 h-16 bg-surface-page shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-space-md lg:px-space-lg">
+        <div class="flex items-center gap-space-sm min-w-0">
+          <button type="button" data-aksi="buka-sidebar" aria-label="Buka menu admin" class="lg:hidden w-10 h-10 -ml-2 flex items-center justify-center rounded-lg text-on-surface hover:bg-surface-container"><span class="material-symbols-outlined">menu</span></button>
+          <div class="flex items-center gap-space-xs font-body-sm text-body-sm text-on-surface-variant min-w-0">
+            <span class="font-label-md text-label-md text-on-surface whitespace-nowrap">Kost AB6</span>
+            <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+            <span id="remah-admin" class="truncate">Portal Pengelola</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-space-sm md:gap-space-md">
+          <div class="relative">
+            <button type="button" data-aksi="buka-notifikasi" aria-label="Notifikasi testimoni baru" class="relative w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors">
+              <span class="material-symbols-outlined text-[22px]">notifications</span>
+              <span id="titik-notifikasi" class="absolute top-2 right-2 w-2 h-2 rounded-full bg-error" hidden></span>
+            </button>
+            <div id="panel-notifikasi" class="absolute right-0 top-12 w-[320px] max-w-[calc(100vw-2rem)] bg-surface-page rounded-xl shadow-[0_8px_24px_-4px_rgba(10,37,64,0.16)] overflow-hidden z-50" hidden></div>
+          </div>
+          <div class="h-6 w-px bg-border-subtle"></div>
+          <div class="relative">
+            <button type="button" data-aksi="buka-menu-akun" aria-label="Menu akun" class="flex items-center gap-space-xs rounded-full pr-1">
+              <span class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></span>
+              <span class="hidden sm:flex flex-col text-left">
+                <span id="admin-nama" class="font-label-md text-label-md text-on-surface leading-none">Administrator</span>
+                <span id="admin-peran" class="font-body-sm text-[11px] text-on-surface-variant leading-tight">Super Admin</span>
+              </span>
+            </button>
+            <div id="panel-akun" class="absolute right-0 top-12 w-56 bg-surface-page rounded-xl shadow-[0_8px_24px_-4px_rgba(10,37,64,0.16)] overflow-hidden z-50 py-1" hidden>
+              <a href="#" data-aksi="ke-keamanan" class="flex items-center gap-2 px-4 py-2.5 font-label-md text-label-md text-on-surface hover:bg-surface-container-low"><span class="material-symbols-outlined text-[18px] text-outline">manage_accounts</span>Pengaturan Akun</a>
+              <a href="#" data-aksi="keluar" class="flex items-center gap-2 px-4 py-2.5 font-label-md text-label-md text-error hover:bg-error-container"><span class="material-symbols-outlined text-[18px]">logout</span>Keluar</a>
+            </div>
+          </div>
+        </div>
+      </header>
+      <main id="konten-admin" class="relative bg-surface-subtle min-h-screen pt-[88px] px-space-md lg:px-space-lg pb-space-xl">
+        <section id="hal-admin-dashboard" class="halaman" data-halaman="admin-dashboard" hidden></section>
+        <section id="hal-admin-konten" class="halaman" data-halaman="admin-konten" hidden></section>
+        <section id="hal-admin-kamar" class="halaman" data-halaman="admin-kamar" hidden></section>
+        <section id="hal-admin-kamar-form" class="halaman" data-halaman="admin-kamar-form" hidden></section>
+        <section id="hal-admin-testimoni" class="halaman" data-halaman="admin-testimoni" hidden></section>
+        <section id="hal-admin-laporan" class="halaman" data-halaman="admin-laporan" hidden></section>
+        <section id="hal-admin-pengaturan" class="halaman" data-halaman="admin-pengaturan" hidden></section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Akar modal & toast (z-index di atas tombol WA melayang) -->
+  <div id="akar-modal"></div>
+  <div id="akar-toast" class="fixed bottom-6 right-6 left-6 sm:left-auto z-[1200] flex flex-col items-end gap-2 pointer-events-none" aria-live="polite"></div>
+
+  <!-- Urutan wajib: config (GAS_URL) → api (fetch ke GAS) → app (SPA) -->
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

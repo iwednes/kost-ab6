@@ -1,0 +1,89 @@
+/* ============================================================
+ * KOST AB6 — Stylesheet.html
+ * Tambahan kecil di atas Tailwind (konfigurasi token ada di Index.html).
+ * Tidak ada mode gelap (keputusan pemilik, PRD §15).
+ * ============================================================ */
+
+html, body { margin: 0; padding: 0; }
+body { overscroll-behavior-y: none; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
+
+/* Ikon Material Symbols */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  line-height: 1;
+  user-select: none;
+  direction: ltr;
+}
+.ikon-isi { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important; }
+
+/* Scrollbar disembunyikan seperti desain, kecuali area tabel admin */
+::-webkit-scrollbar { display: none; }
+* { scrollbar-width: none; }
+.gulir-tampak { scrollbar-width: thin; }
+.gulir-tampak::-webkit-scrollbar { display: block; height: 8px; width: 8px; }
+.gulir-tampak::-webkit-scrollbar-thumb { background: #c2c6d4; border-radius: 9999px; }
+.gulir-tampak::-webkit-scrollbar-track { background: transparent; }
+
+/* Fokus keyboard selalu terlihat (aksesibilitas) */
+:focus { outline: none; }
+:focus-visible { outline: 2px solid #1565c0; outline-offset: 2px; border-radius: 6px; }
+
+/* Transisi halaman SPA */
+.halaman-masuk { animation: halamanMasuk .22s ease-out both; }
+@keyframes halamanMasuk { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+/* Kerangka muat (skeleton) */
+.kerangka {
+  background: linear-gradient(90deg, #f0eded 25%, #f6f3f2 37%, #f0eded 63%);
+  background-size: 400% 100%;
+  animation: kilau 1.4s ease infinite;
+}
+@keyframes kilau { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
+
+/* Gambar gagal dimuat → sembunyikan, latar placeholder tetap terlihat */
+img.gambar-gagal { visibility: hidden; }
+
+/* Toast */
+.toast-masuk { animation: toastMasuk .25s ease-out both; }
+.toast-keluar { animation: toastKeluar .2s ease-in both; }
+@keyframes toastMasuk { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes toastKeluar { to { opacity: 0; transform: translateY(12px); } }
+
+/* Modal & laci */
+.latar-masuk { animation: latarMasuk .18s ease-out both; }
+@keyframes latarMasuk { from { opacity: 0; } to { opacity: 1; } }
+.panel-masuk { animation: panelMasuk .22s ease-out both; }
+@keyframes panelMasuk { from { opacity: 0; transform: translateY(10px) scale(.98); } to { opacity: 1; transform: none; } }
+.laci-kanan-masuk { animation: laciKanan .24s ease-out both; }
+@keyframes laciKanan { from { transform: translateX(100%); } to { transform: none; } }
+
+/* Seret-atur urutan */
+.sedang-diseret { opacity: .45; }
+.target-seret { box-shadow: 0 0 0 2px #1565c0 inset; }
+
+/* Iframe video & peta */
+.bingkai-media iframe { width: 100%; height: 100%; border: 0; display: block; }
+
+/* Input angka tanpa tombol putar */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+input[type=number] { -moz-appearance: textfield; }
+
+/* Teks balance (kutipan visi) */
+.text-balance { text-wrap: balance; }
+
+/* Spinner kecil pada tombol */
+.putar { display: inline-block; width: 1rem; height: 1rem; border: 2px solid rgba(255,255,255,.45); border-top-color: #fff; border-radius: 9999px; animation: putar .6s linear infinite; }
+.putar-gelap { border-color: rgba(21,101,192,.25); border-top-color: #1565c0; }
+@keyframes putar { to { transform: rotate(360deg); } }
+
+/* Hormati preferensi kurangi gerakan */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
