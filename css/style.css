@@ -30,8 +30,10 @@ body { overscroll-behavior-y: none; -webkit-tap-highlight-color: transparent; }
 :focus { outline: none; }
 :focus-visible { outline: 2px solid #1565c0; outline-offset: 2px; border-radius: 6px; }
 
-/* Transisi halaman SPA */
-.halaman-masuk { animation: halamanMasuk .22s ease-out both; }
+/* Transisi halaman SPA. "backwards" (bukan "both"): setelah selesai tidak menyisakan
+   transform, karena transform pada section membuat bar position:fixed di dalamnya
+   (mis. bar Simpan formulir kamar) ikut menggulir alih-alih menempel di layar. */
+.halaman-masuk { animation: halamanMasuk .22s ease-out backwards; }
 @keyframes halamanMasuk { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
 /* Kerangka muat (skeleton) */
