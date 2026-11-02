@@ -830,9 +830,24 @@ function daftarChipKamar(k) {
   return tampil + (sisa > 0 ? `<span class="inline-flex items-center px-2 py-1 rounded-full bg-surface-container-high font-body-sm text-body-sm text-on-surface-variant">+${sisa} lainnya</span>` : '');
 }
 
+/**
+ * Tipe kasur & sirkulasi: kode lama (single-120, taman, …) atau isian bebas dari
+ * formulir kamar (mis. "Single Bed (90 x 120 cm)", "Ada Jendela"). Isian bebas dipakai apa adanya.
+ */
+function infoKasur(v) {
+  if (KONST.KASUR[v]) return KONST.KASUR[v];
+  const t = String(v || '').trim();
+  const m = /(\d{2,3})\s*[x×]\s*(\d{2,3})/i.exec(t);
+  return { label: t, ringkas: t || 'Kasur', spek: t || '-', tabel: t || '-', ukuran: m ? m[1] + 'x' + m[2] : '', jenis: t };
+}
+function infoSirkulasi(v) {
+  if (KONST.SIRKULASI[v]) return KONST.SIRKULASI[v];
+  const t = String(v || '').trim();
+  return { label: t, ringkas: t };
+}
+
 function spekRingkas(k) {
-  const kasur = KONST.KASUR[k.kasur];
-  return `${desimal(k.panjang)} x ${desimal(k.lebar)} m · ${kasur ? kasur.ringkas : 'Kasur'}`;
+  return `${desimal(k.panjang)} x ${desimal(k.lebar)} m · ${infoKasur(k.kasur).ringkas}`;
 }
 
 function lencanaStatusFoto(status) {
@@ -1233,8 +1248,8 @@ function renderDetailIsi(el, k) {
   const u = S.umum || {};
   const info = u.kamarInfo || {};
   const foto = (k.foto || []).filter(f => f && f.id);
-  const kasur = KONST.KASUR[k.kasur] || {};
-  const sirk = KONST.SIRKULASI[k.sirkulasi] || {};
+  const kasur = infoKasur(k.kasur);
+  const sirk = infoSirkulasi(k.sirkulasi);
   const luas = Math.round(k.panjang * k.lebar * 10) / 10;
   const terisi = k.status === 'Terisi';
   const jam = u.jamKerja || { buka: '08:00', tutup: '20:00' };
@@ -1242,7 +1257,7 @@ function renderDetailIsi(el, k) {
     .sort((a, b) => (a.status === b.status ? a.urutan - b.urutan : (a.status === 'Tersedia' ? -1 : 1))).slice(0, 3);
   S.detailIdx = 0;
   const fasilitas = (k.fasilitas || []).map(f => ({
-    ikon: f.ikon, judul: String(f.judul || '').replace('{ukuran}', kasur.ukuran || ''), ket: f.keterangan
+    ikon: f.ikon, judul: String(f.judul || '').replace('{ukuran}', kasur.ukuran || '').trim(), ket: f.keterangan
   })).concat((k.kustom || []).map(t => ({ ikon: 'check_circle', judul: t, ket: '' })));
   const spek = (ik, label, nilai, biru) => `<div class="flex items-center justify-between gap-3 text-body-md font-body-md">
       <span class="text-on-surface-variant flex items-center gap-2 whitespace-nowrap shrink-0">${ikon(ik, 'text-[18px] text-tertiary')}${label}</span>
@@ -3605,7 +3620,7 @@ RENDER['admin-kamar'] = function (el) {
           <th class="py-3.5 px-4 min-w-[230px]">Spesifikasi</th><th class="py-3.5 px-4 min-w-[240px]">Fasilitas Utama</th><th class="py-3.5 px-4 min-w-[150px]">Status Ketersediaan</th><th class="py-3.5 pl-3 pr-5 text-right w-28">Aksi Cepat</th>
         </tr></thead>
         <tbody class="font-table-data text-table-data divide-y divide-border-subtle">${tampil.map((k, i) => {
-          const kasur = KONST.KASUR[k.kasur] || {};
+          const kasur = infoKasur(k.kasur);
           const fas = (k.fasilitas || []).map(c => master[c] && master[c].ringkas).filter(Boolean).concat(k.kustom || []);
           const dipilih = F.pilih.indexOf(k.id) >= 0;
           return `<tr class="${i % 2 ? 'bg-surface-subtle/60 ' : ''}hover:bg-surface-subtle transition-colors group">
@@ -3756,7 +3771,7 @@ S.adm.fk = null;
 function kamarKosong() {
   return {
     id: '', kode: '', nama: '', label: '', lantai: 1, posisi: '', harga: '', listrik: false, air: true, sampah: true,
-    status: 'Tersedia', panjang: '', lebar: '', kasur: 'single-120', sirkulasi: 'taman', kamarMandi: 'Dalam', daya: '',
+    status: 'Tersedia', panjang: '', lebar: '', kasur: '', sirkulasi: '', kamarMandi: 'Dalam', daya: '',
     fasilitas: ['ac', 'wifi', 'kasur', 'meja', 'kursi', 'lemari', 'rak', 'km_dalam', 'cleaning'], kustom: [], deskripsi: '', foto: [], video: ''
   };
 }
@@ -3859,8 +3874,8 @@ function htmlFormKamar() {
             <input inputmode="decimal" data-masukan="fk" data-kunci="lebar" value="${esc(String(f.lebar).replace('.', ','))}" placeholder="3,5" aria-label="Lebar (meter)" class="w-10 bg-transparent font-body-md text-body-md text-on-surface text-center focus:outline-none">
             <span class="font-body-md text-body-md text-on-surface-variant whitespace-nowrap">meter (<span id="fk-luas">${luas ? String(Math.round(luas * 10) / 10).replace('.', ',') : '0'}</span> m²)</span>
           </div>${galatKolom('dimensi')}</div>
-        <div><label class="${label}" for="fk-kasur">Tipe Tempat Tidur</label>${pilihan('id="fk-kasur" data-ubah="fk" data-kunci="kasur"', Object.keys(KONST.KASUR).map(k => [k, KONST.KASUR[k].label]), f.kasur, kelasPilih)}</div>
-        <div><label class="${label}" for="fk-sirk">Sirkulasi Udara</label>${pilihan('id="fk-sirk" data-ubah="fk" data-kunci="sirkulasi"', Object.keys(KONST.SIRKULASI).map(k => [k, KONST.SIRKULASI[k].label]), f.sirkulasi, kelasPilih)}</div>
+        <div><label class="${label}" for="fk-kasur">Tipe Tempat Tidur <span class="text-error">*</span></label><input id="fk-kasur" maxlength="40" data-masukan="fk" data-kunci="kasur" value="${esc(infoKasur(f.kasur).label)}" placeholder="Misal: Single Bed (90 x 120 cm)" class="${KELAS.inputKamar}">${galatKolom('kasur')}</div>
+        <div><label class="${label}" for="fk-sirk">Sirkulasi Udara <span class="text-error">*</span></label><input id="fk-sirk" maxlength="40" data-masukan="fk" data-kunci="sirkulasi" value="${esc(infoSirkulasi(f.sirkulasi).label)}" placeholder="Misal: Ada Jendela" class="${KELAS.inputKamar}">${galatKolom('sirkulasi')}</div>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div><span class="${label}">Tipe Kamar Mandi</span>
@@ -4027,13 +4042,14 @@ AKSI['fk-template'] = async () => {
   if (f.deskripsi.trim() && !(await konfirmasi({ judul: 'Timpa deskripsi?', pesan: 'Deskripsi saat ini akan diganti dengan template standar.', ok: 'Timpa', ikon: 'auto_awesome' }))) return;
   const master = {};
   S.adm.data.fasilitas.forEach(m => { master[m.kode] = m; });
-  const kasur = KONST.KASUR[f.kasur] || KONST.KASUR['single-120'];
+  const kasur = infoKasur(f.kasur);
+  const teksKasur = KONST.KASUR[f.kasur] ? kasur.jenis + ' ' + kasur.ukuran + ' cm' : (kasur.label || '...');
   const daftar = S.adm.data.fasilitas.filter(m => m.aktif && m.kode !== 'cleaning' && f.fasilitas.indexOf(m.kode) >= 0).map(m => m.template);
   const teksDaftar = daftar.length > 1 ? daftar.slice(0, -1).join(', ') + ', dan ' + daftar[daftar.length - 1] : daftar.join('');
   const cleaning = f.fasilitas.indexOf('cleaning') >= 0;
   const p = String(f.panjang || '').replace('.', ',') || '...';
   const l = String(f.lebar || '').replace('.', ',') || '...';
-  f.deskripsi = `Kamar nyaman berukuran ${p} x ${l} m di Lantai ${f.lantai} dengan kasur ${kasur.jenis} ${kasur.ukuran} cm.` +
+  f.deskripsi = `Kamar nyaman berukuran ${p} x ${l} m di Lantai ${f.lantai} dengan kasur ${teksKasur}.` +
     (teksDaftar ? ` Dilengkapi ${teksDaftar}${cleaning ? ', serta layanan cleaning service' : ''}.` : (cleaning ? ' Dilengkapi layanan cleaning service.' : ''));
   f.deskripsi = f.deskripsi.slice(0, 600);
   simpanDrafKamar(true);
@@ -4115,6 +4131,8 @@ KIRIM.kamar = async form => {
   else if (S.adm.data.kamar.some(k => k.id !== fk.id && String(k.kode).toUpperCase() === String(f.kode).trim().toUpperCase())) galat.kode = 'Kode unit sudah dipakai kamar lain.';
   if (!(Number(f.harga) >= 100000)) galat.harga = 'Tarif sewa tidak valid (minimal Rp 100.000).';
   if (angkaDes(f.panjang) < 1 || angkaDes(f.lebar) < 1 || angkaDes(f.panjang) > 20 || angkaDes(f.lebar) > 20) galat.dimensi = 'Isi panjang & lebar kamar (1–20 meter).';
+  if (!String(f.kasur).trim()) galat.kasur = 'Isi tipe tempat tidur.';
+  if (!String(f.sirkulasi).trim()) galat.sirkulasi = 'Isi sirkulasi udara.';
   if (!f.fasilitas.filter(c => c !== 'km_dalam').length && f.kamarMandi !== 'Dalam') galat.fasilitas = 'Pilih minimal satu fasilitas.';
   if (f.deskripsi.trim().length < 20) galat.deskripsi = 'Deskripsi minimal 20 karakter.';
   if (!f.foto.length) galat.foto = 'Unggah minimal 1 foto kamar.';
@@ -4604,7 +4622,7 @@ function dataLaporan(tab, semuaBaris) {
       baris: daftar.map((k, i) => {
         const fas = (k.fasilitas || []).map(c => master[c] && master[c].ringkas).filter(Boolean).concat(k.kustom || []).join(', ');
         const dim = `${desimal(k.panjang)} x ${desimal(k.lebar)} m (${String(Math.round(k.panjang * k.lebar * 10) / 10).replace('.', ',')} m²)`;
-        const kasur = (KONST.KASUR[k.kasur] || {}).spek || '-';
+        const kasur = infoKasur(k.kasur).spek;
         // Daya isian bebas: angka saja (data lama "900"/"1300") diberi satuan VA
         const daya = /^\d+$/.test(String(k.daya || '')) ? k.daya + ' VA' : (k.daya || '-');
         return {
@@ -5185,7 +5203,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) kirim
 setInterval(() => { if (S.rute.nama === 'beranda') kirimStatBanner(); }, 120000);
 
 /** Penanda versi frontend — muncul di konsol agar mudah memastikan versi terbaru sudah terpasang */
-const VERSI_FRONTEND = '2.2.0';
+const VERSI_FRONTEND = '2.3.0';
 
 function mulaiAplikasi() {
   console.info('[Kost AB6] Frontend v' + VERSI_FRONTEND + ' siap');
