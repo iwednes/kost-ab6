@@ -28,9 +28,9 @@ const KONST = {
     3: 'Lantai 3 - View Atap & Balkon Terbuka'
   },
   KASUR: {
-    'single-120': { label: 'Single Bed (120 x 200 cm)', ringkas: 'Kasur Single (120x200)', spek: 'Single Bed (120x200)', tabel: 'Kasur Single (120x200 cm)', ukuran: '120x200', jenis: 'single' },
-    'queen-160': { label: 'Queen Bed (160 x 200 cm)', ringkas: 'Kasur Queen (160x200)', spek: 'Queen Bed (160x200)', tabel: 'Kasur Queen (160x200 cm)', ukuran: '160x200', jenis: 'queen' },
-    'single-90': { label: 'Single Compact (90 x 200 cm)', ringkas: 'Kasur Single (90x200)', spek: 'Single Compact (90x200)', tabel: 'Kasur Single (90x200 cm)', ukuran: '90x200', jenis: 'single' }
+    'single-120': { label: 'Single Bed (120 × 200 cm)', ringkas: 'Kasur Single (120×200)', spek: 'Single Bed (120×200)', tabel: 'Kasur Single (120×200 cm)', ukuran: '120×200', jenis: 'single' },
+    'queen-160': { label: 'Queen Bed (160 × 200 cm)', ringkas: 'Kasur Queen (160×200)', spek: 'Queen Bed (160×200)', tabel: 'Kasur Queen (160×200 cm)', ukuran: '160×200', jenis: 'queen' },
+    'single-90': { label: 'Single Compact (90 × 200 cm)', ringkas: 'Kasur Single (90×200)', spek: 'Single Compact (90×200)', tabel: 'Kasur Single (90×200 cm)', ukuran: '90×200', jenis: 'single' }
   },
   SIRKULASI: {
     taman: { label: 'Jendela Hadap Taman Tropis', ringkas: 'Jendela Hadap Taman' },
@@ -61,7 +61,7 @@ const S = {
   kegiatan: { items: [], adaLagi: false, halaman: 1, memuat: false },
   testiDaftar: { items: [], adaLagi: false, halaman: 1, jumlah: 0, memuat: false },
   rute: { nama: '', param: {} },
-  katalog: { filter: 'semua', halaman: 1 },
+  katalog: { halaman: 1 },
   stat: { tayang: {}, klik: {} },
   sesi: null,
   kotor: false,
@@ -838,7 +838,7 @@ function infoKasur(v) {
   if (KONST.KASUR[v]) return KONST.KASUR[v];
   const t = String(v || '').trim();
   const m = /(\d{2,3})\s*[x×]\s*(\d{2,3})/i.exec(t);
-  return { label: t, ringkas: t || 'Kasur', spek: t || '-', tabel: t || '-', ukuran: m ? m[1] + 'x' + m[2] : '', jenis: t };
+  return { label: t, ringkas: t || 'Kasur', spek: t || '-', tabel: t || '-', ukuran: m ? m[1] + '×' + m[2] : '', jenis: t };
 }
 function infoSirkulasi(v) {
   if (KONST.SIRKULASI[v]) return KONST.SIRKULASI[v];
@@ -847,7 +847,7 @@ function infoSirkulasi(v) {
 }
 
 function spekRingkas(k) {
-  return `${desimal(k.panjang)} x ${desimal(k.lebar)} m · ${infoKasur(k.kasur).ringkas}`;
+  return `${desimal(k.panjang)} × ${desimal(k.lebar)} m · ${infoKasur(k.kasur).ringkas}`;
 }
 
 function lencanaStatusFoto(status) {
@@ -1103,29 +1103,16 @@ function bukaKegiatan(id) {
 // BAGIAN 11: HALAMAN KATALOG KAMAR
 // ════════════════════════════════════════════════════════════
 
-RENDER.kamar = function (el, param) {
-  if (param && param.filter === 'tersedia') {
-    S.katalog.filter = 'tersedia';
-    S.katalog.halaman = 1;
-    param.filter = '';
-  }
+RENDER.kamar = function (el) {
   if (!S.kamar) { el.innerHTML = kerangkaHalaman(); return; }
-  const semua = S.kamar.items;
-  const tersedia = semua.filter(k => k.status === 'Tersedia');
-  const daftar = S.katalog.filter === 'tersedia' ? tersedia : semua;
+  // Desain revisi: tanpa tab filter — semua kamar tampil, status terlihat di lencana foto
+  const daftar = S.kamar.items;
   const per = 6;
   const totalHal = Math.max(1, Math.ceil(daftar.length / per));
   S.katalog.halaman = Math.min(S.katalog.halaman, totalHal);
   const mulai = (S.katalog.halaman - 1) * per;
   const tampil = daftar.slice(mulai, mulai + per);
-  const tabKelas = on => 'filter-tab px-space-md py-2 rounded-full font-headline-sm text-body-sm font-semibold transition-all duration-200 ' +
-    (on ? 'bg-primary-container text-on-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface');
-  const kosong = S.katalog.filter === 'tersedia'
-    ? `<div class="col-span-full text-center py-space-xl flex flex-col items-center gap-space-md">
-        <div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-outline">${ikon('bed', 'text-[32px]')}</div>
-        <p class="font-body-md text-body-md text-on-surface-variant">Semua kamar sedang terisi. Hubungi admin untuk daftar tunggu.</p>
-        <a ${waAttr(PesanWA.umum())} class="inline-flex items-center gap-2 px-space-lg py-3 rounded-full bg-whatsapp-green text-on-primary font-headline-sm text-body-md shadow-sm">${ikon('chat', 'text-[20px]')}Chat WhatsApp Admin</a></div>`
-    : `<p class="col-span-full text-center py-space-xl font-body-md text-body-md text-on-surface-variant">Belum ada data kamar.</p>`;
+  const kosong = `<p class="col-span-full text-center py-space-xl font-body-md text-body-md text-on-surface-variant">Belum ada data kamar.</p>`;
 
   el.innerHTML = `<div class="flex flex-col w-full">
     <section class="${WADAH} pt-space-xl pb-space-lg">
@@ -1137,10 +1124,6 @@ RENDER.kamar = function (el, param) {
             <div class="h-[4px] w-12 rounded-full bg-gradient-to-r from-gradient-start via-gradient-mid to-gradient-end mt-2"></div>
           </div>
           <p class="font-body-md text-body-md text-on-surface-variant pt-1 leading-relaxed">Pilihan kamar nyaman dengan fasilitas lengkap, bersih, dan siap huni. Dirancang dengan ventilasi alami dan tata ruang ergonomis untuk ketenangan istirahat dan produktivitas Anda.</p>
-        </div>
-        <div class="flex items-center self-start lg:self-end bg-surface-container p-1 rounded-full shadow-inner" role="tablist" aria-label="Filter kamar">
-          <button type="button" role="tab" aria-selected="${S.katalog.filter === 'semua'}" data-aksi="katalog-filter" data-filter="semua" class="${tabKelas(S.katalog.filter === 'semua')}">Semua Kamar (${semua.length})</button>
-          <button type="button" role="tab" aria-selected="${S.katalog.filter === 'tersedia'}" data-aksi="katalog-filter" data-filter="tersedia" class="${tabKelas(S.katalog.filter === 'tersedia')}">Kamar Tersedia (${tersedia.length})</button>
         </div>
       </div>
     </section>
@@ -1188,7 +1171,7 @@ function kartuKamar(k) {
           <span class="font-body-sm text-body-sm text-on-surface-variant font-mono bg-surface-container-low px-2 py-0.5 rounded whitespace-nowrap">Lt. ${esc(k.lantai)}</span>
         </div>
         <div class="flex items-baseline gap-1"><span class="font-label-numeric text-label-numeric font-bold text-primary-container">${rupiah(k.harga)}</span><span class="font-body-sm text-body-sm text-on-surface-variant">/bulan</span></div>
-        <p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1 pt-0.5">${ikon('square_foot', 'text-[16px] text-tertiary')}${esc(spekRingkas(k))}</p>
+        <p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1 pt-0.5">${ikon('straighten', 'text-[16px] text-tertiary')}${esc(spekRingkas(k))}</p>
         <div class="flex flex-wrap gap-1.5 pt-2">${daftarChipKamar(k)}</div>
       </div>
       <div class="pt-space-md mt-space-sm flex items-center gap-2">
@@ -1263,6 +1246,26 @@ function renderDetailIsi(el, k) {
       <span class="text-on-surface-variant flex items-center gap-2 whitespace-nowrap shrink-0">${ikon(ik, 'text-[18px] text-tertiary')}${label}</span>
       <span class="font-semibold text-right ${biru ? 'text-primary-container' : 'text-on-surface'}">${nilai}</span></div>`;
   const video = urlEmbedVideo(k.video);
+  // Desain revisi: "Tipe Kamar Lainnya" selebar halaman, di bawah kolom foto & kartu harga
+  const htmlLainnya = lainnya.length ? `<section class="mt-space-xl pt-space-md flex flex-col gap-space-md">
+      <div class="flex items-end justify-between gap-3">
+        <div><h2 class="font-headline-sm text-headline-md text-on-surface">Tipe Kamar Lainnya</h2><p class="font-body-sm text-body-sm text-on-surface-variant">Pilihan alternatif dengan ketersediaan aktif di Kost AB6</p></div>
+        <a href="#" data-nav="kamar" class="hidden sm:inline-flex items-center gap-1 font-label-md text-body-sm text-primary-container hover:underline">Lihat Semua Kamar${ikon('arrow_forward', 'text-[16px]')}</a>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">${lainnya.map(x => `
+        <div class="flex flex-col bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group">
+          <a href="#" data-nav="detail" data-kode="${esc(x.kode)}" class="relative block w-full aspect-[16/10] overflow-hidden bg-surface-container">
+            ${gambar((x.foto[0] || {}).id, 600, 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500', x.nama)}
+            <span class="absolute top-2 left-2 px-2 py-0.5 rounded-full ${x.status === 'Terisi' ? 'bg-primary-container' : 'bg-status-available'} text-on-primary font-label-md text-body-sm">${esc(x.status)}</span>
+            <span class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-inverse-surface/75 text-on-primary font-body-sm text-body-sm backdrop-blur-sm">Lantai ${esc(x.lantai)}</span>
+          </a>
+          <div class="p-space-md flex flex-col flex-1 justify-between gap-space-sm">
+            <div><h3 class="font-headline-sm text-body-lg font-bold text-on-surface group-hover:text-primary transition-colors">${esc(x.nama)}</h3><p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">${esc(spekRingkas(x))}</p></div>
+            <div class="pt-space-xs flex flex-wrap items-center justify-between gap-2"><div class="whitespace-nowrap"><span class="font-headline-sm text-headline-sm text-primary-container font-bold">${rupiah(x.harga)}</span><span class="font-body-sm text-body-sm text-outline"> / bln</span></div>
+              <a href="#" data-nav="detail" data-kode="${esc(x.kode)}" class="shrink-0 px-3 py-1.5 rounded-lg bg-surface-subtle hover:bg-primary hover:text-on-primary text-primary-container font-label-md text-body-sm transition-colors">Detail</a></div>
+          </div>
+        </div>`).join('')}</div>
+    </section>` : '';
 
   el.innerHTML = `<div class="flex flex-col w-full"><div class="${WADAH} py-space-lg">
     <div class="flex items-center justify-between mb-space-lg gap-3">
@@ -1319,26 +1322,6 @@ function renderDetailIsi(el, k) {
             </div>
           </div>
         </div>` : ''}
-
-        ${lainnya.length ? `<div class="flex flex-col gap-space-md mt-space-sm">
-          <div class="flex items-center justify-between">
-            <div><h3 class="font-headline-sm text-headline-md text-on-surface">Tipe Kamar Lainnya</h3><p class="font-body-sm text-body-sm text-on-surface-variant">Pilihan alternatif dengan ketersediaan aktif di Kost AB6</p></div>
-            <a href="#" data-nav="kamar" class="hidden sm:inline-flex items-center gap-1 font-label-md text-body-sm text-primary-container hover:underline">Lihat Semua Kamar${ikon('arrow_forward', 'text-[16px]')}</a>
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">${lainnya.map(x => `
-            <div class="flex flex-col bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group">
-              <a href="#" data-nav="detail" data-kode="${esc(x.kode)}" class="relative block w-full aspect-[16/10] overflow-hidden bg-surface-container">
-                ${gambar((x.foto[0] || {}).id, 600, 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500', x.nama)}
-                <span class="absolute top-2 left-2 px-2 py-0.5 rounded-full ${x.status === 'Terisi' ? 'bg-primary-container' : 'bg-status-available'} text-on-primary font-label-md text-body-sm">${esc(x.status)}</span>
-                <span class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-inverse-surface/75 text-on-primary font-body-sm text-body-sm backdrop-blur-sm">Lantai ${esc(x.lantai)}</span>
-              </a>
-              <div class="p-space-md flex flex-col flex-1 justify-between gap-space-sm">
-                <div><h4 class="font-headline-sm text-body-lg font-bold text-on-surface group-hover:text-primary transition-colors">${esc(x.nama)}</h4><p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">${esc(spekRingkas(x))}</p></div>
-                <div class="pt-space-xs flex flex-wrap items-center justify-between gap-2"><div class="whitespace-nowrap"><span class="font-headline-sm text-headline-sm text-primary-container font-bold">${rupiah(x.harga)}</span><span class="font-body-sm text-body-sm text-outline"> / bln</span></div>
-                  <a href="#" data-nav="detail" data-kode="${esc(x.kode)}" class="shrink-0 px-3 py-1.5 rounded-lg bg-surface-subtle hover:bg-primary hover:text-on-primary text-primary-container font-label-md text-body-sm transition-colors">Detail</a></div>
-              </div>
-            </div>`).join('')}</div>
-        </div>` : ''}
       </div>
 
       <div class="lg:col-span-4 lg:sticky lg:top-[88px] flex flex-col gap-space-md">
@@ -1355,7 +1338,7 @@ function renderDetailIsi(el, k) {
             <span class="text-secondary font-label-md text-body-sm font-semibold bg-secondary-container/40 px-2 py-0.5 rounded">Fixed Rate</span>
           </div>
           <div class="flex flex-col gap-2.5 py-1">
-            ${spek('straighten', 'Dimensi Kamar', `${desimal(k.panjang)} x ${desimal(k.lebar)} m (${String(luas).replace('.', ',')} m²)`)}
+            ${spek('straighten', 'Dimensi Kamar', `${desimal(k.panjang)} × ${desimal(k.lebar)} m (${String(luas).replace('.', ',')} m²)`)}
             ${spek('single_bed', 'Tipe Kasur', esc(kasur.spek || '-'))}
             ${spek('water_damage', 'Kamar Mandi', k.kamarMandi === 'Dalam' ? 'Dalam (Water Heater)' : 'Luar (Bersih Terawat)', k.kamarMandi === 'Dalam')}
             ${spek('layers', 'Lokasi Lantai', 'Lantai ' + esc(k.lantai) + (k.posisi ? ' (' + esc(k.posisi.replace(/^Lantai \d+\s*-\s*/i, '')) + ')' : ''))}
@@ -1378,6 +1361,7 @@ function renderDetailIsi(el, k) {
         </div>
       </div>
     </div>
+    ${htmlLainnya}
   </div></div>`;
   el.dataset.kode = k.kode;
 }
@@ -1758,7 +1742,7 @@ RENDER.tentang = function (el) {
   const kartuArea = a => `<article class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col group">
       <div class="relative h-52 overflow-hidden">
         ${gambar(a.foto, 800, 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-300', a.nama)}
-        <div class="absolute top-3 left-3 bg-surface-container-lowest/90 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm">${ikon(a.ikon || 'verified', 'text-[16px] text-secondary')}<span class="font-label-md text-body-sm text-on-surface">${esc(a.label)}</span></div>
+        ${a.label ? `<div class="absolute top-3 left-3 bg-surface-container-lowest/90 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm">${ikon(a.ikon || 'verified', 'text-[16px] text-secondary')}<span class="font-label-md text-body-sm text-on-surface">${esc(a.label)}</span></div>` : ''}
       </div>
       <div class="p-space-lg flex-1 flex flex-col justify-between">
         <div><h3 class="font-headline-md text-headline-sm text-on-surface mb-2">${esc(a.nama)}</h3><p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">${esc(a.deskripsi)}</p></div>
@@ -1893,7 +1877,7 @@ RENDER['404'] = function (el) {
 };
 
 // ── Aksi publik ──
-AKSI['cek-ketersediaan'] = (el, e) => { e.preventDefault(); navigasi('kamar', { filter: 'tersedia' }); };
+AKSI['cek-ketersediaan'] = (el, e) => { e.preventDefault(); S.katalog.halaman = 1; navigasi('kamar'); };
 AKSI['ke-admin'] = (el, e) => { e.preventDefault(); navigasi(sesiValid() ? 'admin-dashboard' : 'login'); };
 AKSI['buka-menu-hp'] = () => bukaMenuHp();
 AKSI['tutup-menu-hp'] = () => tutupMenuHp();
@@ -1914,7 +1898,6 @@ AKSI['cta-banner'] = (el, e) => {
 };
 AKSI['buka-kegiatan'] = el => bukaKegiatan(el.dataset.id);
 AKSI['muat-kegiatan'] = el => muatLagiKegiatan(el);
-AKSI['katalog-filter'] = el => { S.katalog.filter = el.dataset.filter; S.katalog.halaman = 1; RENDER.kamar($('#hal-kamar'), {}); };
 AKSI['katalog-hal'] = el => {
   S.katalog.halaman = Number(el.dataset.hal) || 1;
   RENDER.kamar($('#hal-kamar'), {});
@@ -2259,10 +2242,10 @@ function sakelar(atribut, nyala, kecil) {
   </label>`;
 }
 
-function pilihan(atribut, opsi, nilai, kelas) {
+function pilihan(atribut, opsi, nilai, kelas, ikonNama) {
   return `<div class="relative">
     <select ${atribut} class="${kelas || KELAS.select} w-full">${opsi.map(o => `<option value="${esc(o[0])}" ${String(o[0]) === String(nilai) ? 'selected' : ''}>${esc(o[1])}</option>`).join('')}</select>
-    ${ikon('expand_more', 'absolute right-2.5 top-1/2 -translate-y-1/2 text-[18px] text-outline pointer-events-none')}
+    ${ikon(ikonNama || 'expand_more', 'absolute right-2.5 top-1/2 -translate-y-1/2 text-[18px] text-outline pointer-events-none')}
   </div>`;
 }
 
@@ -2586,10 +2569,6 @@ RENDER['admin-konten'] = function (el, param) {
         <h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface tracking-tight">Manajemen Konten Publik</h1>
         <p class="font-body-md text-body-md text-on-surface-variant">Kelola banner slider utama beranda, agenda kegiatan penghuni, dan informasi area umum kost dengan pratinjau live.</p>
       </div>
-      <div class="flex flex-wrap items-center gap-3">
-        <button type="button" data-aksi="riwayat-revisi" class="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md transition-all shadow-sm">${ikon('history', 'text-[20px]')}<span>Riwayat Revisi</span></button>
-        <button type="button" data-aksi="tambah-konten" class="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary-container hover:bg-primary text-on-primary font-label-md text-label-md transition-all shadow-sm">${ikon('add_circle', 'text-[20px]')}<span>+ Tambah Konten Baru</span></button>
-      </div>
     </div>
     <div class="bg-surface-page rounded-xl shadow-sm px-6 pt-2"><div class="flex items-center gap-8 overflow-x-auto" role="tablist" aria-label="Modul konten">
       ${tab('banner', 'view_carousel', `Banner Beranda (${aktif}/3 Aktif)`)}
@@ -2683,7 +2662,8 @@ function htmlTabBanner() {
           <div class="flex items-center gap-2"><span class="font-headline-sm text-headline-sm text-on-surface">Daftar Banner Slider</span><span class="px-2 py-0.5 rounded-full font-label-md text-body-sm bg-surface-container-highest text-on-surface-variant">${daftar.length} Slide</span></div>
           <span class="font-body-sm text-body-sm text-on-surface-variant hidden sm:flex items-center gap-1">${ikon('drag_indicator', 'text-[16px]')} Geser kartu untuk atur urutan</span>
         </div>
-        <div id="daftar-banner" class="flex flex-col gap-4">${daftar.map(kartu).join('') || `<p class="bg-surface-page rounded-xl p-6 text-center text-on-surface-variant">Belum ada banner. Klik "+ Tambah Konten Baru".</p>`}</div>
+        <div id="daftar-banner" class="flex flex-col gap-4">${daftar.map(kartu).join('') || `<p class="bg-surface-page rounded-xl p-6 text-center text-on-surface-variant">Belum ada banner. Isi formulir di samping untuk membuat banner pertama.</p>`}</div>
+        ${daftar.length && S.adm.konten.form && S.adm.konten.form.data.id ? `<button type="button" data-aksi="banner-baru" class="w-full flex items-center justify-center gap-2 p-4 rounded-xl border-2 border-dashed border-outline-variant hover:border-primary-container text-on-surface-variant hover:text-primary-container hover:bg-primary-fixed/20 font-label-md text-label-md transition-colors">${ikon('add_circle', 'text-[20px]')}Tambah Banner Baru</button>` : ''}
         <div class="p-4 bg-surface-page rounded-xl shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-2">
           <div class="flex items-center gap-3">
             <div class="p-2.5 rounded-lg bg-surface-container-high text-primary">${ikon('insights', 'text-[24px]')}</div>
@@ -2922,6 +2902,15 @@ async function bolehGantiForm() {
   return ok;
 }
 
+/** Pengganti tombol "+ Tambah Konten Baru" yang dihapus di desain revisi */
+AKSI['banner-baru'] = async () => {
+  if (!(await bolehGantiForm())) return;
+  S.adm.konten.form = formBaru('banner');
+  renderKonten();
+  const ed = $('#editor-panel');
+  if (ed) ed.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+};
+
 AKSI['banner-edit'] = async el => {
   const b = S.adm.data.banner.filter(x => x.id === el.dataset.id)[0];
   if (!b || (S.adm.konten.form && S.adm.konten.form.data.id === b.id)) {
@@ -2997,68 +2986,6 @@ AKSI['konten-tab'] = async el => {
   K.status = 'semua';
   K.hal = 1;
   renderKonten();
-};
-
-AKSI['tambah-konten'] = () => {
-  const item = Modal.buka({
-    lebar: 'max-w-lg', label: 'Tambah konten publik baru',
-    isi: `<div class="flex flex-col gap-5">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2.5"><div class="w-9 h-9 rounded-lg bg-primary-container text-on-primary flex items-center justify-center">${ikon('post_add', 'text-[20px]')}</div>
-          <div><h3 class="font-headline-sm text-headline-sm text-on-surface">Tambah Konten Publik Baru</h3><p class="font-body-sm text-body-sm text-on-surface-variant">Pilih jenis modul konten yang ingin dibuat</p></div></div>
-        <button type="button" data-tk="tutup" aria-label="Tutup" class="p-1 rounded-lg hover:bg-surface-container text-on-surface-variant">${ikon('close')}</button>
-      </div>
-      <div class="grid grid-cols-1 gap-3">${[
-        ['banner', 'view_carousel', 'Slide Banner Beranda Utama', 'Gambar hero promosi 16:9 dengan tombol aksi'],
-        ['kegiatan', 'celebration', 'Agenda &amp; Galeri Kegiatan Hunian', 'Foto aktivitas komunal seperti buka bersama / yoga'],
-        ['area', 'local_laundry_service', 'Fasilitas Area Bersama', 'Dapur umum, laundry corner, rooftop, area santai']
-      ].map(x => `<button type="button" data-tk="${x[0]}" class="flex items-center gap-3 p-3.5 rounded-xl bg-surface-container-low hover:bg-tertiary-fixed/30 text-left transition-all group">
-          <div class="p-2.5 rounded-lg bg-surface-page text-primary shadow-sm group-hover:bg-primary-container group-hover:text-on-primary transition-colors">${ikon(x[1], 'text-[22px]')}</div>
-          <div class="flex flex-col flex-1"><span class="font-label-md text-label-md text-on-surface">${x[2]}</span><span class="font-body-sm text-body-sm text-on-surface-variant">${x[3]}</span></div>
-          ${ikon('chevron_right', 'text-outline group-hover:text-primary')}</button>`).join('')}</div>
-      <div class="flex justify-end pt-2"><button type="button" data-tk="tutup" class="px-4 py-2 rounded-lg bg-surface-container hover:bg-surface-container-high font-label-md text-label-md text-on-surface">Tutup</button></div>
-    </div>`
-  });
-  $$('[data-tk]', item.panel).forEach(b => b.addEventListener('click', async () => {
-    const j = b.dataset.tk;
-    Modal.tutup(item);
-    if (j === 'tutup') return;
-    if (!(await bolehGantiForm())) return;
-    const K = S.adm.konten;
-    K.tab = j;
-    K.form = formBaru(j);
-    renderKonten();
-    const ed = $('#editor-panel');
-    if (ed) ed.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }));
-};
-
-AKSI['riwayat-revisi'] = async () => {
-  const item = Modal.buka({
-    lebar: 'max-w-xl', label: 'Riwayat revisi konten',
-    isi: `<div class="flex items-center justify-between pb-3"><h3 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">${ikon('history', 'text-primary')}Riwayat Revisi Konten</h3>
-      <button type="button" data-rr="tutup" aria-label="Tutup" class="w-9 h-9 rounded-full bg-surface-container-low hover:bg-surface-container flex items-center justify-center">${ikon('close', 'text-[20px]')}</button></div>
-      <div data-rr="isi" class="flex flex-col gap-2">${kerangkaBlok('h-14')}${kerangkaBlok('h-14')}${kerangkaBlok('h-14')}</div>`
-  });
-  item.panel.querySelector('[data-rr=tutup]').addEventListener('click', () => Modal.tutup(item));
-  const muat = async hal => {
-    const wadah = item.panel.querySelector('[data-rr=isi]');
-    try {
-      const r = await panggil('adminRiwayat', tokenAdmin(), { halaman: hal });
-      const total = Math.max(1, Math.ceil(r.total / 20));
-      wadah.innerHTML = (r.items.map(x => `<div class="flex items-start gap-3 p-3 rounded-lg bg-surface-container-low">
-          <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-primary-fixed text-on-primary-fixed shrink-0 mt-0.5">${esc(x.aksi)}</span>
-          <div class="min-w-0 flex-1"><p class="font-body-md text-body-md text-on-surface">${esc(x.ringkasan)}</p><p class="font-body-sm text-body-sm text-on-surface-variant">${esc(x.modul)} • ${esc(x.pengguna)} • ${fTgl(x.waktu, 'pendekJam')}</p></div>
-        </div>`).join('') || '<p class="text-center py-6 text-on-surface-variant">Belum ada riwayat perubahan.</p>') +
-        (total > 1 ? `<div class="flex items-center justify-between pt-2 font-body-sm text-body-sm text-on-surface-variant"><span>Halaman ${hal} dari ${total}</span><div class="flex gap-2">
-          <button type="button" data-rr-hal="${hal - 1}" ${hal <= 1 ? 'disabled' : ''} class="${KELAS.tombolKedua} py-1.5 disabled:opacity-40">Sebelumnya</button>
-          <button type="button" data-rr-hal="${hal + 1}" ${hal >= total ? 'disabled' : ''} class="${KELAS.tombolKedua} py-1.5 disabled:opacity-40">Berikutnya</button></div></div>` : '');
-      $$('[data-rr-hal]', wadah).forEach(b => b.addEventListener('click', () => muat(Number(b.dataset.rrHal))));
-    } catch (e) {
-      wadah.innerHTML = `<p class="text-center py-6 text-error">${esc(e.message)}</p>`;
-    }
-  };
-  muat(1);
 };
 
 // ── Tab Galeri Kegiatan ──
@@ -3294,7 +3221,7 @@ function htmlTabArea() {
             <div class="relative w-32 h-20 rounded-lg overflow-hidden bg-surface-container">${gambarAdmin(a.foto, 400, 'w-full h-full object-cover', a.nama)}</div></div>
           <div class="flex-1 min-w-0 flex flex-col gap-1">
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-surface-container text-on-surface">${ikon(a.ikon, 'text-[13px] text-secondary')}${esc(a.label)}</span>
+              ${a.label ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-surface-container text-on-surface">${ikon(a.ikon, 'text-[13px] text-secondary')}${esc(a.label)}</span>` : ''}
               <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold ${a.jenis === 'Layanan Berbayar' ? 'bg-amber-100 text-amber-800' : 'bg-tertiary-fixed text-on-tertiary-fixed'}">${esc(a.jenis)}</span>
               ${a.status !== 'Tampil' ? '<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-surface-container-high text-on-surface-variant">Disembunyikan</span>' : ''}
             </div>
@@ -3334,50 +3261,53 @@ function htmlPratinjauArea() {
   }
   return `<article class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm flex flex-col max-w-sm">
     <div class="relative h-44 overflow-hidden">${gambarAdmin(a.foto, 600, 'w-full h-full object-cover', a.nama)}
-      <div class="absolute top-3 left-3 bg-surface-container-lowest/90 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm">${ikon(a.ikon || 'verified', 'text-[16px] text-secondary')}<span class="font-label-md text-body-sm text-on-surface">${esc(a.label || 'Label Badge')}</span></div></div>
+      ${a.label ? `<div class="absolute top-3 left-3 bg-surface-container-lowest/90 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm">${ikon(a.ikon || 'verified', 'text-[16px] text-secondary')}<span class="font-label-md text-body-sm text-on-surface">${esc(a.label)}</span></div>` : ''}</div>
     <div class="p-space-md"><h3 class="font-headline-md text-headline-sm text-on-surface mb-2">${esc(a.nama || 'Nama Area')}</h3><p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">${esc(a.deskripsi || 'Deskripsi area...')}</p>
       ${a.catatan ? `<div class="mt-space-sm flex items-center gap-2 ${a.penting ? 'text-error' : 'text-secondary'} font-label-md text-body-sm">${ikon('check_circle', 'text-[18px]')}<span>${esc(a.catatan)}</span></div>` : ''}</div>
   </article>`;
 }
 
+/**
+ * Formulir area (desain revisi): Jenis, Nama, Deskripsi, Catatan, Foto, Tampilkan.
+ * Label badge, ikon, & "Layanan Berbayar" tidak lagi diisi dari sini; data lama tetap
+ * dihormati — area berbayar yang sudah ada masih bisa disunting lengkap.
+ */
 function htmlFormArea() {
   const f = S.adm.konten.form.data;
   const berbayar = f.jenis === 'Layanan Berbayar';
   const harga = (f.harga || []).concat([{}, {}, {}]).slice(0, 3);
-  return `<div class="bg-surface-page rounded-xl shadow-sm p-6 flex flex-col gap-5" id="editor-panel">
-    <div class="flex items-center justify-between gap-2"><div class="flex items-center gap-2"><div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">${ikon('edit_note', 'text-[20px]')}</div>
-      <h3 class="font-headline-sm text-headline-sm text-on-surface">${f.id ? 'Form Sunting Area' : 'Tambah Area / Layanan Baru'}</h3></div>
-      <span class="px-2 py-0.5 rounded text-[11px] font-label-md ${f.id ? 'bg-tertiary-fixed text-on-tertiary-fixed' : 'bg-secondary-fixed text-on-secondary-fixed'}">${f.id ? 'Mode Sunting' : 'Mode Baru'}</span></div>
-    <form class="flex flex-col gap-4" data-kirim="area" novalidate>
-      <div class="flex flex-col gap-1.5"><span class="${KELAS.label}">Jenis <span class="text-error">*</span></span>
-        <div class="grid grid-cols-2 gap-2">${['Fasilitas', 'Layanan Berbayar'].map(j => `<label class="flex items-center gap-2 p-3 rounded-lg bg-surface-container-low cursor-pointer hover:bg-surface-container"><input type="radio" name="area-jenis" value="${j}" data-ubah="konten-isian" data-kunci="jenis" ${f.jenis === j ? 'checked' : ''} class="accent-[#1565c0]"><span class="font-label-md text-label-md text-on-surface">${j}</span></label>`).join('')}</div></div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div class="flex flex-col gap-1.5"><label class="${KELAS.label}" for="ar-nama">Nama Area <span class="text-error">*</span></label><input id="ar-nama" maxlength="40" data-masukan="konten-isian" data-kunci="nama" value="${esc(f.nama)}" class="${KELAS.inputAdm}">${galatKolom('nama')}</div>
-        <div class="flex flex-col gap-1.5"><label class="${KELAS.label}" for="ar-label">Label Badge <span class="text-error">*</span></label><input id="ar-label" maxlength="24" data-masukan="konten-isian" data-kunci="label" value="${esc(f.label)}" placeholder="Area Bersama" class="${KELAS.inputAdm}">${galatKolom('label')}</div>
-      </div>
-      <div class="flex flex-col gap-1.5"><span class="${KELAS.label}">Ikon Badge <span class="text-error">*</span></span>
-        <div class="grid grid-cols-7 gap-1.5" role="radiogroup" aria-label="Pilih ikon">${KONST.IKON.map(n => `<label class="relative cursor-pointer" title="${n}"><input type="radio" name="area-ikon" value="${n}" data-ubah="konten-isian" data-kunci="ikon" ${f.ikon === n ? 'checked' : ''} class="sr-only peer" aria-label="${n}"><span class="w-full aspect-square rounded-lg bg-surface-container-low flex items-center justify-center text-on-surface-variant peer-checked:bg-primary-container peer-checked:text-on-primary peer-focus-visible:ring-2 peer-focus-visible:ring-primary">${ikon(n, 'text-[20px]')}</span></label>`).join('')}</div>${galatKolom('ikon')}</div>
-      <div class="flex flex-col gap-1.5"><label class="${KELAS.label} flex justify-between" for="ar-desk"><span>Deskripsi <span class="text-error">*</span></span><span class="text-[11px] font-normal text-on-surface-variant" data-hitung="deskripsi" data-maks="240">${f.deskripsi.length}/240</span></label><textarea id="ar-desk" rows="3" maxlength="240" data-masukan="konten-isian" data-kunci="deskripsi" class="${KELAS.inputAdm} resize-none">${esc(f.deskripsi)}</textarea>${galatKolom('deskripsi')}</div>
-      ${berbayar ? '' : `<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
-        <div class="flex flex-col gap-1.5 sm:col-span-2"><label class="${KELAS.label}" for="ar-cat">Catatan <span class="text-outline font-normal text-[11px]">(Opsional)</span></label><input id="ar-cat" maxlength="50" data-masukan="konten-isian" data-kunci="catatan" value="${esc(f.catatan)}" placeholder="Terbuka hingga 21:00 WIB" class="${KELAS.inputAdm}"></div>
-        <label class="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-surface-container-low"><span class="font-label-md text-[12px] text-on-surface">Catatan penting (merah)</span>${sakelar('data-ubah="konten-isian" data-kunci="penting"', f.penting, true)}</label>
-      </div>`}
-      ${berbayar ? `<div class="flex flex-col gap-1.5"><label class="${KELAS.label}" for="ar-eyebrow">Eyebrow</label><input id="ar-eyebrow" maxlength="30" data-masukan="konten-isian" data-kunci="eyebrow" value="${esc(f.eyebrow)}" placeholder="Praktis & Hemat Waktu" class="${KELAS.inputAdm}"></div>
-        <div class="flex flex-col gap-2"><span class="${KELAS.label}">Daftar Harga <span class="text-error">*</span> <span class="text-outline font-normal text-[11px]">(maks 3)</span></span>
+  const label = 'font-label-md text-label-md text-on-surface';
+  return `<div class="bg-surface-page rounded-2xl shadow-sm border border-border-subtle p-6 sm:p-8 flex flex-col" id="editor-panel">
+    <div class="flex items-center justify-between gap-3 border-b border-surface-container-low pb-5 mb-6">
+      <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-surface-container text-on-surface-variant flex items-center justify-center shrink-0">${ikon(f.id ? 'edit_note' : 'post_add', 'text-[22px]')}</div>
+        <h3 class="font-headline-sm text-[20px] leading-7 font-bold text-on-surface tracking-tight">${f.id ? 'Sunting Area / Layanan' : 'Tambah Area / Layanan Baru'}</h3></div>
+      <span class="shrink-0 px-3 py-1 rounded-full font-label-md text-[12px] ${f.id ? 'bg-tertiary-fixed text-on-tertiary-fixed' : 'bg-secondary-fixed/40 text-secondary'}">${f.id ? 'Mode Sunting' : 'Mode Baru'}</span>
+    </div>
+    <form class="flex flex-col gap-6" data-kirim="area" novalidate>
+      <div class="flex flex-col gap-2"><span class="${label}">Jenis <span class="text-error">*</span></span>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">${(berbayar ? ['Fasilitas', 'Layanan Berbayar'] : ['Fasilitas']).map(j => `<label class="flex items-center gap-3 p-3.5 rounded-xl bg-surface-container-low cursor-pointer hover:bg-surface-container transition-colors"><input type="radio" name="area-jenis" value="${j}" data-ubah="konten-isian" data-kunci="jenis" ${f.jenis === j ? 'checked' : ''} class="w-4 h-4 accent-[#1565c0]"><span class="font-body-md text-body-md text-on-surface">${j}</span></label>`).join('')}</div></div>
+      <div class="flex flex-col gap-1.5"><label class="${label}" for="ar-nama">Nama Area <span class="text-error">*</span></label><input id="ar-nama" maxlength="40" data-masukan="konten-isian" data-kunci="nama" value="${esc(f.nama)}" placeholder="Contoh: Rooftop Garden, Ruang Tamu Utama" class="${KELAS.inputAdm} py-3">${galatKolom('nama')}</div>
+      <div class="flex flex-col gap-1.5"><label class="${label} flex justify-between" for="ar-desk"><span>Deskripsi <span class="text-error">*</span></span><span class="text-[11px] font-medium text-outline" data-hitung="deskripsi" data-maks="240">${f.deskripsi.length}/240</span></label><textarea id="ar-desk" rows="4" maxlength="240" data-masukan="konten-isian" data-kunci="deskripsi" placeholder="Jelaskan fasilitas atau layanan ini untuk penghuni kost..." class="${KELAS.inputAdm} p-4 resize-none">${esc(f.deskripsi)}</textarea>${galatKolom('deskripsi')}</div>
+      ${berbayar ? `<div class="flex flex-col gap-1.5"><label class="${label}" for="ar-eyebrow">Eyebrow</label><input id="ar-eyebrow" maxlength="30" data-masukan="konten-isian" data-kunci="eyebrow" value="${esc(f.eyebrow)}" placeholder="Praktis & Hemat Waktu" class="${KELAS.inputAdm}"></div>
+        <div class="flex flex-col gap-2"><span class="${label}">Daftar Harga <span class="text-error">*</span> <span class="text-outline font-normal text-[11px]">(maks 3)</span></span>
           ${harga.map((h, i) => `<div class="grid grid-cols-3 gap-2"><input data-masukan="area-harga" data-i="${i}" data-f="nama" value="${esc(h.nama || '')}" maxlength="30" placeholder="Reguler 2 Hari" class="${KELAS.inputAdm}" aria-label="Nama paket ${i + 1}"><input data-masukan="area-harga" data-i="${i}" data-f="harga" value="${esc(h.harga || '')}" maxlength="30" placeholder="Rp 6.000 / kg" class="${KELAS.inputAdm}" aria-label="Harga paket ${i + 1}"><input data-masukan="area-harga" data-i="${i}" data-f="keterangan" value="${esc(h.keterangan || '')}" maxlength="40" placeholder="Cuci + Setrika" class="${KELAS.inputAdm}" aria-label="Keterangan paket ${i + 1}"></div>`).join('')}
-          ${galatKolom('harga')}</div>` : ''}
-      <div class="flex flex-col gap-1.5"><span class="${KELAS.label}">Foto <span class="text-error">*</span></span>
-        <label class="relative group rounded-xl p-4 bg-surface-container-low hover:bg-surface-container transition-all cursor-pointer shadow-inner focus-within:ring-2 focus-within:ring-primary">
+          ${galatKolom('harga')}</div>`
+        : `<div class="flex flex-col gap-1.5"><label class="${label}" for="ar-cat">Catatan <span class="text-outline font-normal text-[11px]">(Opsional)</span></label><input id="ar-cat" maxlength="50" data-masukan="konten-isian" data-kunci="catatan" value="${esc(f.catatan)}" placeholder="Contoh: Jam buka 06:00 - 22:00 WIB" class="${KELAS.inputAdm} py-3"></div>`}
+      <div class="flex flex-col gap-1.5"><span class="${label}">Foto Area <span class="text-error">*</span></span>
+        <label class="relative group rounded-xl p-4 bg-surface-container-low hover:bg-surface-container transition-all cursor-pointer focus-within:ring-2 focus-within:ring-primary">
           <input type="file" accept="image/jpeg,image/png,image/webp" data-ubah="konten-foto-tunggal" data-modul="area" class="absolute inset-0 opacity-0 cursor-pointer" aria-label="Unggah foto area">
           <div class="flex items-center gap-4 w-full"><div class="w-20 h-14 rounded-lg overflow-hidden shrink-0 shadow bg-surface-container-highest">${gambarAdmin(f.foto, 300, 'w-full h-full object-cover', 'Foto area')}</div>
             <div class="flex flex-col text-left flex-1 min-w-0" id="info-foto-tunggal"><span class="font-label-md text-label-md text-on-surface truncate">${f.foto ? 'Foto tersimpan' : 'Belum ada foto'}</span><span class="font-label-md text-[11px] text-primary mt-0.5 group-hover:underline">${f.foto ? 'Ganti Berkas Gambar...' : 'Pilih Berkas Gambar...'}</span></div>
             <div class="p-2 rounded-full bg-surface-page text-on-surface-variant group-hover:text-primary shadow-sm">${ikon('cloud_upload', 'text-[20px]')}</div></div>
         </label>${galatKolom('foto')}</div>
-      <div class="flex items-center justify-between gap-3 p-3.5 rounded-xl bg-surface-container-low">
-        <div class="flex flex-col"><span class="${KELAS.label}">Tampilkan di Tentang Kami</span><span class="font-body-sm text-body-sm text-on-surface-variant">Muncul di bagian Fasilitas &amp; Area Umum</span></div>
+      <div class="flex items-center justify-between gap-3 p-4 rounded-xl bg-surface-subtle border border-surface-container-low">
+        <div class="flex flex-col"><span class="${label}">Tampilkan Segera ke Penghuni</span><span class="font-body-sm text-body-sm text-on-surface-variant">Area/layanan ini langsung muncul di bagian Fasilitas &amp; Area Umum halaman Tentang Kami.</span></div>
         ${sakelar('data-ubah="konten-isian" data-kunci="status" data-nyala="Tampil" data-mati="Disembunyikan" aria-label="Status tampil"', f.status === 'Tampil')}
       </div>
-      <div class="flex items-center justify-end gap-3 pt-3"><button type="button" data-aksi="konten-batal" class="${KELAS.tombolKedua}">Batal</button><button type="submit" class="${KELAS.tombolUtama}">${ikon('save', 'text-[18px]')}<span>Simpan</span></button></div>
+      <div class="flex items-center justify-end gap-3 pt-4 border-t border-surface-container-low">
+        <button type="button" data-aksi="konten-batal" class="px-5 py-2.5 rounded-xl font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors">Batal</button>
+        <button type="submit" class="px-6 py-2.5 rounded-xl bg-primary-container hover:bg-primary text-on-primary font-label-md text-label-md shadow-sm active:scale-[0.98] transition-all disabled:opacity-60">Simpan &amp; Publikasikan</button>
+      </div>
     </form>
   </div>`;
 }
@@ -3416,8 +3346,6 @@ KIRIM.area = async form => {
   const f = S.adm.konten.form.data;
   const galat = {};
   if (!f.nama.trim()) galat.nama = 'Nama area wajib diisi.';
-  if (!f.label.trim()) galat.label = 'Label badge wajib diisi.';
-  if (!f.ikon) galat.ikon = 'Pilih ikon badge.';
   if (!f.deskripsi.trim()) galat.deskripsi = 'Deskripsi wajib diisi.';
   if (!f.foto) galat.foto = 'Foto area wajib diunggah.';
   if (f.jenis === 'Layanan Berbayar' && !(f.harga || []).length) galat.harga = 'Isi minimal 1 baris harga layanan.';
@@ -4244,9 +4172,9 @@ RENDER['admin-testimoni'] = function (el) {
     <div class="flex flex-col xl:flex-row gap-space-sm items-stretch xl:items-center justify-between">
       <div class="relative flex-1 xl:min-w-[260px]">${ikon('search', 'absolute left-3.5 top-1/2 -translate-y-1/2 text-outline-variant text-[20px]')}<input id="testi-cari" type="search" data-masukan="testi-cari" value="${esc(F.cari)}" placeholder="Cari nama penghuni, nomor WA, atau kata kunci ulasan..." aria-label="Cari testimoni" class="w-full pl-10 pr-4 py-2.5 rounded-lg bg-surface-container-low text-on-surface placeholder:text-outline-variant font-body-md text-body-md focus:outline-none focus:bg-surface-page shadow-inner transition-colors"></div>
       <div class="grid grid-cols-2 sm:flex flex-wrap items-center gap-space-xs">
-        ${pilihan('data-ubah="testi-filter" data-kunci="status" aria-label="Filter status"', [['semua', 'Semua Status'], ['Tampil', `Tampil (${tampil})`], ['Disembunyikan', `Disembunyikan (${sembunyi})`]], F.status, 'w-full appearance-none pl-3 pr-8 py-2.5 rounded-lg bg-surface-container-low text-on-surface font-label-md text-label-md focus:outline-none cursor-pointer')}
-        ${pilihan('data-ubah="testi-filter" data-kunci="sumber" aria-label="Filter sumber"', [['semua', 'Semua Sumber'], ['Customer', `Customer / Penghuni (${customer})`], ['Admin', `Input Admin (${admin})`]], F.sumber, 'w-full appearance-none pl-3 pr-8 py-2.5 rounded-lg bg-surface-container-low text-on-surface font-label-md text-label-md focus:outline-none cursor-pointer')}
-        ${pilihan('data-ubah="testi-filter" data-kunci="periode" aria-label="Filter periode"', [['semua', 'Semua Periode'], ['bulan', `Bulan Ini (${KONST.BULAN[k.m - 1]} ${k.y})`], ['kuartal', 'Kuartal Ini'], ['tahun', 'Tahun ' + k.y]], F.periode, 'w-full appearance-none pl-3 pr-8 py-2.5 rounded-lg bg-surface-container-low text-on-surface font-label-md text-label-md focus:outline-none cursor-pointer')}
+        ${pilihan('data-ubah="testi-filter" data-kunci="status" aria-label="Filter status"', [['semua', 'Semua Status'], ['Tampil', 'Tampil Publik'], ['Disembunyikan', 'Disembunyikan']], F.status, 'w-full appearance-none pl-3 pr-8 py-2.5 rounded-lg bg-surface-container-low text-on-surface font-label-md text-label-md focus:outline-none cursor-pointer')}
+        ${pilihan('data-ubah="testi-filter" data-kunci="sumber" aria-label="Filter sumber"', [['semua', 'Semua Sumber'], ['Customer', 'Penghuni (Customer)'], ['Admin', 'Kurasi Admin']], F.sumber, 'w-full appearance-none pl-3 pr-8 py-2.5 rounded-lg bg-surface-container-low text-on-surface font-label-md text-label-md focus:outline-none cursor-pointer')}
+        ${pilihan('data-ubah="testi-filter" data-kunci="periode" aria-label="Filter periode"', [['semua', 'Semua Periode'], ['bulan', `Bulan Ini (${KONST.BULAN[k.m - 1]} ${k.y})`], ['kuartal', 'Kuartal Ini'], ['tahun', 'Tahun ' + k.y]], F.periode, 'w-full appearance-none pl-3 pr-8 py-2.5 rounded-lg bg-surface-container-low text-on-surface font-label-md text-label-md focus:outline-none cursor-pointer', 'calendar_month')}
         <button type="button" data-aksi="testi-segarkan" title="Muat ulang" aria-label="Reset filter & muat ulang" class="w-11 h-11 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface-variant flex items-center justify-center transition-colors">${ikon('refresh', 'text-[20px]')}</button>
       </div>
     </div>
@@ -4946,12 +4874,6 @@ RENDER['admin-pengaturan'] = function (el, param) {
   <form data-kirim="pengaturan" novalidate id="form-pengaturan" class="pb-28">
   <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
     <div class="xl:col-span-7 flex flex-col gap-6">
-      ${kartu('flag', 'bg-surface-container text-primary', 'Visi &amp; Misi Kost AB6', 'Teks ini akan tampil secara otomatis di Beranda publik Kost AB6.', `
-        <div class="flex flex-col gap-5">
-          <div class="flex flex-col gap-1.5"><label class="${KELAS.label}" for="set-visi">Pernyataan Visi</label><textarea id="set-visi" rows="3" maxlength="300" data-masukan="set" data-kunci="VISI" class="${KELAS.inputSet} resize-none">${esc(f.VISI)}</textarea>${galatKolom('VISI')}</div>
-          <div class="flex flex-col gap-1.5"><div class="flex items-center justify-between"><label class="${KELAS.label}" for="set-misi">Butir-butir Misi</label><span class="font-body-sm text-body-sm text-outline">Satu baris = satu poin misi</span></div><textarea id="set-misi" rows="6" data-masukan="set" data-kunci="MISI" class="${KELAS.inputSet} leading-relaxed">${esc(f.MISI)}</textarea>${galatKolom('MISI')}</div>
-        </div>`, '<span class="px-2.5 py-1 rounded bg-surface-subtle text-primary font-label-md text-body-sm">Publik</span>')}
-
       ${kartu('chat', 'bg-secondary/10 text-secondary', 'Informasi Kontak &amp; Saluran WhatsApp', 'Kanal resmi interaksi calon penghuni dan operasional harian.', `
         <div class="flex flex-col gap-4">
           <div class="flex flex-col gap-1.5"><div class="flex flex-wrap items-center justify-between gap-2"><label class="${KELAS.label}" for="set-wa">Nomor WhatsApp Admin Resmi</label><span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-whatsapp-green/10 text-secondary font-label-md text-[11px]">${ikon('check_circle', 'text-[13px]', true)}Terhubung ke Tombol WA Melayang</span></div>
@@ -4959,7 +4881,6 @@ RENDER['admin-pengaturan'] = function (el, param) {
           <div class="flex flex-col gap-1.5"><label class="${KELAS.label}" for="set-pesan">Pesan Otomatis WhatsApp Default</label><textarea id="set-pesan" rows="2" maxlength="300" data-masukan="set" data-kunci="WA_PESAN_DEFAULT" class="${KELAS.inputSet} resize-none">${esc(f.WA_PESAN_DEFAULT)}</textarea>${galatKolom('WA_PESAN_DEFAULT')}</div>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="flex flex-col gap-1.5"><label class="${KELAS.label}" for="set-email">Alamat Surel / Email</label><div class="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-surface-subtle shadow-sm">${ikon('mail', 'text-outline text-[18px]')}${isianSet('set-email', 'EMAIL_PUBLIK', f.EMAIL_PUBLIK, 'email')}</div>${galatKolom('EMAIL_PUBLIK')}</div>
-            <div class="flex flex-col gap-1.5"><label class="${KELAS.label}" for="set-koor">Titik Koordinat GPS</label><div class="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-surface-subtle shadow-sm">${ikon('my_location', 'text-outline text-[18px]')}${isianSet('set-koor', 'KOORDINAT', f.KOORDINAT, 'text', 'placeholder="Lat: -7.7601, Long: 110.3953"')}</div>${galatKolom('KOORDINAT')}</div>
           </div>
           <div class="flex flex-col gap-1.5"><label class="${KELAS.label}" for="set-alamat">Alamat Lengkap Fisik</label><textarea id="set-alamat" rows="2" maxlength="300" data-masukan="set" data-kunci="ALAMAT" class="${KELAS.inputSet} resize-none" placeholder="Baris 2 (opsional) = catatan patokan">${esc(f.ALAMAT)}</textarea><span class="font-body-sm text-[11px] text-outline">Baris kedua tampil sebagai catatan patokan di halaman Tentang Kami.</span>${galatKolom('ALAMAT')}</div>
         </div>`)}
@@ -5078,21 +4999,18 @@ KIRIM.pengaturan = async form => {
   const wa = String(f.WA).replace(/\D/g, '').replace(/^0/, '').replace(/^62/, '');
   if (!/^8\d{7,12}$/.test(wa)) galat.WA_ADMIN = 'Nomor WhatsApp admin wajib valid.';
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(f.EMAIL_PUBLIK)) galat.EMAIL_PUBLIK = 'Format email tidak valid.';
-  const m = /(-?\d+(?:\.\d+)?)\D+?(-?\d+(?:\.\d+)?)/.exec(f.KOORDINAT);
-  if (!m || Math.abs(Number(m[1])) > 90 || Math.abs(Number(m[2])) > 180) galat.KOORDINAT = 'Koordinat tidak valid (contoh: Lat: -7.7601, Long: 110.3953).';
   if (f.MAPS_EMBED_URL.trim() && !srcPeta(f.MAPS_EMBED_URL)) galat.MAPS_EMBED_URL = 'Kode embed harus dari Google Maps (https:\/\/www.google.com/maps/embed?…).';
   ['sj', 'sa', 'mg'].forEach(h => { if (!/^\d{2}:\d{2}$/.test(f[h].buka) || !/^\d{2}:\d{2}$/.test(f[h].tutup) || !(f[h].tutup > f[h].buka)) galat.JADWAL = 'Jam tutup harus setelah jam buka.'; });
-  if (!f.VISI.trim()) galat.VISI = 'Visi wajib diisi.';
-  if (!f.MISI.trim()) galat.MISI = 'Isi minimal 1 poin misi.';
   if (!f.ALAMAT.trim()) galat.ALAMAT = 'Alamat wajib diisi.';
   if (Object.keys(galat).length) { aturGalatKolom(form, galat); return; }
   aturGalatKolom(form, null);
   const tombol = $('[form=form-pengaturan][type=submit]');
   tombolSibuk(tombol, true, 'Menyimpan...');
   try {
+    // Visi/Misi (tab Visi & Misi di Kelola Konten) dan koordinat tidak lagi diubah dari halaman ini → tidak dikirim
     const r = await panggil('adminSimpanPengaturan', tokenAdmin(), {
-      VISI: f.VISI, MISI: f.MISI, WA_ADMIN: '62' + wa, WA_PESAN_DEFAULT: f.WA_PESAN_DEFAULT, EMAIL_PUBLIK: f.EMAIL_PUBLIK,
-      ALAMAT: f.ALAMAT, KOORDINAT: m[1] + ',' + m[2], MAPS_EMBED_URL: f.MAPS_EMBED_URL,
+      WA_ADMIN: '62' + wa, WA_PESAN_DEFAULT: f.WA_PESAN_DEFAULT, EMAIL_PUBLIK: f.EMAIL_PUBLIK,
+      ALAMAT: f.ALAMAT, MAPS_EMBED_URL: f.MAPS_EMBED_URL,
       JADWAL_SENIN_JUMAT: f.sj, JADWAL_SABTU: f.sa, JADWAL_MINGGU: f.mg
     });
     S.adm.data.pengaturan = r.pengaturan;
@@ -5203,7 +5121,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) kirim
 setInterval(() => { if (S.rute.nama === 'beranda') kirimStatBanner(); }, 120000);
 
 /** Penanda versi frontend — muncul di konsol agar mudah memastikan versi terbaru sudah terpasang */
-const VERSI_FRONTEND = '2.3.0';
+const VERSI_FRONTEND = '2.4.0';
 
 function mulaiAplikasi() {
   console.info('[Kost AB6] Frontend v' + VERSI_FRONTEND + ' siap');
