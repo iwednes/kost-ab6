@@ -50,7 +50,7 @@ const KONST = {
     beranda: 'Beranda', kamar: 'Katalog Kamar', detail: 'Detail Kamar', testimoni: 'Testimoni', tentang: 'Tentang Kami',
     '404': 'Halaman Tidak Ditemukan', login: 'Login Pengelola', 'admin-dashboard': 'Dashboard', 'admin-konten': 'Kelola Konten',
     'admin-kamar': 'Kelola Kamar', 'admin-kamar-form': 'Form Kamar', 'admin-testimoni': 'Kelola Testimoni',
-    'admin-laporan': 'Laporan & Ekspor', 'admin-pengaturan': 'Pengaturan Situs'
+    'admin-laporan': 'Laporan', 'admin-pengaturan': 'Pengaturan Situs'
   }
 };
 
@@ -404,21 +404,6 @@ function tombolSibuk(btn, sibuk, teks) {
     btn.removeAttribute('aria-busy');
     if (btn.dataset.asli) btn.innerHTML = btn.dataset.asli;
   }
-}
-
-/** Unduh berkas base64 dari server (Excel/PDF) */
-function unduhBase64(b64, mime, nama) {
-  const biner = atob(b64);
-  const arr = new Uint8Array(biner.length);
-  for (let i = 0; i < biner.length; i++) arr[i] = biner.charCodeAt(i);
-  const url = URL.createObjectURL(new Blob([arr], { type: mime }));
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = nama;
-  a.rel = 'noopener';
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1500);
 }
 
 // ════════════════════════════════════════════════════════════
@@ -3484,7 +3469,6 @@ RENDER['admin-kamar'] = function (el) {
       <p class="font-body-md text-body-md text-on-surface-variant mt-0.5 max-w-2xl">Atur ketersediaan unit, rincian harga sewa, fasilitas, dan kelengkapan data kamar Kost AB6 secara transparan dan terstruktur.</p>
     </div>
     <div class="flex items-center gap-space-sm flex-wrap self-start lg:self-auto">
-      <button type="button" data-aksi="ekspor-cepat" data-jenis="kamar" class="group inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-surface-page text-on-surface font-label-md text-label-md shadow-sm hover:shadow-md hover:bg-surface-container-low transition-all">${ikon('download', 'text-[19px] text-tertiary group-hover:-translate-y-0.5 transition-transform')}<span>Unduh Rekap Kamar</span></button>
       <button type="button" data-nav="admin-kamar-form" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary-container text-on-primary font-label-md text-label-md shadow-md hover:bg-primary transition-all">${ikon('add_circle', 'text-[19px]')}<span>Tambah Kamar Baru</span></button>
     </div>
   </div>
@@ -4154,7 +4138,6 @@ RENDER['admin-testimoni'] = function (el) {
       <p class="font-body-md text-body-md text-on-surface-variant max-w-3xl">Moderasi ulasan dari penghuni maupun kurasi manual pengelola. Nomor WhatsApp terlindungi dengan enkripsi administratif internal dan tidak pernah terekspos di situs publik.</p>
     </div>
     <div class="flex flex-wrap items-center gap-space-sm shrink-0">
-      <button type="button" data-aksi="ekspor-cepat" data-jenis="testimoni" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface-variant font-label-md text-label-md transition-all shadow-sm">${ikon('table_view', 'text-[18px] text-secondary')}<span>Unduh Rekap (.xlsx)</span></button>
       <button type="button" data-aksi="testi-tambah" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary-container hover:bg-primary text-on-primary font-label-md text-label-md shadow-md transition-all">${ikon('add_circle', 'text-[20px]')}<span>+ Tambah Testimoni Baru</span></button>
     </div>
   </div>
@@ -4479,8 +4462,8 @@ function dalamRentang(v, dari, sampai) {
   return (!dari || k >= dari) && (!sampai || k <= sampai);
 }
 
-/** Definisi tiap tab laporan → {judul, kpi[], kolom[], baris[{sel[], ekspor[]}], periode, filter} */
-function dataLaporan(tab, semuaBaris) {
+/** Definisi tiap tab laporan → {judul, kpi[], kolom[], baris[{sel[]}], periode, filter} */
+function dataLaporan(tab) {
   const d = S.adm.data;
   const L = S.adm.lap;
   const q = L.cari.toLowerCase();
@@ -4488,7 +4471,7 @@ function dataLaporan(tab, semuaBaris) {
   const kpi = (label, nilai, sub, ikonNama, kelasIkon, ekstra, kelasNilai) => ({ label, nilai, sub, ikonNama, kelasIkon, ekstra, kelasNilai });
 
   if (tab === 'testimoni') {
-    let daftar = semuaBaris ? d.testimoni.slice() : d.testimoni.filter(t =>
+    let daftar = d.testimoni.filter(t =>
       dalamRentang(t.tanggal, L.dari, L.sampai) && (L.status === 'semua' || t.status === L.status) &&
       (L.kanal === 'semua' || t.sumber === L.kanal) && cocok([t.nama, t.wa, t.id, t.isi].join(' ')));
     daftar.sort((a, b) => {
@@ -4501,7 +4484,7 @@ function dataLaporan(tab, semuaBaris) {
       periode: teksPeriode(L.dari, L.sampai),
       filter: [L.status === 'semua' ? 'Semua status' : L.status, L.kanal === 'semua' ? 'Semua sumber' : L.kanal, L.cari ? '"' + L.cari + '"' : ''].filter(Boolean).join(', '),
       kpi: [
-        kpi('Total Data Rekap', daftar.length, 'Baris siap cetak/ekspor', 'dataset', 'bg-primary-fixed text-primary'),
+        kpi('Total Data Rekap', daftar.length, 'Baris sesuai filter', 'dataset', 'bg-primary-fixed text-primary'),
         kpi('Status: Publikasi', tampil, 'Aktif di etalase beranda', 'check_circle', 'bg-secondary-fixed text-on-secondary-fixed', teksPersen(persen(tampil, daftar.length)), 'text-secondary'),
         kpi('Status: Diarsipkan', daftar.length - tampil, 'Tersimpan dalam arsip audit', 'visibility_off', 'bg-surface-container-highest text-on-surface-variant', teksPersen(persen(daftar.length - tampil, daftar.length))),
         kpi('Periode Audit Aktif', teksPeriode(L.dari, L.sampai), 'Integritas Log Valid', 'calendar_today', 'bg-tertiary-fixed text-tertiary', null, 'text-primary')
@@ -4514,7 +4497,6 @@ function dataLaporan(tab, semuaBaris) {
         const wa = t.wa ? formatWA(t.wa) : (t.sumber === 'Admin' ? '- (Internal Admin)' : '-');
         const operator = t.sumber === 'Admin' ? (t.dibuatOleh || 'Admin') : 'Auto-System';
         return {
-          ekspor: [i + 1, fTgl(t.tanggal, 'pendekJam'), t.id, t.nama + ' — ' + sub, wa, kanal, t.isi, t.fotoBukti ? 'Ada Bukti Foto' : '-', t.status === 'Tampil' ? 'Tampil di Beranda' : 'Disembunyikan', operator],
           sel: [
             `<span class="text-outline font-medium">${i + 1}</span>`,
             `<div class="flex flex-col"><span class="font-medium text-on-surface">${fTgl(t.tanggal)}</span><span class="font-body-sm text-[11px] text-on-surface-variant">${fTgl(t.tanggal, 'jam')}</span></div>`,
@@ -4535,7 +4517,7 @@ function dataLaporan(tab, semuaBaris) {
   if (tab === 'kamar') {
     const master = {};
     d.fasilitas.forEach(f => { master[f.kode] = f; });
-    const daftar = d.kamar.filter(k => semuaBaris || ((L.status === 'semua' || k.status === L.status) && (L.lantai === 'semua' || String(k.lantai) === L.lantai) && cocok([k.kode, k.nama, k.posisi].join(' ')))).sort((a, b) => a.urutan - b.urutan);
+    const daftar = d.kamar.filter(k => ((L.status === 'semua' || k.status === L.status) && (L.lantai === 'semua' || String(k.lantai) === L.lantai) && cocok([k.kode, k.nama, k.posisi].join(' ')))).sort((a, b) => a.urutan - b.urutan);
     const st = statistikKamar(daftar);
     return {
       judul: 'Inventaris & Okupansi Kamar', judulTabel: 'Data Inventaris Kamar', periode: 'Per ' + fTgl(new Date(), 'panjang'),
@@ -4554,7 +4536,6 @@ function dataLaporan(tab, semuaBaris) {
         // Daya isian bebas: angka saja (data lama "900"/"1300") diberi satuan VA
         const daya = /^\d+$/.test(String(k.daya || '')) ? k.daya + ' VA' : (k.daya || '-');
         return {
-          ekspor: [i + 1, k.kode, k.nama, Number(k.lantai), Number(k.harga), dim, kasur, k.kamarMandi, daya, fas, k.status, fTgl(k.diperbarui, 'pendekJam')],
           sel: [`<span class="text-outline font-medium">${i + 1}</span>`, `<span class="font-mono text-[12px] font-semibold text-primary">${esc(k.kode)}</span>`, `<span class="font-semibold text-on-surface">${esc(k.nama)}</span>`, 'Lantai ' + esc(k.lantai),
             `<span class="font-label-numeric text-primary-container whitespace-nowrap">${rupiah(k.harga)}</span>`, esc(dim), esc(kasur), esc(k.kamarMandi), esc(daya),
             `<span class="text-[12px] text-on-surface-variant">${esc(fas)}</span>`,
@@ -4566,20 +4547,19 @@ function dataLaporan(tab, semuaBaris) {
   }
 
   if (tab === 'kegiatan') {
-    const daftar = d.kegiatan.filter(g => semuaBaris || (dalamRentang(g.tanggal, L.dari, L.sampai) && (L.status === 'semua' || g.status === L.status) && cocok([g.id, g.judul, g.ringkas].join(' ')))).sort((a, b) => (a.tanggal < b.tanggal ? 1 : -1));
+    const daftar = d.kegiatan.filter(g => (dalamRentang(g.tanggal, L.dari, L.sampai) && (L.status === 'semua' || g.status === L.status) && cocok([g.id, g.judul, g.ringkas].join(' ')))).sort((a, b) => (a.tanggal < b.tanggal ? 1 : -1));
     const tampil = daftar.filter(g => g.status === 'Tampil').length;
     return {
       judul: 'Riwayat Galeri Kegiatan', judulTabel: 'Data Riwayat Kegiatan', periode: teksPeriode(L.dari, L.sampai),
       filter: [L.status === 'semua' ? 'Semua status' : L.status, L.cari ? '"' + L.cari + '"' : ''].filter(Boolean).join(', '),
       kpi: [
-        kpi('Total Kegiatan', daftar.length, 'Baris siap cetak/ekspor', 'photo_library', 'bg-primary-fixed text-primary'),
+        kpi('Total Kegiatan', daftar.length, 'Baris sesuai filter', 'photo_library', 'bg-primary-fixed text-primary'),
         kpi('Tampil', tampil, 'Aktif di galeri beranda', 'check_circle', 'bg-secondary-fixed text-on-secondary-fixed', teksPersen(persen(tampil, daftar.length)), 'text-secondary'),
         kpi('Disembunyikan', daftar.length - tampil, 'Tersimpan dalam arsip', 'visibility_off', 'bg-surface-container-highest text-on-surface-variant'),
         kpi('Periode', teksPeriode(L.dari, L.sampai), 'Berdasarkan tanggal kegiatan', 'calendar_today', 'bg-tertiary-fixed text-tertiary', null, 'text-primary')
       ],
       kolom: [['No'], ['Tanggal'], ['ID'], ['Judul'], ['Keterangan Singkat'], ['Jumlah Foto'], ['Status'], ['Diperbarui']],
       baris: daftar.map((g, i) => ({
-        ekspor: [i + 1, fTgl(g.tanggal), g.id, g.judul, g.ringkas, (g.foto || []).length, g.status, fTgl(g.diperbarui, 'pendekJam')],
         sel: [`<span class="text-outline font-medium">${i + 1}</span>`, `<span class="whitespace-nowrap">${fTgl(g.tanggal)}</span>`, `<span class="font-mono text-[12px] font-semibold text-primary">${esc(g.id)}</span>`, `<span class="font-semibold text-on-surface">${esc(g.judul)}</span>`,
           `<p class="line-clamp-2 text-on-surface-variant min-w-[220px]">${esc(g.ringkas)}</p>`, String((g.foto || []).length), chipStatusTesti(g.status), `<span class="text-[12px] text-on-surface-variant whitespace-nowrap">${fTgl(g.diperbarui)}</span>`]
       }))
@@ -4590,7 +4570,7 @@ function dataLaporan(tab, semuaBaris) {
   const bulan = L.bulan || rentangBulanIni().bulan;
   const stat = {};
   d.statBanner.filter(s => s.bulan === bulan).forEach(s => { stat[s.idBanner] = s; });
-  const daftar = d.banner.filter(b => semuaBaris || L.status === 'semua' || b.status === L.status).sort((a, b) => a.urutan - b.urutan);
+  const daftar = d.banner.filter(b => L.status === 'semua' || b.status === L.status).sort((a, b) => a.urutan - b.urutan);
   const tayang = daftar.reduce((s, b) => s + ((stat[b.id] || {}).tayang || 0), 0);
   const klik = daftar.reduce((s, b) => s + ((stat[b.id] || {}).klik || 0), 0);
   const [by, bm] = bulan.split('-').map(Number);
@@ -4609,7 +4589,6 @@ function dataLaporan(tab, semuaBaris) {
       const s = stat[b.id] || { tayang: 0, klik: 0 };
       const kv = persen(s.klik, s.tayang);
       return {
-        ekspor: [b.urutan, b.id, b.judul, b.teksTombol ? b.teksTombol + ' (' + b.linkTombol + ')' : '-', b.status, s.tayang, s.klik, kv, fTgl(b.diperbarui, 'pendekJam')],
         sel: [`<span class="text-outline font-medium">#${b.urutan}</span>`, `<span class="font-mono text-[12px] font-semibold text-primary">${esc(b.id)}</span>`, `<span class="font-semibold text-on-surface">${esc(b.judul)}</span>`,
           `<span class="text-[12px] text-on-surface-variant">${b.teksTombol ? esc(b.teksTombol) + ' <code class="text-primary">' + esc(b.linkTombol) + '</code>' : '-'}</span>`,
           `<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold ${b.status === 'Aktif' ? 'bg-secondary-container text-on-secondary-container' : 'bg-surface-container-high text-on-surface-variant'}">${esc(b.status)}</span>`,
@@ -4661,13 +4640,9 @@ RENDER['admin-laporan'] = function (el, param) {
   el.innerHTML = `<div class="h-1 w-full bg-gradient-to-r from-gradient-start via-gradient-mid to-gradient-end rounded-full mb-space-lg shadow-sm"></div>
   <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-space-md mb-space-lg">
     <div class="flex flex-col">
-      <div class="flex items-center gap-space-xs font-body-sm text-body-sm text-on-surface-variant mb-1"><span>Kost AB6</span>${ikon('chevron_right', 'text-[14px]')}<span>Portal Pengelola</span>${ikon('chevron_right', 'text-[14px]')}<span class="font-label-md text-label-md text-primary font-semibold">Laporan &amp; Ekspor</span></div>
-      <h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface tracking-tight">Laporan &amp; Ekspor Data Operasional</h1>
-      <p class="font-body-md text-body-md text-on-surface-variant mt-1 max-w-3xl">Pusat dokumentasi dan rekap data operasional Kost AB6. Filter data berdasarkan modul dan unduh dalam format Excel (.xlsx) atau dokumen cetak PDF resmi berstempel digital.</p>
-    </div>
-    <div class="flex flex-wrap items-center gap-space-sm self-start xl:self-center">
-      <button type="button" data-aksi="lap-ekspor" data-format="xlsx" class="group inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-surface-container-lowest text-secondary font-label-md text-label-md shadow-sm hover:shadow-md hover:bg-secondary hover:text-on-secondary transition-all">${ikon('table_view', 'text-[20px]')}<span>Unduh Excel (.xlsx)</span></button>
-      <button type="button" data-aksi="lap-ekspor" data-format="pdf" class="group inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary-container text-on-primary font-label-md text-label-md shadow-sm hover:shadow-md hover:bg-primary transition-all">${ikon('print', 'text-[20px]')}<span>Unduh PDF Resmi</span></button>
+      <div class="flex items-center gap-space-xs font-body-sm text-body-sm text-on-surface-variant mb-1"><span>Kost AB6</span>${ikon('chevron_right', 'text-[14px]')}<span>Portal Pengelola</span>${ikon('chevron_right', 'text-[14px]')}<span class="font-label-md text-label-md text-primary font-semibold">Laporan</span></div>
+      <h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface tracking-tight">Laporan Data Operasional</h1>
+      <p class="font-body-md text-body-md text-on-surface-variant mt-1 max-w-3xl">Pusat dokumentasi dan rekap data operasional Kost AB6. Filter dan pantau data setiap modul langsung di layar.</p>
     </div>
   </div>
   <div class="relative bg-surface-container-lowest rounded-xl shadow-sm mb-space-lg px-space-md pt-2"><div class="flex items-center gap-space-md overflow-x-auto" role="tablist" aria-label="Modul laporan">
@@ -4711,7 +4686,7 @@ RENDER['admin-laporan'] = function (el, param) {
     <div class="flex items-start gap-space-md max-w-3xl">
       <div class="w-12 h-12 rounded-xl bg-[#E6F4EA] flex items-center justify-center shrink-0 text-[#137333] shadow-sm">${ikon('cloud_sync', 'text-[28px]')}</div>
       <div class="flex flex-col"><div class="flex flex-wrap items-center gap-2"><span class="font-headline-sm text-headline-sm text-on-surface">Sinkronisasi Cloud Google Spreadsheet Terhubung</span><span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-secondary-fixed text-on-secondary-fixed">Live Sync</span></div>
-        <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-relaxed">Tabel data ini terintegrasi langsung dengan database Google Sheets Kost AB6. Ekspor Excel menghasilkan berkas siap cetak berformat <strong>.xlsx</strong> dengan tata letak kolom yang telah dirapikan (Auto-Fit column width &amp; freeze header).</p></div>
+        <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-relaxed">Tabel data ini terintegrasi langsung dengan database Google Sheets Kost AB6.</p></div>
     </div>
     <div class="flex flex-col items-start lg:items-end shrink-0 lg:pl-0">
       <div class="flex items-center gap-1 text-[12px] font-medium text-on-surface-variant">${ikon('update', 'text-[16px] text-secondary')}<span>Terakhir disinkronkan: <strong>${info.terakhirSinkron ? fHariIni(info.terakhirSinkron) : fHariIni(S.adm.waktuMuat ? new Date(S.adm.waktuMuat) : new Date())}</strong></span></div>
@@ -4745,30 +4720,6 @@ MASUKAN['lap-cari'] = debounce(el => {
   if (baru) { baru.focus(); try { baru.setSelectionRange(pos, pos); } catch (e) { /* abaikan */ } }
 }, 300);
 KIRIM['lap-filter'] = () => { S.adm.lap.hal = 1; renderLaporan(); };
-
-/** Kirim baris laporan (sudah difilter) ke server → unduh .xlsx / .pdf */
-async function ekspor(tab, format, tombol, semuaBaris) {
-  const lap = dataLaporan(tab, semuaBaris);
-  if (!lap.baris.length) { toast('Tidak ada data', 'Tidak ada baris untuk diekspor.', 'info'); return; }
-  if (lap.baris.length > 5000) { toast('Data terlalu banyak', 'Persempit filter (maks 5.000 baris).', 'galat'); return; }
-  tombolSibuk(tombol, true, 'Menyiapkan...');
-  try {
-    const r = await panggil('adminEkspor', tokenAdmin(), {
-      jenis: tab, judul: lap.judul, format: format, kolom: lap.kolom.map(c => c[0]),
-      baris: lap.baris.map(b => b.ekspor), ringkasan: lap.kpi.map(k => [k.label, String(k.nilai) + (k.ekstra ? ' (' + k.ekstra + ')' : '')]),
-      periodeTeks: lap.periode, filterTeks: semuaBaris ? 'Semua data' : lap.filter
-    });
-    unduhBase64(r.base64, r.mimeType, r.namaFile);
-    toast('Berkas diunduh', r.namaFile);
-  } catch (e) {
-    toastGalat(e, 'Ekspor gagal');
-  } finally {
-    tombolSibuk(tombol, false);
-  }
-}
-
-AKSI['lap-ekspor'] = el => ekspor(S.adm.lap.tab, el.dataset.format, el, false);
-AKSI['ekspor-cepat'] = el => ekspor(el.dataset.jenis, 'xlsx', el, el.dataset.jenis === 'kamar');
 
 AKSI['sinkronkan'] = async el => {
   tombolSibuk(el, true, 'Menyinkronkan...');
@@ -4940,13 +4891,12 @@ RENDER['admin-pengaturan'] = function (el, param) {
 };
 
 function htmlPratinjauPeta(peta, koordinat) {
+  // Tanpa tombol "Buka Peta Besar": peta Google Maps sudah punya tautannya sendiri
   const m = /(-?\d+(?:\.\d+)?)\D+?(-?\d+(?:\.\d+)?)/.exec(String(koordinat || ''));
-  const link = m ? 'https:\/\/www.google.com/maps?q=' + m[1] + ',' + m[2] : 'https:\/\/www.google.com/maps';
   if (!peta && m) peta = urlPeta({ koordinat: { lat: m[1], lng: m[2] } });
-  return (peta
+  return peta
     ? `<div class="bingkai-media absolute inset-0"><iframe src="${esc(peta)}" title="Pratinjau peta" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>`
-    : `<div class="absolute inset-0 flex flex-col items-center justify-center gap-2 text-outline">${ikon('map', 'text-[48px]')}<span class="font-body-sm text-body-sm">Tempel kode embed Google Maps untuk melihat pratinjau</span></div>`) +
-    `<a href="${esc(link)}" target="_blank" rel="noopener noreferrer" class="absolute bottom-3 right-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-page text-primary font-label-md text-body-sm shadow-md">Buka Peta Besar${ikon('open_in_new', 'text-[16px]')}</a>`;
+    : `<div class="absolute inset-0 flex flex-col items-center justify-center gap-2 text-outline">${ikon('map', 'text-[48px]')}<span class="font-body-sm text-body-sm">Tempel kode embed Google Maps untuk melihat pratinjau</span></div>`;
 }
 
 function tandaiSetKotor() {
@@ -5121,7 +5071,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) kirim
 setInterval(() => { if (S.rute.nama === 'beranda') kirimStatBanner(); }, 120000);
 
 /** Penanda versi frontend — muncul di konsol agar mudah memastikan versi terbaru sudah terpasang */
-const VERSI_FRONTEND = '2.4.0';
+const VERSI_FRONTEND = '2.5.0';
 
 function mulaiAplikasi() {
   console.info('[Kost AB6] Frontend v' + VERSI_FRONTEND + ' siap');
