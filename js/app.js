@@ -50,7 +50,7 @@ const KONST = {
     beranda: 'Beranda', kamar: 'Katalog Kamar', detail: 'Detail Kamar', testimoni: 'Testimoni', tentang: 'Tentang Kami',
     '404': 'Halaman Tidak Ditemukan', login: 'Login Pengelola', 'admin-dashboard': 'Dashboard', 'admin-konten': 'Kelola Konten',
     'admin-kamar': 'Kelola Kamar', 'admin-kamar-form': 'Form Kamar', 'admin-testimoni': 'Kelola Testimoni',
-    'admin-laporan': 'Laporan', 'admin-pengaturan': 'Pengaturan Situs'
+    'admin-pengaturan': 'Pengaturan Situs'
   }
 };
 
@@ -2095,7 +2095,7 @@ function muatAdmin() {
 function bolehRenderUlangAdmin() {
   if (S.kotor || Modal.tumpukan.length) return false;
   const n = S.rute.nama;
-  if (['admin-dashboard', 'admin-kamar', 'admin-testimoni', 'admin-laporan'].indexOf(n) >= 0) return true;
+  if (['admin-dashboard', 'admin-kamar', 'admin-testimoni'].indexOf(n) >= 0) return true;
   if (n === 'admin-konten') return !S.adm.konten || !S.adm.konten.form;
   return false;
 }
@@ -2126,7 +2126,7 @@ function perbaruiKerangkaAdmin() {
   $('#titik-notifikasi').hidden = !n;
   const remah = {
     'admin-dashboard': 'Portal Pengelola', 'admin-konten': 'Kelola Konten', 'admin-kamar': 'Kelola Kamar',
-    'admin-testimoni': 'Portal Pengelola', 'admin-laporan': 'Portal Pengelola', 'admin-pengaturan': 'Portal Pengelola'
+    'admin-testimoni': 'Portal Pengelola', 'admin-pengaturan': 'Portal Pengelola'
   };
   if (S.rute.nama === 'admin-kamar-form') {
     // Desain revisi: Kost AB6 › Portal Pengelola › Kelola Kamar › Tambah/Edit Kamar
@@ -2654,7 +2654,6 @@ function htmlTabBanner() {
             <div class="p-2.5 rounded-lg bg-surface-container-high text-primary">${ikon('insights', 'text-[24px]')}</div>
             <div><div class="font-label-md text-label-md text-on-surface">Statistik Tayangan Slide Bulan Ini</div><div class="font-body-sm text-body-sm text-on-surface-variant">Total ${angka(tayang)} kali diputar • Rata-rata konversi klik tombol ${String(persen(klik, tayang)).replace('.', ',')}%</div></div>
           </div>
-          <button type="button" data-nav="admin-laporan" data-tab="banner" class="text-primary font-label-md text-label-md hover:underline flex items-center gap-1 self-start sm:self-auto"><span>Detail Laporan</span>${ikon('arrow_forward', 'text-[16px]')}</button>
         </div>
       </div>
       <div class="xl:col-span-5 flex flex-col gap-6">
@@ -4314,7 +4313,6 @@ function bukaModalTestimoni(asli) {
   d.waTampil = formatWA(d.wa).replace(/^\+62\s?/, '');
   let tersimpan = false;
   const unggahan = [];
-  const opsiKamar = [['', 'Tidak dikaitkan ke kamar']].concat(S.adm.data.kamar.slice().sort((a, b) => a.urutan - b.urutan).map(k => [k.id, `${k.kode} – ${k.nama} (Lt. ${k.lantai})`]));
   const kelasIsian = 'px-3.5 py-2.5 rounded-lg bg-surface-container-low text-on-surface placeholder:text-outline-variant font-body-md text-body-md focus:outline-none focus:bg-surface-container transition-colors disabled:opacity-70 disabled:cursor-not-allowed w-full';
   const kotakFoto = (jenis, judul, petunjuk, ikonNama) => `<div class="flex flex-col gap-1.5"><span class="font-label-md text-label-md text-on-surface">${judul}</span>
     <label class="p-3 rounded-lg bg-surface-container-low flex items-center justify-between gap-2 ${jenis === 'profil' && kunciForm ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer hover:bg-surface-container'} relative">
@@ -4341,21 +4339,11 @@ function bukaModalTestimoni(asli) {
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
           <div class="flex flex-col gap-1.5"><div class="flex items-center justify-between"><label class="font-label-md text-label-md text-on-surface" for="mt-wa">Nomor WhatsApp (Opsional)</label><span class="text-[11px] text-secondary font-medium">Terkunci privat</span></div>
             <div class="relative"><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-outline font-label-md text-body-md">+62</span><input id="mt-wa" type="tel" data-mt-isi="waTampil" value="${esc(d.waTampil)}" ${kunciForm ? 'disabled' : ''} placeholder="812-3456-7890" class="${kelasIsian} pl-12"></div>${galatKolom('wa')}</div>
-          <div class="flex flex-col gap-1.5"><label class="font-label-md text-label-md text-on-surface" for="mt-kamar">Kamar Penghuni (Opsional)</label>${pilihan('id="mt-kamar" data-mt-isi="idKamar"', opsiKamar, d.idKamar, 'w-full appearance-none px-3.5 py-2.5 pr-9 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:outline-none cursor-pointer')}</div>
         </div>
         <div class="flex flex-col gap-1.5"><label class="font-label-md text-label-md text-on-surface" for="mt-isi">Isi Ulasan Testimoni <span class="text-error">*</span></label><textarea id="mt-isi" data-mt-isi="isi" rows="4" maxlength="500" ${kunciForm ? 'disabled' : ''} placeholder="Tuliskan ulasan pengalaman tinggal di Kost AB6 secara jujur, detail kenyamanan, kamar, atau fasilitas..." class="${kelasIsian} resize-none">${esc(d.isi)}</textarea>${galatKolom('isi')}</div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
           ${kotakFoto('profil', 'Foto Profil Penghuni', 'Pilih foto persegi (.jpg, .png)', 'account_circle')}
           ${kotakFoto('bukti', 'Foto Bukti / Fasilitas (Opsional)', 'Format 16:9 disarankan', 'add_photo_alternate')}
-        </div>
-        <div class="p-space-md rounded-xl bg-surface-container-low flex flex-col gap-3">
-          <span class="font-label-md text-label-md text-on-surface flex items-center gap-1.5">${ikon('tune', 'text-[18px] text-primary')}Detail Kurasi <span class="text-outline font-normal text-[11px]">(Opsional — tampil di kartu publik)</span></span>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <input data-mt-isi="profesi" maxlength="40" value="${esc(d.profesi)}" placeholder="Profesi (cth: Mahasiswa Teknik)" aria-label="Profesi" class="${kelasIsian} bg-surface-page">
-            <input data-mt-isi="ketBukti" maxlength="40" value="${esc(d.ketBukti)}" placeholder="Keterangan foto bukti (cth: Dapur Bersama)" aria-label="Keterangan foto bukti" class="${kelasIsian} bg-surface-page">
-            <input data-mt-isi="tag" maxlength="40" value="${esc(d.tag)}" placeholder="Tag sorotan (cth: WFH Friendly)" aria-label="Tag sorotan" class="${kelasIsian} bg-surface-page sm:col-span-2">
-          </div>
-          <div class="flex flex-wrap gap-1.5" role="radiogroup" aria-label="Ikon tag">${KONST.IKON.map(n => `<label class="cursor-pointer" title="${n}"><input type="radio" name="mt-ikon" value="${n}" data-mt-isi="ikonTag" ${d.ikonTag === n ? 'checked' : ''} class="sr-only peer" aria-label="${n}"><span class="w-9 h-9 rounded-lg bg-surface-page flex items-center justify-center text-on-surface-variant peer-checked:bg-primary-container peer-checked:text-on-primary peer-focus-visible:ring-2 peer-focus-visible:ring-primary">${ikon(n, 'text-[18px]')}</span></label>`).join('')}</div>
         </div>
         <div class="p-space-md rounded-xl bg-surface-container-low flex items-center justify-between gap-3">
           <div class="flex flex-col"><span class="font-label-md text-label-md text-on-surface">Langsung Tampilkan di Website Publik</span><span class="font-body-sm text-[12px] text-on-surface-variant">Jika dimatikan, status ulasan akan disimpan sebagai 'Disembunyikan'.</span></div>
@@ -4435,291 +4423,8 @@ function bukaModalTestimoni(asli) {
 }
 
 // ════════════════════════════════════════════════════════════
-// BAGIAN 23: LAPORAN & EKSPOR
+// BAGIAN 23: SINKRONISASI DATA (tombol di Pengaturan)
 // ════════════════════════════════════════════════════════════
-
-function rentangBulanIni() {
-  const b = bagianJkt(new Date());
-  const p = n => String(n).padStart(2, '0');
-  return { dari: `${b.y}-${p(b.m)}-01`, sampai: `${b.y}-${p(b.m)}-${p(new Date(b.y, b.m, 0).getDate())}`, bulan: `${b.y}-${p(b.m)}` };
-}
-
-S.adm.lap = Object.assign({ tab: 'testimoni', status: 'semua', kanal: 'semua', lantai: 'semua', cari: '', urut: 'tanggal', arah: 'turun', hal: 1 }, rentangBulanIni());
-
-function teksPeriode(dari, sampai) {
-  const a = keTanggal(dari);
-  const z = keTanggal(sampai);
-  if (!a || !z) return 'Semua periode';
-  const ba = bagianJkt(a);
-  const bz = bagianJkt(z);
-  if (ba.d === 1 && ba.y === bz.y && ba.m === bz.m && bz.d === new Date(bz.y, bz.m, 0).getDate()) return KONST.BULAN_PANJANG[ba.m - 1] + ' ' + ba.y;
-  return fTgl(a) + ' - ' + fTgl(z);
-}
-
-function dalamRentang(v, dari, sampai) {
-  const k = fTgl(v, 'iso');
-  if (k === '-') return false;
-  return (!dari || k >= dari) && (!sampai || k <= sampai);
-}
-
-/** Definisi tiap tab laporan → {judul, kpi[], kolom[], baris[{sel[]}], periode, filter} */
-function dataLaporan(tab) {
-  const d = S.adm.data;
-  const L = S.adm.lap;
-  const q = L.cari.toLowerCase();
-  const cocok = teks => !q || teks.toLowerCase().indexOf(q) >= 0;
-  const kpi = (label, nilai, sub, ikonNama, kelasIkon, ekstra, kelasNilai) => ({ label, nilai, sub, ikonNama, kelasIkon, ekstra, kelasNilai });
-
-  if (tab === 'testimoni') {
-    let daftar = d.testimoni.filter(t =>
-      dalamRentang(t.tanggal, L.dari, L.sampai) && (L.status === 'semua' || t.status === L.status) &&
-      (L.kanal === 'semua' || t.sumber === L.kanal) && cocok([t.nama, t.wa, t.id, t.isi].join(' ')));
-    daftar.sort((a, b) => {
-      const x = L.urut === 'id' ? String(a.id).localeCompare(String(b.id)) : (keTanggal(a.tanggal) - keTanggal(b.tanggal));
-      return L.arah === 'naik' ? x : -x;
-    });
-    const tampil = daftar.filter(t => t.status === 'Tampil').length;
-    return {
-      judul: 'Testimoni Penghuni', judulTabel: 'Data Rekapitulasi Testimoni',
-      periode: teksPeriode(L.dari, L.sampai),
-      filter: [L.status === 'semua' ? 'Semua status' : L.status, L.kanal === 'semua' ? 'Semua sumber' : L.kanal, L.cari ? '"' + L.cari + '"' : ''].filter(Boolean).join(', '),
-      kpi: [
-        kpi('Total Data Rekap', daftar.length, 'Baris sesuai filter', 'dataset', 'bg-primary-fixed text-primary'),
-        kpi('Status: Publikasi', tampil, 'Aktif di etalase beranda', 'check_circle', 'bg-secondary-fixed text-on-secondary-fixed', teksPersen(persen(tampil, daftar.length)), 'text-secondary'),
-        kpi('Status: Diarsipkan', daftar.length - tampil, 'Tersimpan dalam arsip audit', 'visibility_off', 'bg-surface-container-highest text-on-surface-variant', teksPersen(persen(daftar.length - tampil, daftar.length))),
-        kpi('Periode Audit Aktif', teksPeriode(L.dari, L.sampai), 'Integritas Log Valid', 'calendar_today', 'bg-tertiary-fixed text-tertiary', null, 'text-primary')
-      ],
-      kolom: [['No'], ['Tanggal & Waktu', 'tanggal'], ['ID Referensi', 'id'], ['Nama Pengirim'], ['Kontak WhatsApp'], ['Kanal Entri'], ['Cuplikan Testimoni'], ['Lampiran'], ['Status Beranda'], ['Operator / Otoritas']],
-      baris: daftar.map((t, i) => {
-        const km = kamarDariId(t.idKamar);
-        const sub = t.tipe === 'Official' ? 'Manajemen Terverifikasi' : (km ? 'Penghuni Kamar ' + km.kode : labelKamarAdmin(t));
-        const kanal = t.sumber === 'Admin' ? 'Input Petugas' : 'Web Form';
-        const wa = t.wa ? formatWA(t.wa) : (t.sumber === 'Admin' ? '- (Internal Admin)' : '-');
-        const operator = t.sumber === 'Admin' ? (t.dibuatOleh || 'Admin') : 'Auto-System';
-        return {
-          sel: [
-            `<span class="text-outline font-medium">${i + 1}</span>`,
-            `<div class="flex flex-col"><span class="font-medium text-on-surface">${fTgl(t.tanggal)}</span><span class="font-body-sm text-[11px] text-on-surface-variant">${fTgl(t.tanggal, 'jam')}</span></div>`,
-            `<span class="font-mono text-[12px] font-semibold text-primary px-2 py-0.5 rounded bg-primary-fixed whitespace-nowrap">#${esc(t.id)}</span>`,
-            `<div class="flex items-center gap-2"><div class="w-7 h-7 rounded-full ${t.tipe === 'Official' ? 'bg-primary-container text-on-primary' : 'bg-surface-container-high text-on-surface-variant'} flex items-center justify-center font-bold text-[11px] shrink-0">${esc(inisial(t.nama))}</div><div class="flex flex-col"><span class="font-semibold text-on-surface">${esc(t.nama)}</span><span class="text-[11px] ${t.tipe === 'Official' ? 'text-primary-container' : 'text-on-surface-variant'}">${esc(sub)}</span></div></div>`,
-            `<span class="font-mono text-[12px] text-on-surface-variant whitespace-nowrap">${esc(wa)}</span>`,
-            t.sumber === 'Admin' ? `<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-primary-container">${ikon('badge', 'text-[14px]')}Input Petugas</span>` : `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-tertiary-fixed text-tertiary">${ikon('globe', 'text-[13px]')}Web Form</span>`,
-            `<p class="line-clamp-2 text-on-surface-variant italic leading-relaxed min-w-[240px]">“${esc(t.isi)}”</p>`,
-            t.fotoBukti ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-secondary-fixed text-on-secondary-fixed whitespace-nowrap">${ikon('photo_camera', 'text-[14px]')}Ada Bukti Foto</span>` : '<span class="text-outline">-</span>',
-            t.status === 'Tampil' ? `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-secondary text-on-secondary shadow-sm whitespace-nowrap"><span class="w-1.5 h-1.5 rounded-full bg-white"></span>Tampil di Beranda</span>` : `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-surface-container-high text-on-surface-variant whitespace-nowrap">${ikon('visibility_off', 'text-[13px]')}Disembunyikan</span>`,
-            `<span class="inline-flex items-center gap-1 text-[11px] text-on-surface-variant whitespace-nowrap">${ikon(t.sumber === 'Admin' ? 'shield_person' : 'smart_toy', 'text-[14px] text-outline')}${esc(operator)}</span>`
-          ]
-        };
-      })
-    };
-  }
-
-  if (tab === 'kamar') {
-    const master = {};
-    d.fasilitas.forEach(f => { master[f.kode] = f; });
-    const daftar = d.kamar.filter(k => ((L.status === 'semua' || k.status === L.status) && (L.lantai === 'semua' || String(k.lantai) === L.lantai) && cocok([k.kode, k.nama, k.posisi].join(' ')))).sort((a, b) => a.urutan - b.urutan);
-    const st = statistikKamar(daftar);
-    return {
-      judul: 'Inventaris & Okupansi Kamar', judulTabel: 'Data Inventaris Kamar', periode: 'Per ' + fTgl(new Date(), 'panjang'),
-      filter: [L.status === 'semua' ? 'Semua status' : L.status, L.lantai === 'semua' ? 'Semua lantai' : 'Lantai ' + L.lantai, L.cari ? '"' + L.cari + '"' : ''].filter(Boolean).join(', '),
-      kpi: [
-        kpi('Total Kamar', st.total, 'Unit dalam rekap', 'apartment', 'bg-primary-fixed text-primary'),
-        kpi('Tersedia', st.tersedia, 'Siap disewakan', 'check_circle', 'bg-secondary-fixed text-on-secondary-fixed', teksPersen(st.siap), 'text-secondary'),
-        kpi('Terisi', st.terisi, 'Kontrak berjalan', 'group', 'bg-tertiary-fixed text-primary-container', teksPersen(st.okupansi), 'text-primary-container'),
-        kpi('Okupansi', teksPersen(st.okupansi), 'Target ' + (d.info.targetOkupansi || 75) + '%', 'pie_chart', 'bg-surface-container text-on-surface-variant', null, 'text-primary')
-      ],
-      kolom: [['No'], ['Kode Unit'], ['Nama Kamar'], ['Lantai'], ['Harga/Bulan'], ['Dimensi & Luas'], ['Tipe Kasur'], ['Kamar Mandi'], ['Daya Listrik'], ['Fasilitas'], ['Status'], ['Diperbarui']],
-      baris: daftar.map((k, i) => {
-        const fas = (k.fasilitas || []).map(c => master[c] && master[c].ringkas).filter(Boolean).concat(k.kustom || []).join(', ');
-        const dim = `${desimal(k.panjang)} x ${desimal(k.lebar)} m (${String(Math.round(k.panjang * k.lebar * 10) / 10).replace('.', ',')} m²)`;
-        const kasur = infoKasur(k.kasur).spek;
-        // Daya isian bebas: angka saja (data lama "900"/"1300") diberi satuan VA
-        const daya = /^\d+$/.test(String(k.daya || '')) ? k.daya + ' VA' : (k.daya || '-');
-        return {
-          sel: [`<span class="text-outline font-medium">${i + 1}</span>`, `<span class="font-mono text-[12px] font-semibold text-primary">${esc(k.kode)}</span>`, `<span class="font-semibold text-on-surface">${esc(k.nama)}</span>`, 'Lantai ' + esc(k.lantai),
-            `<span class="font-label-numeric text-primary-container whitespace-nowrap">${rupiah(k.harga)}</span>`, esc(dim), esc(kasur), esc(k.kamarMandi), esc(daya),
-            `<span class="text-[12px] text-on-surface-variant">${esc(fas)}</span>`,
-            `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold ${k.status === 'Tersedia' ? 'bg-secondary-container text-on-secondary-container' : 'bg-primary-fixed text-primary'}">${esc(k.status)}</span>`,
-            `<span class="text-[12px] text-on-surface-variant whitespace-nowrap">${fTgl(k.diperbarui)}</span>`]
-        };
-      })
-    };
-  }
-
-  if (tab === 'kegiatan') {
-    const daftar = d.kegiatan.filter(g => (dalamRentang(g.tanggal, L.dari, L.sampai) && (L.status === 'semua' || g.status === L.status) && cocok([g.id, g.judul, g.ringkas].join(' ')))).sort((a, b) => (a.tanggal < b.tanggal ? 1 : -1));
-    const tampil = daftar.filter(g => g.status === 'Tampil').length;
-    return {
-      judul: 'Riwayat Galeri Kegiatan', judulTabel: 'Data Riwayat Kegiatan', periode: teksPeriode(L.dari, L.sampai),
-      filter: [L.status === 'semua' ? 'Semua status' : L.status, L.cari ? '"' + L.cari + '"' : ''].filter(Boolean).join(', '),
-      kpi: [
-        kpi('Total Kegiatan', daftar.length, 'Baris sesuai filter', 'photo_library', 'bg-primary-fixed text-primary'),
-        kpi('Tampil', tampil, 'Aktif di galeri beranda', 'check_circle', 'bg-secondary-fixed text-on-secondary-fixed', teksPersen(persen(tampil, daftar.length)), 'text-secondary'),
-        kpi('Disembunyikan', daftar.length - tampil, 'Tersimpan dalam arsip', 'visibility_off', 'bg-surface-container-highest text-on-surface-variant'),
-        kpi('Periode', teksPeriode(L.dari, L.sampai), 'Berdasarkan tanggal kegiatan', 'calendar_today', 'bg-tertiary-fixed text-tertiary', null, 'text-primary')
-      ],
-      kolom: [['No'], ['Tanggal'], ['ID'], ['Judul'], ['Keterangan Singkat'], ['Jumlah Foto'], ['Status'], ['Diperbarui']],
-      baris: daftar.map((g, i) => ({
-        sel: [`<span class="text-outline font-medium">${i + 1}</span>`, `<span class="whitespace-nowrap">${fTgl(g.tanggal)}</span>`, `<span class="font-mono text-[12px] font-semibold text-primary">${esc(g.id)}</span>`, `<span class="font-semibold text-on-surface">${esc(g.judul)}</span>`,
-          `<p class="line-clamp-2 text-on-surface-variant min-w-[220px]">${esc(g.ringkas)}</p>`, String((g.foto || []).length), chipStatusTesti(g.status), `<span class="text-[12px] text-on-surface-variant whitespace-nowrap">${fTgl(g.diperbarui)}</span>`]
-      }))
-    };
-  }
-
-  // Kinerja Banner
-  const bulan = L.bulan || rentangBulanIni().bulan;
-  const stat = {};
-  d.statBanner.filter(s => s.bulan === bulan).forEach(s => { stat[s.idBanner] = s; });
-  const daftar = d.banner.filter(b => L.status === 'semua' || b.status === L.status).sort((a, b) => a.urutan - b.urutan);
-  const tayang = daftar.reduce((s, b) => s + ((stat[b.id] || {}).tayang || 0), 0);
-  const klik = daftar.reduce((s, b) => s + ((stat[b.id] || {}).klik || 0), 0);
-  const [by, bm] = bulan.split('-').map(Number);
-  const namaBulan = KONST.BULAN_PANJANG[(bm || 1) - 1] + ' ' + by;
-  return {
-    judul: 'Kinerja Banner Beranda', judulTabel: 'Data Kinerja Banner', periode: namaBulan,
-    filter: L.status === 'semua' ? 'Semua status' : L.status,
-    kpi: [
-      kpi('Total Tayang', angka(tayang), 'Slide tampil di layar pengunjung', 'visibility', 'bg-primary-fixed text-primary'),
-      kpi('Total Klik', angka(klik), 'Klik tombol CTA', 'ads_click', 'bg-secondary-fixed text-on-secondary-fixed', null, 'text-secondary'),
-      kpi('Rata-rata Konversi', String(persen(klik, tayang)).replace('.', ',') + '%', 'Klik ÷ tayang', 'insights', 'bg-surface-container text-on-surface-variant'),
-      kpi('Banner Aktif', d.banner.filter(b => b.status === 'Aktif').length + '/3', 'Maksimal 3 aktif', 'view_carousel', 'bg-tertiary-fixed text-tertiary', null, 'text-primary')
-    ],
-    kolom: [['Urutan'], ['ID'], ['Judul'], ['CTA'], ['Status'], ['Tayang'], ['Klik'], ['Konversi %'], ['Diperbarui']],
-    baris: daftar.map(b => {
-      const s = stat[b.id] || { tayang: 0, klik: 0 };
-      const kv = persen(s.klik, s.tayang);
-      return {
-        sel: [`<span class="text-outline font-medium">#${b.urutan}</span>`, `<span class="font-mono text-[12px] font-semibold text-primary">${esc(b.id)}</span>`, `<span class="font-semibold text-on-surface">${esc(b.judul)}</span>`,
-          `<span class="text-[12px] text-on-surface-variant">${b.teksTombol ? esc(b.teksTombol) + ' <code class="text-primary">' + esc(b.linkTombol) + '</code>' : '-'}</span>`,
-          `<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold ${b.status === 'Aktif' ? 'bg-secondary-container text-on-secondary-container' : 'bg-surface-container-high text-on-surface-variant'}">${esc(b.status)}</span>`,
-          angka(s.tayang), angka(s.klik), String(kv).replace('.', ',') + '%', `<span class="text-[12px] text-on-surface-variant whitespace-nowrap">${fTgl(b.diperbarui)}</span>`]
-      };
-    })
-  };
-}
-
-RENDER['admin-laporan'] = function (el, param) {
-  const d = S.adm.data;
-  if (!d) { el.innerHTML = kerangkaAdmin(); return; }
-  const L = S.adm.lap;
-  if (param && param.tab) { L.tab = param.tab; L.hal = 1; param.tab = ''; }
-  const lap = dataLaporan(L.tab);
-  const per = 10;
-  const totalHal = Math.max(1, Math.ceil(lap.baris.length / per));
-  L.hal = Math.min(L.hal, totalHal);
-  const mulai = (L.hal - 1) * per;
-  const tampil = lap.baris.slice(mulai, mulai + per);
-  const tab = (id, ikonNama, label, jumlah) => `<button type="button" role="tab" aria-selected="${L.tab === id}" data-aksi="lap-tab" data-tab="${id}" class="relative pb-3 pt-2 font-label-md text-label-md flex items-center gap-2 whitespace-nowrap ${L.tab === id ? 'text-primary' : 'text-on-surface-variant hover:text-on-surface transition-colors'}">
-      ${ikon(ikonNama, 'text-[18px]')}<span>${label}</span>${jumlah !== null ? `<span class="px-2 py-0.5 rounded-full text-[11px] ${L.tab === id ? 'font-bold bg-primary-fixed text-on-primary-fixed' : 'font-medium bg-surface-container text-on-surface-variant'}">${jumlah}</span>` : ''}
-      ${L.tab === id ? '<span class="absolute bottom-0 left-0 right-0 h-[3px] bg-gradient-to-r from-gradient-start via-gradient-mid to-gradient-end rounded-t-full"></span>' : ''}</button>`;
-  const kotak = (label, isi) => `<div class="flex flex-col gap-1.5"><label class="font-label-md text-label-md text-on-surface-variant">${label}</label>${isi}</div>`;
-  const kotakIkon = (ikonNama, isi) => `<div class="relative flex items-center bg-surface-container-low rounded-lg px-3 py-2 text-on-surface focus-within:bg-surface-container-lowest shadow-sm min-h-[40px]">${ikon(ikonNama, 'text-outline text-[18px] mr-2 shrink-0')}${isi}</div>`;
-  const pilihSederhana = (kunci, opsi, nilai) => `<select data-ubah="lap-filter" data-kunci="${kunci}" class="w-full bg-transparent font-body-sm text-body-sm text-on-surface focus:outline-none cursor-pointer pr-5 appearance-none">${opsi.map(o => `<option value="${esc(o[0])}" ${String(o[0]) === String(nilai) ? 'selected' : ''}>${esc(o[1])}</option>`).join('')}</select>${ikon('expand_more', 'text-[16px] text-outline absolute right-3 pointer-events-none')}`;
-  const rentang = kotak('Rentang Tanggal' + (L.tab === 'testimoni' ? ' Pengajuan' : ''), kotakIkon('date_range', `<input type="date" data-ubah="lap-filter" data-kunci="dari" value="${esc(L.dari)}" aria-label="Dari tanggal" class="bg-transparent font-body-sm text-body-sm text-on-surface focus:outline-none w-full min-w-0"><span class="px-1 text-outline">–</span><input type="date" data-ubah="lap-filter" data-kunci="sampai" value="${esc(L.sampai)}" aria-label="Sampai tanggal" class="bg-transparent font-body-sm text-body-sm text-on-surface focus:outline-none w-full min-w-0">`));
-  let filterHtml = '';
-  if (L.tab === 'testimoni') {
-    filterHtml = rentang +
-      kotak('Status Publikasi', kotakIkon('visibility', pilihSederhana('status', [['semua', 'Semua Status (Tampil & Sembunyi)'], ['Tampil', 'Hanya Tampil di Beranda'], ['Disembunyikan', 'Disembunyikan (Arsip Internal)']], L.status))) +
-      kotak('Kanal / Sumber Entri', kotakIkon('input', pilihSederhana('kanal', [['semua', 'Semua Sumber (Customer & Admin)'], ['Customer', 'Formulir Publik (Customer)'], ['Admin', 'Input Petugas (Super Admin)']], L.kanal)));
-  } else if (L.tab === 'kamar') {
-    filterHtml = kotak('Status Ketersediaan', kotakIkon('bed', pilihSederhana('status', [['semua', 'Semua Status'], ['Tersedia', 'Tersedia'], ['Terisi', 'Terisi']], L.status))) +
-      kotak('Lantai', kotakIkon('layers', pilihSederhana('lantai', [['semua', 'Semua Lantai']].concat(Array.from(new Set(d.kamar.map(k => k.lantai))).sort().map(l => [String(l), 'Lantai ' + l])), L.lantai))) +
-      '<div class="hidden xl:block"></div>';
-  } else if (L.tab === 'kegiatan') {
-    filterHtml = rentang + kotak('Status', kotakIkon('visibility', pilihSederhana('status', [['semua', 'Semua Status'], ['Tampil', 'Tampil'], ['Disembunyikan', 'Disembunyikan']], L.status))) + '<div class="hidden xl:block"></div>';
-  } else {
-    filterHtml = kotak('Bulan', kotakIkon('calendar_month', `<input type="month" data-ubah="lap-filter" data-kunci="bulan" value="${esc(L.bulan)}" aria-label="Bulan" class="bg-transparent font-body-sm text-body-sm text-on-surface focus:outline-none w-full">`)) +
-      kotak('Status Banner', kotakIkon('view_carousel', pilihSederhana('status', [['semua', 'Semua Status'], ['Aktif', 'Aktif'], ['Nonaktif', 'Nonaktif']], L.status))) + '<div class="hidden xl:block"></div>';
-  }
-  const kepalaKolom = lap.kolom.map(c => {
-    if (!c[1]) return `<th class="py-3 px-4 whitespace-nowrap">${esc(c[0])}</th>`;
-    const aktif = L.urut === c[1];
-    return `<th class="py-3 px-4 whitespace-nowrap"><button type="button" data-aksi="lap-urut" data-kolom="${c[1]}" class="flex items-center gap-1 uppercase tracking-wider hover:text-on-surface transition-colors" aria-label="Urutkan ${esc(c[0])}">${esc(c[0])}${ikon(aktif ? (L.arah === 'naik' ? 'arrow_upward' : 'arrow_downward') : 'unfold_more', 'text-[14px]')}</button></th>`;
-  }).join('');
-  const info = d.info;
-  el.innerHTML = `<div class="h-1 w-full bg-gradient-to-r from-gradient-start via-gradient-mid to-gradient-end rounded-full mb-space-lg shadow-sm"></div>
-  <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-space-md mb-space-lg">
-    <div class="flex flex-col">
-      <div class="flex items-center gap-space-xs font-body-sm text-body-sm text-on-surface-variant mb-1"><span>Kost AB6</span>${ikon('chevron_right', 'text-[14px]')}<span>Portal Pengelola</span>${ikon('chevron_right', 'text-[14px]')}<span class="font-label-md text-label-md text-primary font-semibold">Laporan</span></div>
-      <h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface tracking-tight">Laporan Data Operasional</h1>
-      <p class="font-body-md text-body-md text-on-surface-variant mt-1 max-w-3xl">Pusat dokumentasi dan rekap data operasional Kost AB6. Filter dan pantau data setiap modul langsung di layar.</p>
-    </div>
-  </div>
-  <div class="relative bg-surface-container-lowest rounded-xl shadow-sm mb-space-lg px-space-md pt-2"><div class="flex items-center gap-space-md overflow-x-auto" role="tablist" aria-label="Modul laporan">
-    ${tab('testimoni', 'rate_review', 'Testimoni Penghuni', d.testimoni.length)}${tab('kamar', 'bed', 'Inventaris &amp; Okupansi Kamar', d.kamar.length)}${tab('kegiatan', 'photo_library', 'Riwayat Galeri Kegiatan', d.kegiatan.length)}${tab('banner', 'view_carousel', 'Kinerja Banner Beranda', d.banner.length)}
-  </div></div>
-  <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-md mb-space-lg">
-    <div class="flex items-center justify-between gap-2 mb-space-md">
-      <div class="flex items-center gap-2">${ikon('tune', 'text-primary text-[20px]')}<span class="font-headline-sm text-headline-sm text-on-surface">Parameter &amp; Kriteria Rekap</span></div>
-      <span class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-status-available"></span>Database Sinkron Otomatis</span>
-    </div>
-    <form class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-space-md items-end" data-kirim="lap-filter" novalidate>
-      ${filterHtml}
-      ${L.tab === 'banner' ? '<div></div>' : kotak('Pencarian Nama / Kata Kunci', `<div class="flex items-center gap-2"><div class="relative flex-1 flex items-center bg-surface-container-low rounded-lg px-3 py-2 text-on-surface focus-within:bg-surface-container-lowest shadow-sm min-h-[40px]">${ikon('search', 'text-outline text-[18px] mr-2')}<input id="lap-cari" type="search" data-masukan="lap-cari" value="${esc(L.cari)}" placeholder="Cari nama, WhatsApp, ID..." aria-label="Cari" class="w-full bg-transparent font-body-sm text-body-sm text-on-surface focus:outline-none"></div>
-        <button type="submit" title="Terapkan Filter" aria-label="Terapkan filter" class="px-3.5 py-2 min-h-[40px] rounded-lg bg-primary text-on-primary hover:bg-primary-container transition-colors shadow-sm flex items-center justify-center">${ikon('filter_alt', 'text-[18px]')}</button>
-        <button type="button" data-aksi="lap-reset" title="Reset Filter" aria-label="Reset filter" class="px-3.5 py-2 min-h-[40px] rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors shadow-sm flex items-center justify-center">${ikon('restart_alt', 'text-[18px]')}</button></div>`)}
-    </form>
-  </div>
-  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-space-md mb-space-lg">${lap.kpi.map(k => `
-    <div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex items-start justify-between gap-2">
-      <div class="flex flex-col min-w-0"><span class="font-body-sm text-body-sm text-on-surface-variant uppercase tracking-wider font-semibold">${esc(k.label)}</span>
-        <div class="flex items-baseline gap-2 mt-1"><span class="${typeof k.nilai === 'number' || /^[\d.,%/]+$/.test(String(k.nilai)) ? 'font-display-hero-mobile text-display-hero-mobile' : 'font-label-numeric text-label-numeric'} ${k.kelasNilai || 'text-on-surface'} font-bold truncate">${esc(k.nilai)}</span>${k.ekstra ? `<span class="font-label-md text-label-md ${k.kelasNilai || 'text-on-surface-variant'}">${esc(k.ekstra)}</span>` : ''}</div>
-        <span class="font-body-sm text-body-sm text-on-surface-variant mt-1 ${k.label.indexOf('Periode') === 0 ? 'text-secondary flex items-center gap-1' : ''}">${k.label.indexOf('Periode') === 0 ? ikon('verified', 'text-[14px]') : ''}${esc(k.sub)}</span></div>
-      <div class="w-10 h-10 rounded-lg ${k.kelasIkon} flex items-center justify-center shrink-0">${ikon(k.ikonNama, 'text-[22px]')}</div>
-    </div>`).join('')}</div>
-  <div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden mb-space-lg">
-    <div class="p-space-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-space-sm">
-      <div class="flex items-center gap-space-xs"><span class="font-headline-sm text-headline-sm text-on-surface">${esc(lap.judulTabel)}</span><span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-surface-container text-on-surface-variant">Format Tabular</span></div>
-      <span class="font-body-sm text-body-sm text-on-surface-variant">Menampilkan <strong class="text-on-surface">${tampil.length}</strong> dari <strong class="text-on-surface">${lap.baris.length}</strong> entri terpilih</span>
-    </div>
-    <div class="overflow-x-auto gulir-tampak"><table class="w-full min-w-[960px] text-left font-table-data text-table-data">
-      <thead class="bg-surface-subtle font-label-md text-[11px] text-on-surface-variant uppercase tracking-wider"><tr>${kepalaKolom}</tr></thead>
-      <tbody class="divide-y divide-surface-container-high text-on-surface">${tampil.map((b, i) => `<tr class="${i % 2 ? 'bg-surface-subtle/60 ' : ''}hover:bg-surface-subtle transition-colors">${b.sel.map(s => `<td class="py-3.5 px-4 align-middle">${s}</td>`).join('')}</tr>`).join('') ||
-        `<tr><td colspan="${lap.kolom.length}" class="py-10 text-center text-on-surface-variant">Tidak ada data untuk filter ini.</td></tr>`}</tbody>
-    </table></div>
-    <div class="p-space-md flex flex-col sm:flex-row items-center justify-between gap-space-sm border-t border-border-subtle">
-      <span class="font-body-sm text-body-sm text-on-surface-variant">Menampilkan <strong class="text-on-surface">${tampil.length ? (mulai + 1) + ' - ' + (mulai + tampil.length) : 0}</strong> dari <strong class="text-on-surface">${lap.baris.length}</strong> data laporan terpilih</span>
-      ${paginasiAdmin(L.hal, totalHal, 'lap-hal')}
-    </div>
-  </div>
-  <div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-space-md">
-    <div class="flex items-start gap-space-md max-w-3xl">
-      <div class="w-12 h-12 rounded-xl bg-[#E6F4EA] flex items-center justify-center shrink-0 text-[#137333] shadow-sm">${ikon('cloud_sync', 'text-[28px]')}</div>
-      <div class="flex flex-col"><div class="flex flex-wrap items-center gap-2"><span class="font-headline-sm text-headline-sm text-on-surface">Sinkronisasi Cloud Google Spreadsheet Terhubung</span><span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-secondary-fixed text-on-secondary-fixed">Live Sync</span></div>
-        <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-relaxed">Tabel data ini terintegrasi langsung dengan database Google Sheets Kost AB6.</p></div>
-    </div>
-    <div class="flex flex-col items-start lg:items-end shrink-0 lg:pl-0">
-      <div class="flex items-center gap-1 text-[12px] font-medium text-on-surface-variant">${ikon('update', 'text-[16px] text-secondary')}<span>Terakhir disinkronkan: <strong>${info.terakhirSinkron ? fHariIni(info.terakhirSinkron) : fHariIni(S.adm.waktuMuat ? new Date(S.adm.waktuMuat) : new Date())}</strong></span></div>
-      <span class="text-[11px] text-outline mt-0.5">Operator aktif: ${esc(info.adminPeran)} (${esc(info.adminNama)})</span>
-      <button type="button" data-aksi="sinkronkan" class="mt-2 text-[12px] font-label-md text-primary hover:underline flex items-center gap-1">${ikon('refresh', 'text-[14px]')}<span>Sinkronkan Sekarang</span></button>
-    </div>
-  </div>`;
-};
-
-function renderLaporan() { RENDER['admin-laporan']($('#hal-admin-laporan'), {}); }
-
-AKSI['lap-tab'] = el => { S.adm.lap.tab = el.dataset.tab; S.adm.lap.hal = 1; S.adm.lap.status = 'semua'; S.adm.lap.cari = ''; renderLaporan(); };
-AKSI['lap-hal'] = el => { S.adm.lap.hal = Number(el.dataset.hal) || 1; renderLaporan(); };
-AKSI['lap-urut'] = el => {
-  const L = S.adm.lap;
-  if (L.urut === el.dataset.kolom) L.arah = L.arah === 'naik' ? 'turun' : 'naik';
-  else { L.urut = el.dataset.kolom; L.arah = 'turun'; }
-  renderLaporan();
-};
-AKSI['lap-reset'] = () => {
-  Object.assign(S.adm.lap, { status: 'semua', kanal: 'semua', lantai: 'semua', cari: '', hal: 1 }, rentangBulanIni());
-  renderLaporan();
-};
-UBAH['lap-filter'] = el => { S.adm.lap[el.dataset.kunci] = el.value; S.adm.lap.hal = 1; renderLaporan(); };
-MASUKAN['lap-cari'] = debounce(el => {
-  S.adm.lap.cari = el.value;
-  S.adm.lap.hal = 1;
-  const pos = el.selectionStart;
-  renderLaporan();
-  const baru = $('#lap-cari');
-  if (baru) { baru.focus(); try { baru.setSelectionRange(pos, pos); } catch (e) { /* abaikan */ } }
-}, 300);
-KIRIM['lap-filter'] = () => { S.adm.lap.hal = 1; renderLaporan(); };
 
 AKSI['sinkronkan'] = async el => {
   tombolSibuk(el, true, 'Menyinkronkan...');
@@ -5071,7 +4776,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) kirim
 setInterval(() => { if (S.rute.nama === 'beranda') kirimStatBanner(); }, 120000);
 
 /** Penanda versi frontend — muncul di konsol agar mudah memastikan versi terbaru sudah terpasang */
-const VERSI_FRONTEND = '2.5.0';
+const VERSI_FRONTEND = '2.6.0';
 
 function mulaiAplikasi() {
   console.info('[Kost AB6] Frontend v' + VERSI_FRONTEND + ' siap');
