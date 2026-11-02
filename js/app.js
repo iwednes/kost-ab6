@@ -23,9 +23,9 @@
 
 const KONST = {
   LANTAI: {
-    1: 'Lantai 1 - Akses Ramah & Dekat Lobi',
-    2: 'Lantai 2 - Tenang & Pencahayaan Alami',
-    3: 'Lantai 3 - View Atap & Balkon Terbuka'
+    1: 'Lantai 1',
+    2: 'Lantai 2',
+    3: 'Lantai 3'
   },
   KASUR: {
     'single-120': { label: 'Single Bed (120 × 200 cm)', ringkas: 'Kasur Single (120×200)', spek: 'Single Bed (120×200)', tabel: 'Kasur Single (120×200 cm)', ukuran: '120×200', jenis: 'single' },
@@ -4776,7 +4776,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) kirim
 setInterval(() => { if (S.rute.nama === 'beranda') kirimStatBanner(); }, 120000);
 
 /** Penanda versi frontend — muncul di konsol agar mudah memastikan versi terbaru sudah terpasang */
-const VERSI_FRONTEND = '2.6.0';
+const VERSI_FRONTEND = '2.6.1';
 
 function mulaiAplikasi() {
   console.info('[Kost AB6] Frontend v' + VERSI_FRONTEND + ' siap');
