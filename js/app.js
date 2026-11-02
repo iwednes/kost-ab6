@@ -3807,7 +3807,7 @@ function htmlFormKamar() {
           const cek = km ? f.kamarMandi === 'Dalam' : f.fasilitas.indexOf(m.kode) >= 0;
           return `<label class="group flex items-center gap-3 p-3.5 rounded-xl ${kelasPilihKartu} select-none ${km ? 'opacity-80 cursor-not-allowed' : 'cursor-pointer hover:bg-surface-subtle'}" ${km ? 'title="Mengikuti pilihan Tipe Kamar Mandi"' : ''}>
             <input type="checkbox" class="sr-only" data-ubah="fk-fasilitas" data-kode="${esc(m.kode)}" ${cek ? 'checked' : ''} ${km ? 'disabled' : ''}>
-            ${ikon(m.ikon, 'text-[20px] text-outline group-has-[:checked]:text-primary-container')}<span class="font-body-sm text-[12px] font-medium text-on-surface">${esc(m.label)}</span></label>`;
+            ${ikon(m.ikon, 'text-[20px] text-outline group-has-[:checked]:text-primary-container')}<span class="font-body-sm text-[12px] font-medium text-on-surface">${esc(m.ringkas || m.label)}</span></label>`;
         }).join('')}</div>
         ${galatKolom('fasilitas')}
       </div>
@@ -4776,7 +4776,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) kirim
 setInterval(() => { if (S.rute.nama === 'beranda') kirimStatBanner(); }, 120000);
 
 /** Penanda versi frontend — muncul di konsol agar mudah memastikan versi terbaru sudah terpasang */
-const VERSI_FRONTEND = '2.6.1';
+const VERSI_FRONTEND = '2.6.2';
 
 function mulaiAplikasi() {
   console.info('[Kost AB6] Frontend v' + VERSI_FRONTEND + ' siap');
