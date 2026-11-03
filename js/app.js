@@ -1730,7 +1730,6 @@ function urlPeta(t) {
 RENDER.tentang = function (el) {
   const t = S.tentang;
   if (!t) { el.innerHTML = kerangkaHalaman(); return; }
-  const kl = t.kartuLayanan || {};
   const warnaChip = ['text-secondary', 'text-primary', 'text-tertiary'];
   const kartuArea = a => `<article class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col group">
       <div class="relative h-52 overflow-hidden">
@@ -1777,21 +1776,6 @@ RENDER.tentang = function (el) {
           <div class="flex items-center gap-space-xs px-4 py-3 rounded-xl bg-surface-container-lowest shadow-sm">${ikon(c.ikon || 'verified', 'text-[22px] ' + warnaChip[i % 3])}<div><p class="font-headline-sm text-label-md text-on-surface">${esc(c.judul)}</p><p class="font-body-sm text-body-sm text-on-surface-variant">${esc(c.sub)}</p></div></div>`).join('')}</div></div>
       </div>
     </div></section>
-
-    <section class="w-full bg-surface py-space-md overflow-hidden"><div class="${WADAH}"><div class="grid grid-cols-12 gap-gutter items-center">
-      <div class="col-span-12 lg:col-span-8 rounded-xl overflow-hidden shadow-sm relative group h-80">
-        ${gambar(t.foto, 1600, 'w-full h-80 object-cover transform group-hover:scale-105 transition-transform duration-500', 'Gedung Kost AB6')}
-        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-space-md">
-          <div><span class="px-2.5 py-1 rounded bg-surface-container-lowest/90 text-on-surface font-label-md text-body-sm">${esc(t.fotoLabel)}</span><p class="text-on-primary font-headline-sm text-headline-sm mt-1">${esc(t.fotoJudul)}</p></div>
-        </div>
-      </div>
-      <div class="col-span-12 lg:col-span-4 flex flex-col gap-gutter">
-        <div class="p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between lg:h-80 gap-space-md">
-          <div>${ikon('verified', 'text-primary text-[32px] mb-space-xs')}<h3 class="font-headline-md text-headline-md text-on-surface mb-2">${esc(kl.judul || 'Standar Layanan Nyaman')}</h3><p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">${esc(kl.teks || '')}</p></div>
-          <div class="pt-space-md flex items-center justify-between"><span class="font-headline-sm text-label-numeric text-primary">${esc(kl.sorotan || '')}</span><span class="text-body-sm font-label-md text-secondary">${esc(kl.status || '')}</span></div>
-        </div>
-      </div>
-    </div></div></section>
 
     <section class="w-full bg-surface-subtle py-space-xl"><div class="${WADAH}">
       <div class="flex flex-col md:flex-row md:items-end justify-between mb-space-xl">
@@ -4742,7 +4726,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) kirim
 setInterval(() => { if (S.rute.nama === 'beranda') kirimStatBanner(); }, 120000);
 
 /** Penanda versi frontend — muncul di konsol agar mudah memastikan versi terbaru sudah terpasang */
-const VERSI_FRONTEND = '3.1.1';
+const VERSI_FRONTEND = '3.1.2';
 
 function mulaiAplikasi() {
   console.info('[Kost AB6] Frontend v' + VERSI_FRONTEND + ' siap');
