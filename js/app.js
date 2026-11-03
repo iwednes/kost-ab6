@@ -1339,14 +1339,12 @@ function renderDetailIsi(el, k) {
             ${spek('straighten', 'Dimensi Kamar', `${desimal(k.panjang)} × ${desimal(k.lebar)} m (${String(luas).replace('.', ',')} m²)`)}
             ${spek('single_bed', 'Tipe Kasur', esc(kasur.spek || '-'))}
             ${spek('water_damage', 'Kamar Mandi', k.kamarMandi === 'Dalam' ? 'Dalam' : 'Luar', k.kamarMandi === 'Dalam')}
-            ${spek('layers', 'Lokasi Lantai', 'Lantai ' + esc(k.lantai) + (k.posisi ? ' (' + esc(k.posisi.replace(/^Lantai \d+\s*-\s*/i, '')) + ')' : ''))}
           </div>
           <div class="flex flex-col gap-2.5 pt-space-xs">
             <a ${waAttr(terisi ? PesanWA.terisi(k) : PesanWA.tersedia(k))} class="w-full h-12 rounded-lg bg-whatsapp-green hover:opacity-95 text-on-primary font-headline-sm text-body-md font-bold flex items-center justify-center gap-2 shadow-sm transition-all hover:scale-[1.01] active:scale-[0.99]">${ikon('chat', 'text-[22px]')}<span>${terisi ? 'Tanya Info Kamar' : 'Tanya via WhatsApp'}</span></a>
             ${video ? `<button type="button" data-aksi="tonton-video" class="w-full h-11 rounded-lg bg-surface-page text-primary-container font-headline-sm text-body-md font-semibold flex items-center justify-center gap-2 shadow-sm hover:bg-surface-subtle transition-all">${ikon('smart_display', 'text-[20px]')}<span>Tonton Video Kamar</span></button>` : ''}
           </div>
           <div class="p-3 bg-surface-container-low rounded-lg flex items-start gap-2.5">${ikon('schedule', 'text-[18px] text-primary mt-0.5 shrink-0')}<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">Respon cepat oleh pengelola kost dalam waktu &lt; ${esc(u.responMenit || 15)} menit pada jam kerja (${esc(jam.buka)} - ${esc(jam.tutup)} WIB).</p></div>
-          <div class="text-center pt-1"><a ${waAttr(PesanWA.survei(k))} class="inline-flex items-center gap-1 font-label-md text-body-md text-primary-container hover:underline group"><span>Jadwalkan Survei Langsung ke Lokasi</span>${ikon('arrow_forward', 'text-[16px] group-hover:translate-x-1 transition-transform')}</a></div>
         </div>
         <div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex items-center gap-space-md">
           <div class="w-12 h-12 rounded-full bg-secondary-fixed/50 flex items-center justify-center text-secondary shrink-0">${ikon('verified_user', 'text-[24px]')}</div>
@@ -4698,7 +4696,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) kirim
 setInterval(() => { if (S.rute.nama === 'beranda') kirimStatBanner(); }, 120000);
 
 /** Penanda versi frontend — muncul di konsol agar mudah memastikan versi terbaru sudah terpasang */
-const VERSI_FRONTEND = '3.2.2';
+const VERSI_FRONTEND = '3.2.3';
 
 function mulaiAplikasi() {
   console.info('[Kost AB6] Frontend v' + VERSI_FRONTEND + ' siap');

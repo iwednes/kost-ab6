@@ -24,7 +24,7 @@ git commit -m "Deskripsi perubahan"
 git push
 ```
 
-GitHub Pages memperbarui situs dalam 1–2 menit. Jika masih tampil versi lama, tekan Ctrl+Shift+R. Versi yang aktif tercetak di konsol browser: `[Kost AB6] Frontend v3.2.2 siap`.
+GitHub Pages memperbarui situs dalam 1–2 menit. Jika masih tampil versi lama, tekan Ctrl+Shift+R. Versi yang aktif tercetak di konsol browser: `[Kost AB6] Frontend v3.2.3 siap`.
 
 ## Tailwind
 
