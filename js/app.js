@@ -709,7 +709,7 @@ function renderGalatMuat() {
 // ════════════════════════════════════════════════════════════
 
 const Slider = {
-  el: null, idx: 0, jalan: true, timer: null, jumlah: 0, xAwal: null,
+  el: null, idx: 0, timer: null, jumlah: 0, xAwal: null,
   pasang(el) {
     this.berhenti();
     this.el = el;
@@ -738,12 +738,6 @@ const Slider = {
       s.classList.toggle('z-0', !on);
       s.setAttribute('aria-hidden', on ? 'false' : 'true');
     });
-    $$('[data-garis]', this.el).forEach((b, n) => {
-      b.className = n === this.idx
-        ? 'h-1.5 w-10 rounded-full bg-gradient-to-r from-gradient-start via-gradient-mid to-gradient-end transition-all'
-        : 'h-1.5 w-10 rounded-full bg-surface-container-lowest/50 hover:bg-surface-container-lowest/80 transition-all';
-      b.setAttribute('aria-current', n === this.idx ? 'true' : 'false');
-    });
     const aktif = $$('.slide-item', this.el)[this.idx];
     if (aktif && aktif.dataset.id && !document.hidden && S.rute.nama === 'beranda') {
       S.stat.tayang[aktif.dataset.id] = (S.stat.tayang[aktif.dataset.id] || 0) + 1;
@@ -751,7 +745,7 @@ const Slider = {
   },
   mulai() {
     clearInterval(this.timer);
-    if (this.jumlah > 1 && this.jalan) {
+    if (this.jumlah > 1) {
       this.timer = setInterval(() => { if (!document.hidden) this.tampil(this.idx + 1); }, 5000);
     }
   },
@@ -759,18 +753,6 @@ const Slider = {
   geser(arah) {
     this.tampil(this.idx + arah);
     this.mulai();
-  },
-  ke(i) {
-    this.tampil(i);
-    this.mulai();
-  },
-  jedaPutar(btn) {
-    this.jalan = !this.jalan;
-    if (this.jalan) this.mulai(); else this.berhenti();
-    if (btn) {
-      btn.innerHTML = ikon(this.jalan ? 'pause' : 'play_arrow', 'text-[18px]');
-      btn.setAttribute('aria-label', this.jalan ? 'Jeda putar otomatis' : 'Mulai putar otomatis');
-    }
   }
 };
 
@@ -853,6 +835,12 @@ function infoSirkulasi(v) {
   return { label: t, ringkas: t };
 }
 
+/** Isian "Kapasitas Daya Listrik" untuk ditampilkan: "1850/kwh" → "1850/kWh", angka saja (data lama) → "1300 VA" */
+function teksDayaListrik(v) {
+  const s = String(v || '').trim();
+  return /^\d+$/.test(s) ? s + ' VA' : s.replace(/kwh/i, 'kWh');
+}
+
 function spekRingkas(k) {
   return `${desimal(k.panjang)} × ${desimal(k.lebar)} m · ${infoKasur(k.kasur).ringkas}`;
 }
@@ -933,11 +921,7 @@ function htmlHero(banner) {
   const kontrol = n > 1 ? `
     <button type="button" data-aksi="slider-prev" aria-label="Slide sebelumnya" class="absolute left-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-surface-container-lowest text-on-surface hidden md:flex items-center justify-center shadow-md hover:bg-surface-bright active:scale-95 transition-all">${ikon('chevron_left', 'text-[24px]')}</button>
     <button type="button" data-aksi="slider-next" aria-label="Slide berikutnya" class="absolute right-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-surface-container-lowest text-on-surface hidden md:flex items-center justify-center shadow-md hover:bg-surface-bright active:scale-95 transition-all">${ikon('chevron_right', 'text-[24px]')}</button>
-    <div class="absolute bottom-5 right-4 md:right-8 z-30 flex items-center gap-space-md bg-on-surface/50 px-space-md py-space-xs rounded-full">
-      <div class="flex items-center gap-1.5">${banner.map((s, i) => `<button type="button" data-aksi="slider-ke" data-i="${i}" data-garis aria-label="Pindah ke slide ${i + 1}" class="h-1.5 w-10 rounded-full ${i === 0 ? 'bg-gradient-to-r from-gradient-start via-gradient-mid to-gradient-end' : 'bg-surface-container-lowest/50'} transition-all"></button>`).join('')}</div>
-      <button type="button" data-aksi="slider-jeda" aria-label="${Slider.jalan ? 'Jeda putar otomatis' : 'Mulai putar otomatis'}" class="text-on-primary hover:text-secondary-fixed transition-colors flex items-center">${ikon(Slider.jalan ? 'pause' : 'play_arrow', 'text-[18px]')}</button>
-      <span class="hidden sm:inline-block font-body-sm text-body-sm text-surface-container-high tracking-tight">Otomatis berganti tiap 5 detik</span>
-    </div>` : '';
+    ` : '';
   return `<section class="relative w-full rounded-xl overflow-hidden shadow-sm h-[440px] md:h-[460px] select-none group" id="hero-slider" aria-roledescription="carousel" aria-label="Banner Kost AB6">
     <div class="relative w-full h-full overflow-hidden bg-on-surface">${slides}</div>${kontrol}
   </section>`;
@@ -998,6 +982,20 @@ function chipSorotanTesti(t, i) {
   return '<span></span>';
 }
 
+/**
+ * Deretan kartu yang bergeser perlahan tanpa henti ('kiri' atau 'kanan'); berhenti saat disorot
+ * mouse, disentuh, atau difokus (CSS .berjalan di style.css). Kartu diulang agar satu putaran
+ * selalu lebih lebar dari layar, lalu satu putaran digandakan agar sambungannya mulus.
+ * Salinan disembunyikan dari pembaca layar dan tombol Tab.
+ */
+function htmlBerjalan(kartu, arah, kelasLebar) {
+  const putaran = [];
+  for (let i = 0; i < Math.max(1, Math.ceil(6 / kartu.length)); i++) putaran.push(...kartu);
+  const item = (h, salinan) => `<div class="berjalan-item ${kelasLebar} shrink-0 pr-6"${salinan ? ' aria-hidden="true" data-salinan' : ''}>${salinan ? h.replace(/tabindex="0"/g, 'tabindex="-1"') : h}</div>`;
+  const isi = putaran.map((h, i) => item(h, i >= kartu.length)).join('') + putaran.map(h => item(h, true)).join('');
+  return `<div class="berjalan overflow-hidden py-2"><div class="berjalan-trek berjalan-${arah} flex w-max" style="animation-duration:${putaran.length * 8}s">${isi}</div></div>`;
+}
+
 function htmlKataMereka(daftar) {
   if (!daftar.length) return '';
   return `<section class="mt-space-xl pt-space-lg">
@@ -1005,7 +1003,7 @@ function htmlKataMereka(daftar) {
       <div><h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-on-surface tracking-tight">Kata Mereka</h2><div class="${GARIS_JUDUL}"></div></div>
       <a href="#" data-nav="testimoni" class="inline-flex items-center gap-1 font-headline-sm text-body-md text-primary-container hover:text-primary transition-colors font-semibold"><span>Lihat Semua Testimoni</span>${ikon('arrow_forward', 'text-[18px]')}</a>
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-space-lg">${daftar.map((t, i) => `
+    ${htmlBerjalan(daftar.map((t, i) => `
       <div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
         <div>
           <div class="flex items-center gap-space-md mb-space-md">
@@ -1018,7 +1016,7 @@ function htmlKataMereka(daftar) {
           ${chipSorotanTesti(t, i)}
           ${t.kamar ? `<span class="font-body-sm text-body-sm text-on-surface-variant text-right whitespace-nowrap shrink-0">${esc(namaKamarPendek(t.kamar))}</span>` : ''}
         </div>
-      </div>`).join('')}</div>
+      </div>`), 'kanan', 'w-[300px] md:w-[380px]')}
   </section>`;
 }
 
@@ -1042,7 +1040,7 @@ function kartuKegiatan(g) {
 function htmlGaleriKegiatan() {
   const g = S.kegiatan;
   const isi = g.items.length
-    ? `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-space-lg" id="grid-kegiatan">${g.items.map(kartuKegiatan).join('')}</div>`
+    ? htmlBerjalan(g.items.map(kartuKegiatan), 'kiri', 'w-[300px] md:w-[360px]')
     : `<p class="text-center font-body-md text-body-md text-on-surface-variant py-space-lg">Belum ada dokumentasi kegiatan.</p>`;
   return `<section class="mt-space-xl pt-space-lg" id="bagian-kegiatan">
     <div class="mb-space-lg text-center max-w-2xl mx-auto">
@@ -1334,6 +1332,7 @@ function renderDetailIsi(el, k) {
           <div class="p-space-md bg-surface-subtle rounded-xl flex items-baseline justify-between gap-2 flex-wrap">
             <div><span class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary-container font-bold tracking-tight">${rupiah(k.harga)}</span><span class="font-body-md text-body-md text-on-surface-variant"> / bulan</span></div>
             <span class="text-secondary font-label-md text-body-sm font-semibold bg-secondary-container/40 px-2 py-0.5 rounded">Fixed Rate</span>
+            <div class="w-full flex items-center gap-1.5 pt-1 font-label-md text-body-sm ${k.listrik ? 'text-secondary' : 'text-on-surface-variant'}">${ikon('bolt', 'text-[18px] shrink-0')}<span>${k.listrik ? 'Termasuk Listrik' : 'Belum Termasuk Listrik' + (k.daya ? ' ' + esc(teksDayaListrik(k.daya)) : '')}</span></div>
           </div>
           <div class="flex flex-col gap-2.5 py-1">
             ${spek('straighten', 'Dimensi Kamar', `${desimal(k.panjang)} × ${desimal(k.lebar)} m (${String(luas).replace('.', ',')} m²)`)}
@@ -1860,8 +1859,6 @@ AKSI['buka-menu-hp'] = () => bukaMenuHp();
 AKSI['tutup-menu-hp'] = () => tutupMenuHp();
 AKSI['slider-prev'] = () => Slider.geser(-1);
 AKSI['slider-next'] = () => Slider.geser(1);
-AKSI['slider-ke'] = el => Slider.ke(Number(el.dataset.i) || 0);
-AKSI['slider-jeda'] = el => Slider.jedaPutar(el);
 AKSI['cta-banner'] = (el, e) => {
   const id = el.dataset.id;
   if (id) {
@@ -3704,7 +3701,6 @@ function htmlFormKamar() {
   const master = S.adm.data.fasilitas.filter(x => x.aktif);
   const luas = (Number(String(f.panjang).replace(',', '.')) || 0) * (Number(String(f.lebar).replace(',', '.')) || 0);
   const label = 'block font-label-md text-[12px] font-bold text-on-surface mb-1.5';
-  const kelasPilih = KELAS.inputKamar + ' appearance-none cursor-pointer pr-10';
   const tombolBiru = 'inline-flex items-center justify-center gap-1.5 rounded-lg bg-primary-fixed/40 hover:bg-primary-fixed text-primary-container font-label-md text-[12px] font-bold whitespace-nowrap transition-colors';
   const kartuBagian = (no, ikonNama, judul, sub, isi, ekstra) => `<section class="bg-surface-page border border-border-subtle rounded-xl p-space-md md:p-6 shadow-sm flex flex-col gap-6">
     <div class="flex flex-wrap items-center justify-between gap-3 border-b border-surface-container-low pb-4">
@@ -3732,8 +3728,6 @@ function htmlFormKamar() {
     ${kartuBagian(1, 'domain', 'Informasi Dasar Unit', 'Identitas utama, penetapan tarif, dan status okupansi', `
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div><label class="${label}" for="fk-nama">Nama / Tipe Kamar <span class="text-error">*</span></label><input id="fk-nama" maxlength="40" data-masukan="fk" data-kunci="nama" value="${esc(f.nama)}" placeholder="Contoh: Kamar Deluxe A2" class="${KELAS.inputKamar}">${galatKolom('nama')}</div>
-        <div><label class="${label}" for="fk-kode">Nomor Pintu / Kode Unit <span class="text-error">*</span></label><input id="fk-kode" maxlength="10" data-masukan="fk" data-kunci="kode" value="${esc(f.kode)}" placeholder="Misal: A-02" class="${KELAS.inputKamar} uppercase">${galatKolom('kode')}</div>
-        <div><label class="${label}" for="fk-lantai">Lokasi Lantai <span class="text-error">*</span></label>${pilihan('id="fk-lantai" data-ubah="fk" data-kunci="lantai"', Object.keys(KONST.LANTAI).map(l => [l, KONST.LANTAI[l]]), f.lantai, kelasPilih)}${galatKolom('lantai')}</div>
         <div><label class="${label}" for="fk-harga">Tarif Sewa per Bulan <span class="text-error">*</span></label>
           <div class="relative flex items-center"><span class="absolute left-3.5 font-label-md text-[14px] font-semibold text-primary-container">Rp</span><input id="fk-harga" inputmode="numeric" data-masukan="fk-harga" value="${f.harga ? angka(f.harga) : ''}" placeholder="1.850.000" class="${KELAS.inputKamar} pl-11 pr-16 font-semibold"><span class="absolute right-3.5 font-body-sm text-body-sm text-outline">/ bulan</span></div>${galatKolom('harga')}</div>
         <div><span class="${label}">Biaya Tambahan Termasuk (Gratis)</span><div class="flex flex-wrap gap-3 pt-1">${chipBiaya('listrik', 'bolt', 'Termasuk Listrik')}</div></div>
@@ -3759,8 +3753,8 @@ function htmlFormKamar() {
               <span class="flex flex-col"><span class="font-label-md text-[12px] font-bold text-on-surface">Kamar Mandi Dalam</span><span class="font-body-sm text-[11px] text-on-surface-variant">${f.kamarMandi === 'Dalam' ? 'Kamar mandi di dalam kamar' : 'Tidak dicentang = kamar mandi luar'}</span></span>
             </label>
           </div></div>
-        <div><label class="${label}" for="fk-daya">Kapasitas Daya Listrik Kamar</label>
-          <div class="grid grid-cols-2 gap-3"><input id="fk-daya" maxlength="20" data-masukan="fk" data-kunci="daya" value="${esc(f.daya)}" placeholder="Misal: 1300 VA" class="${KELAS.inputKamar} text-center font-label-md text-[12px] font-bold"></div>${galatKolom('daya')}</div>
+        <div><label class="${label}" for="fk-daya">Tarif Listrik <span class="text-outline font-normal text-[11px]">(bila belum termasuk)</span></label>
+          <div class="grid grid-cols-2 gap-3"><input id="fk-daya" maxlength="20" data-masukan="fk" data-kunci="daya" value="${esc(f.daya)}" placeholder="Misal: 1850/kWh" class="${KELAS.inputKamar} text-center font-label-md text-[12px] font-bold"></div>${galatKolom('daya')}</div>
       </div>`)}
 
     ${kartuBagian(3, 'tune', 'Fasilitas Kamar (Pilih yang Tersedia)', 'Pilihan fasilitas terstandarisasi untuk menarik calon penghuni Kost AB6', `
@@ -3995,14 +3989,23 @@ AKSI['fk-batal'] = async () => {
   navigasi('admin-kamar');
 };
 
+/** Kode unit otomatis untuk kamar baru: angka terbesar yang sudah dipakai + 1 (mulai 101) */
+function kodeUnitBaru() {
+  const dipakai = S.adm.data.kamar.map(k => String(k.kode).toUpperCase());
+  let n = Math.max.apply(null, [100].concat(dipakai.map(k => parseInt(k, 10)).filter(x => !isNaN(x)))) + 1;
+  while (dipakai.indexOf(String(n)) >= 0) n++;
+  return String(n);
+}
+
 KIRIM.kamar = async form => {
   const fk = S.adm.fk;
   const f = fk.data;
   const angkaDes = v => Number(String(v).replace(',', '.')) || 0;
   const galat = {};
+  // Kode unit & lantai tidak lagi diisi di formulir: kamar baru dapat kode otomatis dan
+  // Lantai 1 (lantai tetap bisa diubah dari tabel Kelola Kamar); kamar lama tetap memakai miliknya.
+  if (!String(f.kode).trim()) f.kode = kodeUnitBaru();
   if (!f.nama.trim()) galat.nama = 'Nama kamar wajib diisi.';
-  if (!/^[A-Z0-9-]{1,10}$/.test(String(f.kode).trim().toUpperCase())) galat.kode = 'Kode unit 1–10 karakter (huruf, angka, tanda hubung).';
-  else if (S.adm.data.kamar.some(k => k.id !== fk.id && String(k.kode).toUpperCase() === String(f.kode).trim().toUpperCase())) galat.kode = 'Kode unit sudah dipakai kamar lain.';
   if (!(Number(f.harga) >= 100000)) galat.harga = 'Tarif sewa tidak valid (minimal Rp 100.000).';
   if (angkaDes(f.panjang) < 1 || angkaDes(f.lebar) < 1 || angkaDes(f.panjang) > 20 || angkaDes(f.lebar) > 20) galat.dimensi = 'Isi panjang & lebar kamar (1–20 meter).';
   if (!String(f.kasur).trim()) galat.kasur = 'Isi tipe tempat tidur.';
@@ -4726,7 +4729,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) kirim
 setInterval(() => { if (S.rute.nama === 'beranda') kirimStatBanner(); }, 120000);
 
 /** Penanda versi frontend — muncul di konsol agar mudah memastikan versi terbaru sudah terpasang */
-const VERSI_FRONTEND = '3.1.2';
+const VERSI_FRONTEND = '3.2.0';
 
 function mulaiAplikasi() {
   console.info('[Kost AB6] Frontend v' + VERSI_FRONTEND + ' siap');

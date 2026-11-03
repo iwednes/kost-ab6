@@ -39,6 +39,20 @@ body { overscroll-behavior-y: none; -webkit-tap-highlight-color: transparent; }
 .halaman-masuk { animation: halamanMasuk .22s ease-out backwards; }
 @keyframes halamanMasuk { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
+/* Deretan kartu berjalan: Galeri Kegiatan ke kiri, Kata Mereka ke kanan (htmlBerjalan di app.js).
+   Berhenti saat disorot mouse, disentuh, atau difokus keyboard. Tepi kiri-kanan memudar. */
+.berjalan {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 4%, #000 96%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 4%, #000 96%, transparent);
+}
+.berjalan-trek { animation: berjalanKiri 48s linear infinite; }
+.berjalan-kanan { animation-name: berjalanKanan; }
+.berjalan:hover .berjalan-trek, .berjalan:active .berjalan-trek, .berjalan:focus-within .berjalan-trek { animation-play-state: paused; }
+.berjalan-item { display: flex; }
+.berjalan-item > * { flex: 1 1 auto; min-width: 0; }
+@keyframes berjalanKiri { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@keyframes berjalanKanan { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+
 /* Kerangka muat (skeleton) */
 .kerangka {
   background: linear-gradient(90deg, #e1e7dc 25%, #ebf0e8 37%, #e1e7dc 63%);
@@ -92,4 +106,8 @@ input[type=number] { -moz-appearance: textfield; }
     transition-duration: .01ms !important;
     scroll-behavior: auto !important;
   }
+  /* Deretan berjalan menjadi deretan diam yang bisa digeser manual */
+  .berjalan-trek { animation: none !important; }
+  .berjalan { overflow-x: auto; }
+  .berjalan [data-salinan] { display: none; }
 }
