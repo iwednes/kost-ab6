@@ -783,10 +783,10 @@ function remah(teks) {
   </nav>`;
 }
 
-function labelPenulis(t, panjang) {
+function labelPenulis(t) {
   if (t.tipe === 'Official') return 'Kurasi Tim';
   if (t.tipe === 'Alumni') return 'Alumni Penghuni';
-  return t.lantai ? (panjang ? 'Penghuni Lantai ' : 'Penghuni Lt. ') + t.lantai : 'Penghuni';
+  return 'Penghuni';
 }
 
 /** Avatar bercincin gradasi; tanpa foto → inisial / ikon gedung (Official) */
@@ -1172,10 +1172,7 @@ function kartuKamar(k) {
     </a>
     <div class="flex flex-col flex-1 p-space-md justify-between">
       <div class="space-y-space-xs">
-        <div class="flex items-start justify-between gap-2">
-          <h2 class="font-headline-md text-headline-md text-on-surface tracking-tight group-hover:text-primary transition-colors"><a href="#" data-nav="detail" data-kode="${esc(k.kode)}">${esc(k.nama)}</a></h2>
-          <span class="font-body-sm text-body-sm text-on-surface-variant font-mono bg-surface-container-low px-2 py-0.5 rounded whitespace-nowrap">Lt. ${esc(k.lantai)}</span>
-        </div>
+        <h2 class="font-headline-md text-headline-md text-on-surface tracking-tight group-hover:text-primary transition-colors"><a href="#" data-nav="detail" data-kode="${esc(k.kode)}">${esc(k.nama)}</a></h2>
         <div class="flex items-baseline gap-1"><span class="font-label-numeric text-label-numeric font-bold text-primary-container">${rupiah(k.harga)}</span><span class="font-body-sm text-body-sm text-on-surface-variant">/bulan</span></div>
         <p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1 pt-0.5">${ikon('straighten', 'text-[16px] text-tertiary')}${esc(spekRingkas(k))}</p>
         <div class="flex flex-wrap gap-1.5 pt-2">${daftarChipKamar(k)}</div>
@@ -1254,7 +1251,6 @@ function renderDetailIsi(el, k) {
           <a href="#" data-nav="detail" data-kode="${esc(x.kode)}" class="relative block w-full aspect-[16/10] overflow-hidden bg-surface-container">
             ${gambar((x.foto[0] || {}).id, 600, 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500', x.nama)}
             <span class="absolute top-2 left-2 px-2 py-0.5 rounded-full ${x.status === 'Terisi' ? 'bg-primary-container' : 'bg-status-available'} text-on-primary font-label-md text-body-sm">${esc(x.status)}</span>
-            <span class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-inverse-surface/75 text-on-primary font-body-sm text-body-sm">Lantai ${esc(x.lantai)}</span>
           </a>
           <div class="p-space-md flex flex-col flex-1 justify-between gap-space-sm">
             <div><h3 class="font-headline-sm text-body-lg font-bold text-on-surface group-hover:text-primary transition-colors">${esc(x.nama)}</h3><p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">${esc(spekRingkas(x))}</p></div>
@@ -1268,7 +1264,7 @@ function renderDetailIsi(el, k) {
     <div class="flex items-center justify-between mb-space-lg gap-3">
       <a href="#" data-nav="kamar" class="inline-flex items-center gap-space-xs font-label-md text-label-md text-primary-container hover:opacity-80 transition-opacity group">${ikon('arrow_back', 'text-[18px] group-hover:-translate-x-0.5 transition-transform')}<span>Kembali ke Katalog Kamar</span></a>
       <div class="hidden sm:flex items-center gap-space-sm text-on-surface-variant font-body-sm text-body-sm">
-        <a href="#" data-nav="kamar" class="hover:text-primary">Katalog</a><span>/</span><span>Lantai ${esc(k.lantai)}</span><span>/</span><span class="text-on-surface font-semibold">${esc(namaKamarPendek(k.nama))}</span>
+        <a href="#" data-nav="kamar" class="hover:text-primary">Katalog</a><span>/</span><span class="text-on-surface font-semibold">${esc(namaKamarPendek(k.nama))}</span>
       </div>
     </div>
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-start">
@@ -1328,7 +1324,7 @@ function renderDetailIsi(el, k) {
               ? `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#e2e8f0] text-[#1d252c] font-label-md text-body-sm font-semibold"><span class="w-2 h-2 rounded-full bg-[#1d252c]"></span>Terisi</span>`
               : `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#DCFCE7] text-[#166534] font-label-md text-body-sm font-semibold"><span class="w-2 h-2 rounded-full bg-status-available animate-pulse"></span>Tersedia Siap Huni</span>`}
           </div>
-          <div><h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-on-surface tracking-tight">${esc(k.nama)}</h1><p class="font-body-md text-body-md text-on-surface-variant mt-0.5">Kost AB6 Unit Lantai ${esc(k.lantai)}${k.label ? ' · ' + esc(k.label) : ''}</p></div>
+          <div><h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-on-surface tracking-tight">${esc(k.nama)}</h1><p class="font-body-md text-body-md text-on-surface-variant mt-0.5">Kost AB6${k.label ? ' · ' + esc(k.label) : ''}</p></div>
           <div class="p-space-md bg-surface-subtle rounded-xl flex items-baseline justify-between gap-2 flex-wrap">
             <div><span class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary-container font-bold tracking-tight">${rupiah(k.harga)}</span><span class="font-body-md text-body-md text-on-surface-variant"> / bulan</span></div>
             <span class="text-secondary font-label-md text-body-sm font-semibold bg-secondary-container/40 px-2 py-0.5 rounded">Fixed Rate</span>
@@ -1390,7 +1386,7 @@ RENDER.testimoni = function (el) {
 };
 
 function kartuTestiPenuh(t) {
-  const sub = labelPenulis(t, true) + (t.profesi ? ' · ' + t.profesi : '');
+  const sub = labelPenulis(t) + (t.profesi ? ' · ' + t.profesi : '');
   return `<article class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between group">
     <div class="space-y-space-md">
       <div class="flex items-start gap-space-md">
@@ -2267,10 +2263,9 @@ function statistikKamar(kamar) {
 }
 
 function labelKamarAdmin(t) {
-  const k = S.adm.data && S.adm.data.kamar.filter(x => x.id === t.idKamar)[0];
   if (t.tipe === 'Official') return 'Kurasi Tim';
   if (t.tipe === 'Alumni') return 'Alumni Penghuni';
-  return k ? 'Penghuni Lt. ' + k.lantai : 'Penghuni';
+  return 'Penghuni';
 }
 
 function kamarDariId(id) {
@@ -2431,7 +2426,7 @@ RENDER['admin-dashboard'] = function (el) {
           </tr></thead>
           <tbody class="divide-y divide-border-subtle font-body-sm text-[13px] text-on-surface">${baris.map(t => {
             const km = kamarDariId(t.idKamar);
-            const kamar = km ? `Kamar ${km.kode} (Lt ${km.lantai})` : (t.tipe === 'Official' ? 'Kurasi Tim' : '-');
+            const kamar = km ? km.nama : (t.tipe === 'Official' ? 'Kurasi Tim' : '-');
             return `<tr data-aksi="buka-testi-admin" data-id="${esc(t.id)}" class="hover:bg-surface-subtle/60 transition-colors cursor-pointer" title="Lihat detail testimoni">
               <td class="py-3 px-4 font-semibold text-on-surface whitespace-nowrap">${esc(t.nama)}</td>
               <td class="py-3 px-4 text-on-surface-variant whitespace-nowrap">${esc(kamar)}</td>
@@ -3459,7 +3454,7 @@ RENDER['admin-kamar'] = function (el) {
 
   <div class="p-4 rounded-xl bg-surface-page shadow-sm mb-space-md flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-space-sm">
     <div class="relative flex-1 xl:min-w-[280px]">${ikon('search', 'absolute left-3.5 top-1/2 -translate-y-1/2 text-[20px] text-outline')}
-      <input id="kamar-cari" type="search" data-masukan="kamar-cari" value="${esc(F.cari)}" placeholder="Cari nama kamar, lantai, atau fasilitas..." aria-label="Cari kamar" class="w-full pl-10 pr-4 py-2.5 rounded-lg bg-surface-subtle text-on-surface font-body-md text-body-md placeholder:text-outline focus:outline-none focus:bg-surface-page shadow-inner transition-colors"></div>
+      <input id="kamar-cari" type="search" data-masukan="kamar-cari" value="${esc(F.cari)}" placeholder="Cari nama kamar atau fasilitas..." aria-label="Cari kamar" class="w-full pl-10 pr-4 py-2.5 rounded-lg bg-surface-subtle text-on-surface font-body-md text-body-md placeholder:text-outline focus:outline-none focus:bg-surface-page shadow-inner transition-colors"></div>
     <div class="grid grid-cols-2 sm:flex items-center gap-space-sm">
       ${pilihan('data-ubah="kamar-filter" data-kunci="status" aria-label="Filter status"', [['semua', `Semua Status (${st.total})`], ['Tersedia', `Tersedia (${st.tersedia})`], ['Terisi', `Terisi (${st.terisi})`]], F.status)}
       ${pilihan('data-ubah="kamar-filter" data-kunci="urut" aria-label="Urutkan"', [['default', 'Nama (A–Z)'], ['harga-naik', 'Harga Terendah'], ['harga-turun', 'Harga Tertinggi']], F.urut)}
@@ -3808,9 +3803,6 @@ function simpanDrafKamar(renderUlang) {
 
 function nilaiFk(el) {
   if (el.type === 'checkbox') return el.checked;
-  const k = el.dataset.kunci;
-  if (k === 'lantai') return Number(el.value);
-  if (k === 'kode') return el.value.toUpperCase();
   return el.value;
 }
 
@@ -3883,7 +3875,7 @@ AKSI['fk-template'] = async () => {
   const cleaning = f.fasilitas.indexOf('cleaning') >= 0;
   const p = String(f.panjang || '').replace('.', ',') || '...';
   const l = String(f.lebar || '').replace('.', ',') || '...';
-  f.deskripsi = `Kamar nyaman berukuran ${p} x ${l} m di Lantai ${f.lantai} dengan kasur ${teksKasur}.` +
+  f.deskripsi = `Kamar nyaman berukuran ${p} x ${l} m dengan kasur ${teksKasur}.` +
     (teksDaftar ? ` Dilengkapi ${teksDaftar}${cleaning ? ', serta layanan cleaning service' : ''}.` : (cleaning ? ' Dilengkapi layanan cleaning service.' : ''));
   f.deskripsi = f.deskripsi.slice(0, 600);
   simpanDrafKamar(true);
@@ -3968,8 +3960,8 @@ KIRIM.kamar = async form => {
   const f = fk.data;
   const angkaDes = v => Number(String(v).replace(',', '.')) || 0;
   const galat = {};
-  // Kode unit & lantai tidak lagi diisi di formulir: kamar baru dapat kode otomatis dan
-  // Lantai 1 (lantai tetap bisa diubah dari tabel Kelola Kamar); kamar lama tetap memakai miliknya.
+  // Kode unit & lantai tidak lagi diisi maupun ditampilkan: kamar baru dapat kode otomatis
+  // (penanda internal untuk tautan detail) dan lantai bawaan 1; kamar lama tetap memakai miliknya.
   if (!String(f.kode).trim()) f.kode = kodeUnitBaru();
   if (!f.nama.trim()) galat.nama = 'Nama kamar wajib diisi.';
   if (!(Number(f.harga) >= 100000)) galat.harga = 'Tarif sewa tidak valid (minimal Rp 100.000).';
@@ -4695,7 +4687,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) kirim
 setInterval(() => { if (S.rute.nama === 'beranda') kirimStatBanner(); }, 120000);
 
 /** Penanda versi frontend — muncul di konsol agar mudah memastikan versi terbaru sudah terpasang */
-const VERSI_FRONTEND = '3.2.4';
+const VERSI_FRONTEND = '3.2.5';
 
 function mulaiAplikasi() {
   console.info('[Kost AB6] Frontend v' + VERSI_FRONTEND + ' siap');
