@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://script.google.com" crossorigin>
   <link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Playfair+Display:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
   <!-- Ikon: sumbu dikunci ke nilai yang dipakai style.css (opsz 24, wght 400, GRAD 0; FILL 0–1) → ±450 KB, bukan 3,9 MB -->
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&display=block" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
@@ -50,7 +50,7 @@
 
     <!-- Laci menu ponsel (tidak ada di desain; memakai token yang sama) -->
     <div id="laci-hp" class="fixed inset-0 z-[1050]" role="dialog" aria-modal="true" aria-label="Menu navigasi" hidden>
-      <div class="absolute inset-0 bg-[#1a3326]/60 backdrop-blur-sm latar-masuk" data-aksi="tutup-menu-hp"></div>
+      <div class="absolute inset-0 bg-[#1a3326]/60 latar-masuk" data-aksi="tutup-menu-hp"></div>
       <nav class="absolute right-0 top-0 h-full w-[80%] max-w-[320px] bg-surface-container-lowest shadow-xl flex flex-col laci-kanan-masuk">
         <div class="h-[72px] px-space-md flex items-center justify-between">
           <span class="font-headline-sm text-headline-sm text-on-surface tracking-tight">Kost AB6</span>
@@ -200,7 +200,7 @@
 
   <!-- ═══════════════ LAPISAN ADMIN ═══════════════ -->
   <div id="lapisan-admin" class="bg-surface-subtle min-h-screen" hidden>
-    <div id="latar-sidebar" class="fixed inset-0 z-[45] bg-[#1a3326]/60 backdrop-blur-sm lg:hidden" data-aksi="tutup-sidebar" hidden></div>
+    <div id="latar-sidebar" class="fixed inset-0 z-[45] bg-[#1a3326]/60 lg:hidden" data-aksi="tutup-sidebar" hidden></div>
     <aside id="sidebar-admin" class="fixed left-0 top-0 h-full w-[240px] bg-[#1a3326] z-50 flex flex-col justify-between select-none shadow-[0_1px_8px_rgba(0,0,0,0.12)] -translate-x-full lg:translate-x-0 transition-transform duration-200" aria-label="Menu panel admin">
       <div class="flex flex-col">
         <div class="h-16 px-space-md flex items-center justify-between border-b border-[#24452f]">

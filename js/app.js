@@ -65,7 +65,8 @@ const S = {
   stat: { tayang: {}, klik: {} },
   sesi: null,
   kotor: false,
-  adm: { data: null, waktuMuat: 0, memuat: null }
+  adm: { data: null, waktuMuat: 0, memuat: null },
+  versiData: 0          // naik setiap data publik berubah → tampilan halaman yang disimpan dibangun ulang
 };
 
 const AKSI = {};      // klik [data-aksi]
@@ -284,7 +285,7 @@ const Modal = {
   buka(opsi) {
     const akar = $('#akar-modal');
     const latar = document.createElement('div');
-    latar.className = 'fixed inset-0 z-[1100] bg-[#1a3326]/60 backdrop-blur-sm flex items-center justify-center p-4 latar-masuk';
+    latar.className = 'fixed inset-0 z-[1100] bg-[#1a3326]/60 flex items-center justify-center p-4 latar-masuk';
     latar.setAttribute('role', 'dialog');
     latar.setAttribute('aria-modal', 'true');
     latar.setAttribute('aria-label', opsi.label || 'Dialog');
@@ -451,6 +452,13 @@ const KELAS_MENU = {
   admPasif: 'flex items-center gap-space-xs px-space-md py-3 font-label-md text-label-md text-outline-variant hover:bg-[#24452f] hover:text-on-primary transition-colors border-l-[3px] border-transparent'
 };
 
+/** Halaman publik yang tampilannya disimpan antar-navigasi (lihat navigasi()) */
+const HALAMAN_DISIMPAN = { beranda: true, kamar: true, detail: true, testimoni: true, tentang: true };
+
+function kunciTampilan(nama, param) {
+  return [nama, JSON.stringify(param || {}), S.versiData, nama === 'kamar' ? S.katalog.halaman : ''].join('|');
+}
+
 function lapisanUntuk(nama) {
   if (nama === 'login') return 'login';
   if (nama.indexOf('admin-') === 0) return 'admin';
@@ -491,6 +499,9 @@ async function navigasi(nama, param, opsi) {
     Slider.berhenti();
     kirimStatBanner();
   }
+  // Video tur yang sedang diputar dihentikan saat halamannya ditinggalkan
+  const elSebelum = sebelum && sebelum !== nama ? $('#hal-' + sebelum) : null;
+  if (elSebelum) $$('iframe[src*="youtube"], iframe[src*="drive.google.com/file"]', elSebelum).forEach(f => { f.remove(); elSebelum.dataset.kunci = ''; });
   S.rute = { nama, param };
   tutupMenuHp();
   tutupSidebar();
@@ -501,11 +512,20 @@ async function navigasi(nama, param, opsi) {
   $$('.halaman').forEach(h => { h.hidden = h.dataset.halaman !== nama; });
 
   const el = $('#hal-' + nama);
-  try {
-    RENDER[nama](el, param);
-  } catch (e) {
-    console.error(e);
-    toast('Gagal menampilkan halaman', e.message, 'galat');
+  // Halaman publik yang sudah pernah dibuka dengan data & parameter sama ditampilkan ulang
+  // apa adanya — foto dan peta Google tidak dimuat ulang, jadi pindah halaman terasa ringan.
+  const kunci = HALAMAN_DISIMPAN[nama] ? kunciTampilan(nama, param) : '';
+  if (kunci && el.dataset.kunci === kunci) {
+    if (nama === 'beranda') Slider.mulai();
+  } else {
+    try {
+      RENDER[nama](el, param);
+      if (el) el.dataset.kunci = kunci;
+    } catch (e) {
+      console.error(e);
+      if (el) el.dataset.kunci = '';
+      toast('Gagal menampilkan halaman', e.message, 'galat');
+    }
   }
   if (el) {
     el.classList.remove('halaman-masuk');
@@ -605,6 +625,7 @@ function terapkanData(d) {
     berubah.push(k);
   });
   if (!berubah.length) return;
+  S.versiData++;
   if (berubah.indexOf('beranda') >= 0 && S.beranda) {
     S.kegiatan = { items: S.beranda.kegiatan.items.slice(), adaLagi: S.beranda.kegiatan.adaLagi, halaman: 1, memuat: false };
   }
@@ -620,6 +641,7 @@ function terapkanData(d) {
   if (butuh && butuh.some(k => berubah.indexOf(k) >= 0)) {
     if (nama === 'testimoni') renderTestimoniBagian();
     else RENDER[nama]($('#hal-' + nama), S.rute.param);
+    $('#hal-' + nama).dataset.kunci = kunciTampilan(nama, S.rute.param);
     perbaruiWaMelayang();
   }
 }
@@ -911,7 +933,7 @@ function htmlHero(banner) {
   const kontrol = n > 1 ? `
     <button type="button" data-aksi="slider-prev" aria-label="Slide sebelumnya" class="absolute left-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-surface-container-lowest text-on-surface hidden md:flex items-center justify-center shadow-md hover:bg-surface-bright active:scale-95 transition-all">${ikon('chevron_left', 'text-[24px]')}</button>
     <button type="button" data-aksi="slider-next" aria-label="Slide berikutnya" class="absolute right-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-surface-container-lowest text-on-surface hidden md:flex items-center justify-center shadow-md hover:bg-surface-bright active:scale-95 transition-all">${ikon('chevron_right', 'text-[24px]')}</button>
-    <div class="absolute bottom-5 right-4 md:right-8 z-30 flex items-center gap-space-md bg-on-surface/50 backdrop-blur-md px-space-md py-space-xs rounded-full">
+    <div class="absolute bottom-5 right-4 md:right-8 z-30 flex items-center gap-space-md bg-on-surface/50 px-space-md py-space-xs rounded-full">
       <div class="flex items-center gap-1.5">${banner.map((s, i) => `<button type="button" data-aksi="slider-ke" data-i="${i}" data-garis aria-label="Pindah ke slide ${i + 1}" class="h-1.5 w-10 rounded-full ${i === 0 ? 'bg-gradient-to-r from-gradient-start via-gradient-mid to-gradient-end' : 'bg-surface-container-lowest/50'} transition-all"></button>`).join('')}</div>
       <button type="button" data-aksi="slider-jeda" aria-label="${Slider.jalan ? 'Jeda putar otomatis' : 'Mulai putar otomatis'}" class="text-on-primary hover:text-secondary-fixed transition-colors flex items-center">${ikon(Slider.jalan ? 'pause' : 'play_arrow', 'text-[18px]')}</button>
       <span class="hidden sm:inline-block font-body-sm text-body-sm text-surface-container-high tracking-tight">Otomatis berganti tiap 5 detik</span>
@@ -1147,7 +1169,7 @@ function kartuKamar(k) {
       ${gambar(foto && foto.id, 800, `w-full h-full object-cover ${terisi ? 'grayscale-[25%] contrast-90' : ''} group-hover:scale-105 transition-transform duration-500`, k.nama)}
       ${terisi ? '<div class="absolute inset-0 bg-on-surface/10"></div>' : ''}
       ${lencanaStatusFoto(k.status)}
-      ${(k.foto || []).length ? `<div class="absolute bottom-3 right-3 px-2.5 py-1 rounded-lg bg-inverse-surface/80 backdrop-blur-sm text-inverse-on-surface font-body-sm text-body-sm flex items-center gap-1">${ikon('photo_camera', 'text-[16px] text-secondary-fixed')}${k.foto.length} Foto</div>` : ''}
+      ${(k.foto || []).length ? `<div class="absolute bottom-3 right-3 px-2.5 py-1 rounded-lg bg-inverse-surface/80 text-inverse-on-surface font-body-sm text-body-sm flex items-center gap-1">${ikon('photo_camera', 'text-[16px] text-secondary-fixed')}${k.foto.length} Foto</div>` : ''}
     </a>
     <div class="flex flex-col flex-1 p-space-md justify-between">
       <div class="space-y-space-xs">
@@ -1233,7 +1255,7 @@ function renderDetailIsi(el, k) {
           <a href="#" data-nav="detail" data-kode="${esc(x.kode)}" class="relative block w-full aspect-[16/10] overflow-hidden bg-surface-container">
             ${gambar((x.foto[0] || {}).id, 600, 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500', x.nama)}
             <span class="absolute top-2 left-2 px-2 py-0.5 rounded-full ${x.status === 'Terisi' ? 'bg-primary-container' : 'bg-status-available'} text-on-primary font-label-md text-body-sm">${esc(x.status)}</span>
-            <span class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-inverse-surface/75 text-on-primary font-body-sm text-body-sm backdrop-blur-sm">Lantai ${esc(x.lantai)}</span>
+            <span class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-inverse-surface/75 text-on-primary font-body-sm text-body-sm">Lantai ${esc(x.lantai)}</span>
           </a>
           <div class="p-space-md flex flex-col flex-1 justify-between gap-space-sm">
             <div><h3 class="font-headline-sm text-body-lg font-bold text-on-surface group-hover:text-primary transition-colors">${esc(x.nama)}</h3><p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">${esc(spekRingkas(x))}</p></div>
@@ -1257,9 +1279,9 @@ function renderDetailIsi(el, k) {
             <div id="galeri-utama" class="w-full h-full">${gambar(foto[0] && foto[0].id, 1600, 'w-full h-full object-cover transition-all duration-500 ease-out', k.nama, true)}</div>
             <div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/30 via-transparent to-transparent pointer-events-none"></div>
             <div class="absolute top-space-md left-space-md flex items-center gap-space-xs">
-              <span class="px-3 py-1 rounded-full bg-surface-container-lowest/90 backdrop-blur-md font-label-md text-body-sm text-primary-container shadow-sm flex items-center gap-1">${ikon('verified', 'text-[16px] text-primary')}Foto Asli Terverifikasi</span>
+              <span class="px-3 py-1 rounded-full bg-surface-container-lowest/90 font-label-md text-body-sm text-primary-container shadow-sm flex items-center gap-1">${ikon('verified', 'text-[16px] text-primary')}Foto Asli Terverifikasi</span>
             </div>
-            ${foto.length ? `<button type="button" data-aksi="galeri-perbesar" aria-label="Perbesar foto" class="absolute bottom-space-md right-space-md inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-inverse-surface/85 backdrop-blur-md text-on-primary font-label-md text-body-sm hover:bg-inverse-surface transition-all shadow-md">${ikon('fullscreen', 'text-[18px]')}<span class="hidden sm:inline">Perbesar Layar</span></button>` : ''}
+            ${foto.length ? `<button type="button" data-aksi="galeri-perbesar" aria-label="Perbesar foto" class="absolute bottom-space-md right-space-md inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-inverse-surface/85 text-on-primary font-label-md text-body-sm hover:bg-inverse-surface transition-all shadow-md">${ikon('fullscreen', 'text-[18px]')}<span class="hidden sm:inline">Perbesar Layar</span></button>` : ''}
           </div>
           ${foto.length > 1 ? `<div class="flex gap-space-xs sm:gap-space-sm overflow-x-auto" id="strip-thumb">${foto.map((f, i) => `
             <button type="button" data-aksi="galeri-pilih" data-i="${i}" aria-label="Tampilkan foto ${i + 1}" class="thumb-btn relative shrink-0 w-[calc((100%-1rem)/5)] sm:w-[calc((100%-2rem)/5)] aspect-[16/10] rounded-lg overflow-hidden bg-surface-container-high transition-all ${i === 0 ? 'ring-2 ring-primary-container' : 'opacity-80 hover:opacity-100'}">
@@ -1290,7 +1312,7 @@ function renderDetailIsi(el, k) {
           <div class="relative w-full aspect-[16/9] rounded-xl overflow-hidden bg-inverse-surface shadow-md group cursor-pointer" id="kartu-video" data-aksi="putar-video" role="button" tabindex="0" aria-label="Putar video tur ${esc(k.nama)}">
             ${gambar(foto[0] && foto[0].id, 1280, 'w-full h-full object-cover opacity-80 group-hover:scale-105 group-hover:opacity-90 transition-all duration-700', '')}
             <div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/80 via-inverse-surface/30 to-transparent"></div>
-            <div class="absolute top-space-md left-space-md"><span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-inverse-surface/80 backdrop-blur-md text-on-primary font-label-md text-body-sm">${ikon('videocam', 'text-[16px] text-gradient-mid')}Video Tur Kamar</span></div>
+            <div class="absolute top-space-md left-space-md"><span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-inverse-surface/80 text-on-primary font-label-md text-body-sm">${ikon('videocam', 'text-[16px] text-gradient-mid')}Video Tur Kamar</span></div>
             <div class="absolute inset-0 flex items-center justify-center"><div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-primary-container text-on-primary flex items-center justify-center shadow-xl group-hover:scale-110 group-active:scale-95 transition-transform duration-300">${ikon('play_arrow', 'text-[36px] sm:text-[44px] ml-1')}</div></div>
             <div class="absolute bottom-space-md left-space-md right-space-md flex items-center justify-between text-on-primary">
               <div class="flex flex-col"><span class="font-headline-sm text-body-lg font-semibold text-on-primary">Walkthrough Lengkap ${esc(k.nama)}</span><span class="font-body-sm text-body-sm text-surface-container-high">Eksplorasi setiap sudut kamar sebelum survei langsung</span></div>
@@ -1713,7 +1735,7 @@ RENDER.tentang = function (el) {
   const kartuArea = a => `<article class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col group">
       <div class="relative h-52 overflow-hidden">
         ${gambar(a.foto, 800, 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-300', a.nama)}
-        ${a.label ? `<div class="absolute top-3 left-3 bg-surface-container-lowest/90 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm">${ikon(a.ikon || 'verified', 'text-[16px] text-secondary')}<span class="font-label-md text-body-sm text-on-surface">${esc(a.label)}</span></div>` : ''}
+        ${a.label ? `<div class="absolute top-3 left-3 bg-surface-container-lowest/90 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm">${ikon(a.ikon || 'verified', 'text-[16px] text-secondary')}<span class="font-label-md text-body-sm text-on-surface">${esc(a.label)}</span></div>` : ''}
       </div>
       <div class="p-space-lg flex-1 flex flex-col justify-between">
         <div><h3 class="font-headline-md text-headline-sm text-on-surface mb-2">${esc(a.nama)}</h3><p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">${esc(a.deskripsi)}</p></div>
@@ -1760,7 +1782,7 @@ RENDER.tentang = function (el) {
       <div class="col-span-12 lg:col-span-8 rounded-xl overflow-hidden shadow-sm relative group h-80">
         ${gambar(t.foto, 1600, 'w-full h-80 object-cover transform group-hover:scale-105 transition-transform duration-500', 'Gedung Kost AB6')}
         <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-space-md">
-          <div><span class="px-2.5 py-1 rounded bg-surface-container-lowest/90 backdrop-blur-sm text-on-surface font-label-md text-body-sm">${esc(t.fotoLabel)}</span><p class="text-on-primary font-headline-sm text-headline-sm mt-1">${esc(t.fotoJudul)}</p></div>
+          <div><span class="px-2.5 py-1 rounded bg-surface-container-lowest/90 text-on-surface font-label-md text-body-sm">${esc(t.fotoLabel)}</span><p class="text-on-primary font-headline-sm text-headline-sm mt-1">${esc(t.fotoJudul)}</p></div>
         </div>
       </div>
       <div class="col-span-12 lg:col-span-4 flex flex-col gap-gutter">
@@ -2066,8 +2088,11 @@ function muatAdmin() {
   if (S.adm.memuat) return S.adm.memuat;
   S.adm.memuat = panggil('adminMuat', tokenAdmin()).then(d => {
     const pertama = !S.adm.data;
+    // Penyegaran berkala yang isinya sama tidak perlu menggambar ulang halaman (tanpa kedip)
+    const sama = !pertama && JSON.stringify(d) === JSON.stringify(S.adm.data);
     S.adm.data = d;
     S.adm.waktuMuat = Date.now();
+    if (sama) return d;
     perbaruiKerangkaAdmin();
     if (pertama || bolehRenderUlangAdmin()) renderAdminAktif();
     return d;
@@ -3231,7 +3256,7 @@ function htmlPratinjauArea() {
   }
   return `<article class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm flex flex-col max-w-sm">
     <div class="relative h-44 overflow-hidden">${gambarAdmin(a.foto, 600, 'w-full h-full object-cover', a.nama)}
-      ${a.label ? `<div class="absolute top-3 left-3 bg-surface-container-lowest/90 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm">${ikon(a.ikon || 'verified', 'text-[16px] text-secondary')}<span class="font-label-md text-body-sm text-on-surface">${esc(a.label)}</span></div>` : ''}</div>
+      ${a.label ? `<div class="absolute top-3 left-3 bg-surface-container-lowest/90 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm">${ikon(a.ikon || 'verified', 'text-[16px] text-secondary')}<span class="font-label-md text-body-sm text-on-surface">${esc(a.label)}</span></div>` : ''}</div>
     <div class="p-space-md"><h3 class="font-headline-md text-headline-sm text-on-surface mb-2">${esc(a.nama || 'Nama Area')}</h3><p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">${esc(a.deskripsi || 'Deskripsi area...')}</p>
       ${a.catatan ? `<div class="mt-space-sm flex items-center gap-2 ${a.penting ? 'text-error' : 'text-secondary'} font-label-md text-body-sm">${ikon('check_circle', 'text-[18px]')}<span>${esc(a.catatan)}</span></div>` : ''}</div>
   </article>`;
@@ -3431,9 +3456,6 @@ RENDER['admin-kamar'] = function (el) {
   if (!d) { el.innerHTML = kerangkaAdmin(); return; }
   const F = S.adm.kamar;
   const st = statistikKamar(d.kamar);
-  const target = d.info.targetOkupansi || 75;
-  const potensi = Math.max(0, Math.ceil(target / 100 * st.total) - st.terisi);
-  const delta = d.okupansiBulanLalu === null || d.okupansiBulanLalu === undefined ? null : Math.round((st.okupansi - d.okupansiBulanLalu) * 10) / 10;
   const lantaiAda = Array.from(new Set(d.kamar.map(k => k.lantai))).sort((a, b) => a - b);
   const master = {};
   d.fasilitas.forEach(f => { master[f.kode] = f; });
@@ -3455,35 +3477,6 @@ RENDER['admin-kamar'] = function (el) {
     </div>
     <div class="flex items-center gap-space-sm flex-wrap self-start lg:self-auto">
       <button type="button" data-nav="admin-kamar-form" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary-container text-on-primary font-label-md text-label-md shadow-md hover:bg-primary transition-all">${ikon('add_circle', 'text-[19px]')}<span>Tambah Kamar Baru</span></button>
-    </div>
-  </div>
-
-  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-space-md mb-space-lg">
-    <div class="p-space-md rounded-xl bg-surface-page shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-shadow">
-      <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-surface-container-low rounded-full pointer-events-none group-hover:scale-110 transition-transform"></div>
-      <div class="flex items-center justify-between mb-3 relative"><span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Total Unit Kost</span><span class="w-9 h-9 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant">${ikon('apartment', 'text-[20px]')}</span></div>
-      <div class="relative"><div class="flex items-baseline gap-2"><span class="font-display-hero text-[36px] leading-[40px] font-bold text-on-surface tracking-tight">${st.total}</span><span class="font-label-md text-label-md text-on-surface-variant">Kamar</span></div>
-        <div class="flex items-center gap-1.5 mt-2"><span class="inline-block w-2 h-2 rounded-full bg-tertiary"></span><span class="font-body-sm text-body-sm text-on-surface-variant">Kapasitas penuh ${st.total} unit (${lantaiAda.length} Lantai)</span></div></div>
-    </div>
-    <div class="p-space-md rounded-xl bg-surface-page shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-shadow">
-      <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-secondary-fixed/30 rounded-full pointer-events-none group-hover:scale-110 transition-transform"></div>
-      <div class="flex items-center justify-between mb-3 relative"><span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Kamar Tersedia</span><span class="w-9 h-9 rounded-lg bg-secondary-container/30 flex items-center justify-center text-on-secondary-container">${ikon('check_circle', 'text-[20px]')}</span></div>
-      <div class="relative"><div class="flex items-baseline gap-2"><span class="font-display-hero text-[36px] leading-[40px] font-bold text-status-available tracking-tight">${st.tersedia}</span><span class="font-label-md text-label-md text-on-surface-variant">Unit</span></div>
-        <div class="flex items-center gap-1.5 mt-2 min-w-0"><span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-semibold bg-secondary-container text-on-secondary-container whitespace-nowrap">${teksPersen(st.siap)} Siap Huni</span><span class="font-body-sm text-body-sm text-on-surface-variant truncate">Siap disewakan langsung</span></div></div>
-    </div>
-    <div class="p-space-md rounded-xl bg-surface-page shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-shadow">
-      <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-tertiary-fixed/30 rounded-full pointer-events-none group-hover:scale-110 transition-transform"></div>
-      <div class="flex items-center justify-between mb-3 relative"><span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Kamar Terisi</span><span class="w-9 h-9 rounded-lg bg-tertiary-fixed flex items-center justify-center text-primary-container">${ikon('group', 'text-[20px]')}</span></div>
-      <div class="relative"><div class="flex items-baseline gap-2"><span class="font-display-hero text-[36px] leading-[40px] font-bold text-primary-container tracking-tight">${st.terisi}</span><span class="font-label-md text-label-md text-on-surface-variant">Unit</span></div>
-        <div class="flex items-center gap-1.5 mt-2"><span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-semibold bg-tertiary-fixed text-on-tertiary-fixed">Aktif</span><span class="font-body-sm text-body-sm text-on-surface-variant truncate">Kontrak berjalan</span></div></div>
-    </div>
-    <div class="p-space-md rounded-xl bg-surface-page shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-shadow">
-      <div class="flex items-center justify-between mb-3"><span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Estimasi Okupansi</span><span class="w-9 h-9 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant">${ikon('pie_chart', 'text-[20px]')}</span></div>
-      <div class="space-y-2">
-        <div class="flex items-baseline justify-between gap-2"><span class="font-display-hero text-[36px] leading-[40px] font-bold text-on-surface tracking-tight">${teksPersen(st.okupansi)}</span><span class="font-body-sm text-body-sm text-on-surface-variant">Target: ${target}%</span></div>
-        <div class="w-full h-2 rounded-full bg-surface-container overflow-hidden" role="progressbar" aria-valuenow="${st.okupansi}" aria-valuemin="0" aria-valuemax="100"><div class="h-full bg-primary-container rounded-full" style="width:${Math.min(100, st.okupansi)}%"></div></div>
-        <div class="flex justify-between items-center gap-2 text-[11px] font-body-sm text-on-surface-variant pt-0.5"><span>Potensi: ${potensi} unit tersisa target</span>${delta !== null ? `<span class="font-semibold ${delta >= 0 ? 'text-secondary' : 'text-error'} whitespace-nowrap">${delta >= 0 ? '+' : ''}${delta}% bln ini</span>` : ''}</div>
-      </div>
     </div>
   </div>
 
@@ -4762,7 +4755,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) kirim
 setInterval(() => { if (S.rute.nama === 'beranda') kirimStatBanner(); }, 120000);
 
 /** Penanda versi frontend — muncul di konsol agar mudah memastikan versi terbaru sudah terpasang */
-const VERSI_FRONTEND = '3.0.0';
+const VERSI_FRONTEND = '3.1.0';
 
 function mulaiAplikasi() {
   console.info('[Kost AB6] Frontend v' + VERSI_FRONTEND + ' siap');
