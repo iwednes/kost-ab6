@@ -1224,9 +1224,10 @@ function renderDetailIsi(el, k) {
   const lainnya = ((S.kamar && S.kamar.items) || []).filter(x => x.kode !== k.kode)
     .sort((a, b) => (a.status === b.status ? a.urutan - b.urutan : (a.status === 'Tersedia' ? -1 : 1))).slice(0, 3);
   S.detailIdx = 0;
+  // Fasilitas cukup nama singkat (Label Ringkas di MasterFasilitas), tanpa keterangan
   const fasilitas = (k.fasilitas || []).map(f => ({
-    ikon: f.ikon, judul: String(f.judul || '').replace('{ukuran}', kasur.ukuran || '').trim(), ket: f.keterangan
-  })).concat((k.kustom || []).map(t => ({ ikon: 'check_circle', judul: t, ket: '' })));
+    ikon: f.ikon, judul: f.ringkas || String(f.judul || '').replace('{ukuran}', kasur.ukuran || '').trim()
+  })).concat((k.kustom || []).map(t => ({ ikon: 'check_circle', judul: t })));
   const spek = (ik, label, nilai, biru) => `<div class="flex items-center justify-between gap-3 text-body-md font-body-md">
       <span class="text-on-surface-variant flex items-center gap-2 whitespace-nowrap shrink-0">${ikon(ik, 'text-[18px] text-tertiary')}${label}</span>
       <span class="font-semibold text-right ${biru ? 'text-primary-container' : 'text-on-surface'}">${nilai}</span></div>`;
@@ -1278,10 +1279,10 @@ function renderDetailIsi(el, k) {
 
         <div class="flex flex-col gap-space-md">
           <div class="relative pb-2"><h2 class="font-headline-md text-headline-md text-on-surface">Fasilitas Kamar</h2><div class="h-[2px] w-24 bg-gradient-to-r from-gradient-start via-gradient-mid to-gradient-end rounded-full mt-1.5"></div></div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-space-md">${fasilitas.map(f => `
-            <div class="flex items-start gap-space-sm p-space-md bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-shadow">
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-space-sm md:gap-space-md">${fasilitas.map(f => `
+            <div class="flex items-center gap-space-sm p-space-sm md:p-space-md bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-shadow">
               <div class="w-10 h-10 rounded-lg bg-tertiary-fixed/40 text-primary-container flex items-center justify-center shrink-0">${ikon(f.ikon, 'text-[22px]')}</div>
-              <div class="flex flex-col min-w-0"><span class="font-headline-sm text-body-lg font-semibold text-on-surface leading-snug">${esc(f.judul)}</span>${f.ket ? `<span class="font-body-sm text-body-sm text-on-surface-variant">${esc(f.ket)}</span>` : ''}</div>
+              <span class="font-headline-sm text-body-md md:text-body-lg font-semibold text-on-surface leading-snug min-w-0">${esc(f.judul)}</span>
             </div>`).join('')}</div>
         </div>
 
@@ -1325,7 +1326,7 @@ function renderDetailIsi(el, k) {
           <div class="flex flex-col gap-2.5 py-1">
             ${spek('straighten', 'Dimensi Kamar', `${desimal(k.panjang)} × ${desimal(k.lebar)} m (${String(luas).replace('.', ',')} m²)`)}
             ${spek('single_bed', 'Tipe Kasur', esc(kasur.spek || '-'))}
-            ${spek('water_damage', 'Kamar Mandi', k.kamarMandi === 'Dalam' ? 'Dalam (Water Heater)' : 'Luar (Bersih Terawat)', k.kamarMandi === 'Dalam')}
+            ${spek('water_damage', 'Kamar Mandi', k.kamarMandi === 'Dalam' ? 'Dalam' : 'Luar', k.kamarMandi === 'Dalam')}
             ${spek('layers', 'Lokasi Lantai', 'Lantai ' + esc(k.lantai) + (k.posisi ? ' (' + esc(k.posisi.replace(/^Lantai \d+\s*-\s*/i, '')) + ')' : ''))}
           </div>
           <div class="h-[1px] w-full bg-surface-container"></div>
@@ -3793,7 +3794,7 @@ function htmlFormKamar() {
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <label class="flex items-start gap-2.5 p-3 rounded-lg ${kelasPilihKartu} cursor-pointer hover:bg-surface-subtle">
               <input type="checkbox" data-ubah="fk-km" ${f.kamarMandi === 'Dalam' ? 'checked' : ''} class="mt-0.5 w-4 h-4 shrink-0 cursor-pointer accent-[#1565c0]">
-              <span class="flex flex-col"><span class="font-label-md text-[12px] font-bold text-on-surface">Kamar Mandi Dalam</span><span class="font-body-sm text-[11px] text-on-surface-variant">${f.kamarMandi === 'Dalam' ? 'Shower &amp; Water Heater' : 'Tidak dicentang = kamar mandi luar'}</span></span>
+              <span class="flex flex-col"><span class="font-label-md text-[12px] font-bold text-on-surface">Kamar Mandi Dalam</span><span class="font-body-sm text-[11px] text-on-surface-variant">${f.kamarMandi === 'Dalam' ? 'Kamar mandi di dalam kamar' : 'Tidak dicentang = kamar mandi luar'}</span></span>
             </label>
           </div></div>
         <div><label class="${label}" for="fk-daya">Kapasitas Daya Listrik Kamar</label>
@@ -4776,7 +4777,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) kirim
 setInterval(() => { if (S.rute.nama === 'beranda') kirimStatBanner(); }, 120000);
 
 /** Penanda versi frontend — muncul di konsol agar mudah memastikan versi terbaru sudah terpasang */
-const VERSI_FRONTEND = '2.6.2';
+const VERSI_FRONTEND = '2.6.3';
 
 function mulaiAplikasi() {
   console.info('[Kost AB6] Frontend v' + VERSI_FRONTEND + ' siap');
