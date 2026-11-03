@@ -18,17 +18,20 @@ body { overscroll-behavior-y: none; -webkit-tap-highlight-color: transparent; }
 }
 .ikon-isi { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important; }
 
+/* Tema Lindenberg x Dior: judul Playfair Display beraksen miring (italic) khas editorial */
+.font-display-hero, .font-display-hero-mobile, .font-headline-lg, .font-headline-lg-mobile, .font-headline-md { font-style: italic; }
+
 /* Scrollbar disembunyikan seperti desain, kecuali area tabel admin */
 ::-webkit-scrollbar { display: none; }
 * { scrollbar-width: none; }
 .gulir-tampak { scrollbar-width: thin; }
 .gulir-tampak::-webkit-scrollbar { display: block; height: 8px; width: 8px; }
-.gulir-tampak::-webkit-scrollbar-thumb { background: #c2c6d4; border-radius: 9999px; }
+.gulir-tampak::-webkit-scrollbar-thumb { background: #9aa894; border-radius: 9999px; }
 .gulir-tampak::-webkit-scrollbar-track { background: transparent; }
 
 /* Fokus keyboard selalu terlihat (aksesibilitas) */
 :focus { outline: none; }
-:focus-visible { outline: 2px solid #1565c0; outline-offset: 2px; border-radius: 6px; }
+:focus-visible { outline: 2px solid #1e3a2b; outline-offset: 2px; border-radius: 6px; }
 
 /* Transisi halaman SPA. "backwards" (bukan "both"): setelah selesai tidak menyisakan
    transform, karena transform pada section membuat bar position:fixed di dalamnya
@@ -38,7 +41,7 @@ body { overscroll-behavior-y: none; -webkit-tap-highlight-color: transparent; }
 
 /* Kerangka muat (skeleton) */
 .kerangka {
-  background: linear-gradient(90deg, #f0eded 25%, #f6f3f2 37%, #f0eded 63%);
+  background: linear-gradient(90deg, #e1e7dc 25%, #ebf0e8 37%, #e1e7dc 63%);
   background-size: 400% 100%;
   animation: kilau 1.4s ease infinite;
 }
@@ -63,7 +66,7 @@ img.gambar-gagal { visibility: hidden; }
 
 /* Seret-atur urutan */
 .sedang-diseret { opacity: .45; }
-.target-seret { box-shadow: 0 0 0 2px #1565c0 inset; }
+.target-seret { box-shadow: 0 0 0 2px #1e3a2b inset; }
 
 /* Iframe video & peta */
 .bingkai-media iframe { width: 100%; height: 100%; border: 0; display: block; }
@@ -78,7 +81,7 @@ input[type=number] { -moz-appearance: textfield; }
 
 /* Spinner kecil pada tombol */
 .putar { display: inline-block; width: 1rem; height: 1rem; border: 2px solid rgba(255,255,255,.45); border-top-color: #fff; border-radius: 9999px; animation: putar .6s linear infinite; }
-.putar-gelap { border-color: rgba(21,101,192,.25); border-top-color: #1565c0; }
+.putar-gelap { border-color: rgba(30,58,43,.25); border-top-color: #1e3a2b; }
 @keyframes putar { to { transform: rotate(360deg); } }
 
 /* Hormati preferensi kurangi gerakan */

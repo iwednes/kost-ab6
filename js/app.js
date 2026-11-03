@@ -254,7 +254,7 @@ function toast(judul, pesan, jenis) {
   const akar = $('#akar-toast');
   const galat = jenis === 'galat';
   const el = document.createElement('div');
-  el.className = 'pointer-events-auto bg-[#0A2540] text-on-primary px-4 py-3 rounded-xl shadow-xl flex items-start gap-3 max-w-sm w-full sm:w-auto toast-masuk';
+  el.className = 'pointer-events-auto bg-[#1a3326] text-on-primary px-4 py-3 rounded-xl shadow-xl flex items-start gap-3 max-w-sm w-full sm:w-auto toast-masuk';
   el.setAttribute('role', galat ? 'alert' : 'status');
   el.innerHTML = `
     <div class="w-7 h-7 rounded-full ${galat ? 'bg-error' : (jenis === 'info' ? 'bg-primary-container' : 'bg-status-available')} text-on-primary flex items-center justify-center shrink-0">
@@ -284,7 +284,7 @@ const Modal = {
   buka(opsi) {
     const akar = $('#akar-modal');
     const latar = document.createElement('div');
-    latar.className = 'fixed inset-0 z-[1100] bg-[#0A2540]/60 backdrop-blur-sm flex items-center justify-center p-4 latar-masuk';
+    latar.className = 'fixed inset-0 z-[1100] bg-[#1a3326]/60 backdrop-blur-sm flex items-center justify-center p-4 latar-masuk';
     latar.setAttribute('role', 'dialog');
     latar.setAttribute('aria-modal', 'true');
     latar.setAttribute('aria-label', opsi.label || 'Dialog');
@@ -447,8 +447,8 @@ const KELAS_MENU = {
   pasif: 'relative flex items-center h-full text-on-surface-variant hover:text-on-surface font-headline-sm text-body-md transition-colors',
   hpAktif: 'flex items-center gap-3 px-3 py-3 rounded-lg font-headline-sm text-body-lg bg-primary-fixed/40 text-primary-container',
   hpPasif: 'flex items-center gap-3 px-3 py-3 rounded-lg font-headline-sm text-body-lg text-on-surface hover:bg-surface-container',
-  admAktif: 'flex items-center gap-space-xs px-space-md py-3 transition-colors bg-[#14324f] text-on-primary border-l-[3px] border-gradient-mid font-semibold pl-[13px] font-label-md text-label-md',
-  admPasif: 'flex items-center gap-space-xs px-space-md py-3 font-label-md text-label-md text-outline-variant hover:bg-[#14324f] hover:text-on-primary transition-colors border-l-[3px] border-transparent'
+  admAktif: 'flex items-center gap-space-xs px-space-md py-3 transition-colors bg-[#24452f] text-on-primary border-l-[3px] border-gradient-mid font-semibold pl-[13px] font-label-md text-label-md',
+  admPasif: 'flex items-center gap-space-xs px-space-md py-3 font-label-md text-label-md text-outline-variant hover:bg-[#24452f] hover:text-on-primary transition-colors border-l-[3px] border-transparent'
 };
 
 function lapisanUntuk(nama) {
@@ -674,7 +674,7 @@ function renderGalatMuat() {
   const el = $('#hal-' + S.rute.nama);
   if (!el || lapisanUntuk(S.rute.nama) !== 'publik') return;
   el.innerHTML = `
-    <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin py-space-xl text-center flex flex-col items-center gap-space-md">
+    <div class="max-w-[1240px] mx-auto px-margin-mobile md:px-margin py-space-xl text-center flex flex-col items-center gap-space-md">
       <div class="w-16 h-16 rounded-full bg-error-container text-error flex items-center justify-center">${ikon('wifi_off', 'text-[32px]')}</div>
       <h1 class="font-headline-md text-headline-md text-on-surface">Gagal memuat data</h1>
       <p class="font-body-md text-body-md text-on-surface-variant max-w-md">Koneksi ke server bermasalah. Periksa internet Anda lalu coba lagi.</p>
@@ -764,7 +764,7 @@ function kirimStatBanner() {
 // BAGIAN 9: KOMPONEN PUBLIK BERSAMA
 // ════════════════════════════════════════════════════════════
 
-const WADAH = 'max-w-[1280px] w-full mx-auto px-margin-mobile md:px-margin';
+const WADAH = 'max-w-[1240px] w-full mx-auto px-margin-mobile md:px-margin';
 const GARIS_JUDUL = 'w-12 h-[3px] mt-2 rounded-full bg-gradient-to-r from-gradient-start via-gradient-mid to-gradient-end';
 
 function kerangkaBlok(kelas) { return `<div class="kerangka rounded-xl ${kelas}"></div>`; }
@@ -837,7 +837,7 @@ function spekRingkas(k) {
 
 function lencanaStatusFoto(status) {
   return status === 'Terisi'
-    ? `<div class="absolute top-3 left-3 flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#DBEAFE] text-[#1D4ED8] font-headline-sm text-body-sm font-semibold shadow-sm"><span class="w-2 h-2 rounded-full bg-[#1D4ED8]"></span>Terisi</div>`
+    ? `<div class="absolute top-3 left-3 flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#e2e8f0] text-[#1d252c] font-headline-sm text-body-sm font-semibold shadow-sm"><span class="w-2 h-2 rounded-full bg-[#1d252c]"></span>Terisi</div>`
     : `<div class="absolute top-3 left-3 flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#DCFCE7] text-[#166534] font-headline-sm text-body-sm font-semibold shadow-sm"><span class="w-2 h-2 rounded-full bg-[#166534] animate-pulse"></span>Tersedia</div>`;
 }
 
@@ -896,7 +896,7 @@ function htmlHero(banner) {
     }
     const foto = s.foto
       ? `<img src="${esc(urlGambar(s.foto, 1920))}" alt="" class="absolute inset-0 w-full h-full object-cover" ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" referrerpolicy="no-referrer">`
-      : `<div class="absolute inset-0 bg-gradient-to-br from-[#0A2540] via-primary to-gradient-start"></div>`;
+      : `<div class="absolute inset-0 bg-gradient-to-br from-[#1a3326] via-primary to-gradient-start"></div>`;
     return `<div class="slide-item absolute inset-0 transition-opacity duration-700 ease-in-out ${i === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}" data-id="${esc(s.id)}" role="group" aria-roledescription="slide" aria-label="${i + 1} dari ${n}">
       ${foto}
       <div class="absolute inset-0 bg-gradient-to-r from-on-surface/90 via-on-surface/65 to-transparent w-full md:w-[70%]"></div>
@@ -1034,7 +1034,7 @@ function htmlGaleriKegiatan() {
 }
 
 function htmlCtaBeranda() {
-  return `<section class="mt-space-xl mb-space-md bg-gradient-to-r from-[#0A2540] to-primary rounded-xl p-space-lg md:p-space-xl text-on-primary flex flex-col md:flex-row items-start md:items-center justify-between gap-space-lg shadow-sm">
+  return `<section class="mt-space-xl mb-space-md bg-gradient-to-r from-[#1a3326] to-primary rounded-xl p-space-lg md:p-space-xl text-on-primary flex flex-col md:flex-row items-start md:items-center justify-between gap-space-lg shadow-sm">
     <div class="max-w-xl">
       <span class="font-label-md text-label-md uppercase tracking-wider text-secondary-fixed">Siap Pindah Hunian?</span>
       <h3 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-on-primary mt-1">Jadwalkan Kunjungan Survei Lokasi Sekarang</h3>
@@ -1116,7 +1116,7 @@ RENDER.kamar = function (el) {
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">${tampil.length ? tampil.map(kartuKamar).join('') : kosong}</div>
     </section>
     <section class="${WADAH} py-space-md">
-      <div class="p-space-lg rounded-[16px] shadow-sm relative overflow-hidden bg-gradient-to-r from-[#E6F4EA] via-[#EBF5FB] to-[#E0F7FA] flex flex-col md:flex-row items-start md:items-center justify-between gap-space-lg">
+      <div class="p-space-lg rounded-[16px] shadow-sm relative overflow-hidden bg-gradient-to-r from-[#E6F4EA] via-[#eef4ea] to-[#e3ede0] flex flex-col md:flex-row items-start md:items-center justify-between gap-space-lg">
         <div class="flex items-center gap-space-md max-w-2xl">
           <div class="w-14 h-14 shrink-0 rounded-full bg-surface-container-lowest flex items-center justify-center shadow-sm text-primary">${ikon('support_agent', 'text-[28px]')}</div>
           <div class="space-y-1">
@@ -1304,7 +1304,7 @@ function renderDetailIsi(el, k) {
         <div class="bg-surface-container-lowest rounded-xl shadow-md p-space-lg flex flex-col gap-space-md">
           <div class="flex items-center justify-between gap-2">
             ${terisi
-              ? `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#DBEAFE] text-[#1D4ED8] font-label-md text-body-sm font-semibold"><span class="w-2 h-2 rounded-full bg-[#1D4ED8]"></span>Terisi</span>`
+              ? `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#e2e8f0] text-[#1d252c] font-label-md text-body-sm font-semibold"><span class="w-2 h-2 rounded-full bg-[#1d252c]"></span>Terisi</span>`
               : `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#DCFCE7] text-[#166534] font-label-md text-body-sm font-semibold"><span class="w-2 h-2 rounded-full bg-status-available animate-pulse"></span>Tersedia Siap Huni</span>`}
             <span class="font-label-md text-body-sm text-outline-variant font-mono">KODE: ${esc(k.kode)}</span>
           </div>
@@ -1506,7 +1506,7 @@ function renderFormTesti() {
             </div>
           </div>
           <div class="pt-space-md">
-            <button type="submit" id="testi-kirim" class="w-full h-[48px] rounded-xl bg-primary-container hover:bg-[#0D47A1] text-on-primary font-headline-sm text-headline-sm flex items-center justify-center gap-space-sm shadow-md hover:shadow-lg active:scale-[0.99] transition-all"><span>Kirim Testimoni Sekarang</span>${ikon('send', 'text-[20px]')}</button>
+            <button type="submit" id="testi-kirim" class="w-full h-[48px] rounded-xl bg-primary-container hover:bg-[#153022] text-on-primary font-headline-sm text-headline-sm flex items-center justify-center gap-space-sm shadow-md hover:shadow-lg active:scale-[0.99] transition-all"><span>Kirim Testimoni Sekarang</span>${ikon('send', 'text-[20px]')}</button>
           </div>
           <p class="text-center font-body-sm text-body-sm text-outline mt-space-xs">Ulasan Anda akan langsung tampil di halaman ini. Tim Kost AB6 dapat menyembunyikan ulasan yang tidak sesuai ketentuan.</p>
         </form>
@@ -1821,7 +1821,7 @@ RENDER.tentang = function (el) {
     </div></section>
 
     <section class="w-full bg-surface-subtle py-space-xl"><div class="${WADAH}">
-      <div class="relative overflow-hidden rounded-xl p-space-lg md:p-space-xl bg-gradient-to-r from-[#0B6B5C]/10 via-[#00E676]/10 to-[#7FDBFF]/15 shadow-sm">
+      <div class="relative overflow-hidden rounded-xl p-space-lg md:p-space-xl bg-gradient-to-r from-[#1e3a2b]/10 via-[#10b981]/10 to-[#a3d4b6]/15 shadow-sm">
         <div class="absolute -right-12 -bottom-12 w-64 h-64 rounded-full bg-secondary-fixed/30 blur-2xl pointer-events-none"></div>
         <div class="absolute right-40 -top-10 w-48 h-48 rounded-full bg-primary-fixed/40 blur-xl pointer-events-none"></div>
         <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-space-lg">
@@ -2252,7 +2252,7 @@ function svgDonat(segmen, tebal) {
     offset += p;
     return c;
   }).join('');
-  return `<svg viewBox="0 0 100 100" class="w-full h-full -rotate-90" aria-hidden="true"><circle cx="50" cy="50" r="38" fill="transparent" stroke="#f0eded" stroke-width="${tebal || 12}"></circle>${lingkar}</svg>`;
+  return `<svg viewBox="0 0 100 100" class="w-full h-full -rotate-90" aria-hidden="true"><circle cx="50" cy="50" r="38" fill="transparent" stroke="#e1e7dc" stroke-width="${tebal || 12}"></circle>${lingkar}</svg>`;
 }
 
 function statistikKamar(kamar) {
@@ -2366,7 +2366,7 @@ RENDER['admin-dashboard'] = function (el) {
           </div>
           <div class="flex flex-col sm:flex-row lg:flex-col xl:flex-row items-center justify-center gap-space-lg py-4">
             <div class="relative w-44 h-44 flex items-center justify-center shrink-0">
-              ${svgDonat([{ nilai: k.tersedia, warna: '#00A86B' }, { nilai: k.terisi, warna: '#1565C0' }])}
+              ${svgDonat([{ nilai: k.tersedia, warna: '#10b981' }, { nilai: k.terisi, warna: '#1e3a2b' }])}
               <div class="absolute inset-0 flex flex-col items-center justify-center text-center"><span class="font-display-hero text-[28px] leading-tight text-on-surface font-bold">${k.total}</span><span class="font-body-sm text-[11px] text-on-surface-variant uppercase font-semibold tracking-wider">Total Unit</span></div>
             </div>
             <div class="flex flex-col gap-2.5 w-full sm:w-auto lg:w-full xl:w-auto whitespace-nowrap">
@@ -2677,7 +2677,7 @@ function htmlPratinjauBanner() {
   return `<div class="relative w-full aspect-[16/9] rounded-xl overflow-hidden shadow-md group select-none bg-inverse-surface">
     ${daftar.map((b, i) => `<div class="pv-slide absolute inset-0 transition-opacity duration-700 ${i === iAktif ? 'opacity-100' : 'opacity-0 pointer-events-none'}">
       ${gambarAdmin(b.foto, 800, 'w-full h-full object-cover', '')}
-      <div class="absolute inset-0 bg-gradient-to-t from-[#0A2540]/90 via-[#0A2540]/40 to-transparent flex flex-col justify-end p-5 text-on-primary">
+      <div class="absolute inset-0 bg-gradient-to-t from-[#1a3326]/90 via-[#1a3326]/40 to-transparent flex flex-col justify-end p-5 text-on-primary">
         <span class="px-2 py-0.5 rounded ${warnaLencana[i % 3]} text-[10px] font-bold w-fit mb-1.5 uppercase tracking-wide">Slide ${i + 1} dari ${daftar.length}</span>
         <h4 ${i === iAktif ? 'id="pv-judul"' : ''} class="font-headline-sm text-headline-sm font-bold text-on-primary leading-snug drop-shadow-sm">${esc(b.judul || 'Judul Banner Kosong')}</h4>
         <p ${i === iAktif ? 'id="pv-ket"' : ''} class="font-body-sm text-body-sm text-surface-container-low line-clamp-2 mt-1">${esc(b.keterangan || 'Deskripsi banner...')}</p>
@@ -3255,7 +3255,7 @@ function htmlFormArea() {
     </div>
     <form class="flex flex-col gap-6" data-kirim="area" novalidate>
       <div class="flex flex-col gap-2"><span class="${label}">Jenis <span class="text-error">*</span></span>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">${(berbayar ? ['Fasilitas', 'Layanan Berbayar'] : ['Fasilitas']).map(j => `<label class="flex items-center gap-3 p-3.5 rounded-xl bg-surface-container-low cursor-pointer hover:bg-surface-container transition-colors"><input type="radio" name="area-jenis" value="${j}" data-ubah="konten-isian" data-kunci="jenis" ${f.jenis === j ? 'checked' : ''} class="w-4 h-4 accent-[#1565c0]"><span class="font-body-md text-body-md text-on-surface">${j}</span></label>`).join('')}</div></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">${(berbayar ? ['Fasilitas', 'Layanan Berbayar'] : ['Fasilitas']).map(j => `<label class="flex items-center gap-3 p-3.5 rounded-xl bg-surface-container-low cursor-pointer hover:bg-surface-container transition-colors"><input type="radio" name="area-jenis" value="${j}" data-ubah="konten-isian" data-kunci="jenis" ${f.jenis === j ? 'checked' : ''} class="w-4 h-4 accent-[#1e3a2b]"><span class="font-body-md text-body-md text-on-surface">${j}</span></label>`).join('')}</div></div>
       <div class="flex flex-col gap-1.5"><label class="${label}" for="ar-nama">Nama Area <span class="text-error">*</span></label><input id="ar-nama" maxlength="40" data-masukan="konten-isian" data-kunci="nama" value="${esc(f.nama)}" placeholder="Contoh: Rooftop Garden, Ruang Tamu Utama" class="${KELAS.inputAdm} py-3">${galatKolom('nama')}</div>
       <div class="flex flex-col gap-1.5"><label class="${label} flex justify-between" for="ar-desk"><span>Deskripsi <span class="text-error">*</span></span><span class="text-[11px] font-medium text-outline" data-hitung="deskripsi" data-maks="240">${f.deskripsi.length}/240</span></label><textarea id="ar-desk" rows="4" maxlength="240" data-masukan="konten-isian" data-kunci="deskripsi" placeholder="Jelaskan fasilitas atau layanan ini untuk penghuni kost..." class="${KELAS.inputAdm} p-4 resize-none">${esc(f.deskripsi)}</textarea>${galatKolom('deskripsi')}</div>
       ${berbayar ? `<div class="flex flex-col gap-1.5"><label class="${label}" for="ar-eyebrow">Eyebrow</label><input id="ar-eyebrow" maxlength="30" data-masukan="konten-isian" data-kunci="eyebrow" value="${esc(f.eyebrow)}" placeholder="Praktis & Hemat Waktu" class="${KELAS.inputAdm}"></div>
@@ -3778,7 +3778,7 @@ function htmlFormKamar() {
         <div><span class="${label}">Tipe Kamar Mandi</span>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <label class="flex items-start gap-2.5 p-3 rounded-lg ${kelasPilihKartu} cursor-pointer hover:bg-surface-subtle">
-              <input type="checkbox" data-ubah="fk-km" ${f.kamarMandi === 'Dalam' ? 'checked' : ''} class="mt-0.5 w-4 h-4 shrink-0 cursor-pointer accent-[#1565c0]">
+              <input type="checkbox" data-ubah="fk-km" ${f.kamarMandi === 'Dalam' ? 'checked' : ''} class="mt-0.5 w-4 h-4 shrink-0 cursor-pointer accent-[#1e3a2b]">
               <span class="flex flex-col"><span class="font-label-md text-[12px] font-bold text-on-surface">Kamar Mandi Dalam</span><span class="font-body-sm text-[11px] text-on-surface-variant">${f.kamarMandi === 'Dalam' ? 'Kamar mandi di dalam kamar' : 'Tidak dicentang = kamar mandi luar'}</span></span>
             </label>
           </div></div>
@@ -4148,7 +4148,7 @@ RENDER['admin-testimoni'] = function (el) {
     </div>
   </div>
 
-  ${F.pilih.length ? `<div class="sticky top-20 z-30 mb-space-md bg-[#0A2540] text-on-primary rounded-xl px-space-md py-3 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-3">
+  ${F.pilih.length ? `<div class="sticky top-20 z-30 mb-space-md bg-[#1a3326] text-on-primary rounded-xl px-space-md py-3 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-3">
     <div class="flex items-center gap-space-sm"><div class="w-6 h-6 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-label-md text-[11px] font-bold">${F.pilih.length}</div><span class="font-label-md text-label-md text-on-primary">${F.pilih.length} ulasan dipilih</span><span class="h-4 w-px bg-outline/40 hidden sm:inline-block"></span><span class="font-body-sm text-[12px] text-outline-variant hidden sm:inline">Aksi serentak pada ulasan tercentang</span></div>
     <div class="flex items-center gap-space-xs flex-wrap justify-center">
       <button type="button" data-aksi="testi-massal" data-nilai="Disembunyikan" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-surface-container-highest/20 hover:bg-surface-container-highest/30 text-on-primary font-label-md text-body-sm transition-colors">${ikon('visibility_off', 'text-[16px]')}<span>Sembunyikan</span></button>
@@ -4563,7 +4563,7 @@ RENDER['admin-pengaturan'] = function (el, param) {
     </div>
   </div>
   </form>
-  <div class="fixed bottom-0 left-0 lg:left-[240px] right-0 z-30 bg-surface-page/95 shadow-[0_-4px_16px_rgba(10,37,64,0.08)] px-space-md lg:px-space-lg py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
+  <div class="fixed bottom-0 left-0 lg:left-[240px] right-0 z-30 bg-surface-page/95 shadow-[0_-4px_16px_rgba(28,40,32,0.08)] px-space-md lg:px-space-lg py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
     <span class="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant">${ikon('check_circle', 'text-[18px] text-status-available')}<span id="set-status">${S.kotor ? 'Ada perubahan yang belum disimpan' : 'Terakhir disimpan: <strong class="text-on-surface">' + (S.adm.set.terakhir ? fHariIni(S.adm.set.terakhir) : '—') + '</strong>'}</span></span>
     <div class="flex items-center gap-3 w-full sm:w-auto">
       <button type="button" data-aksi="set-reset" class="${KELAS.tombolKedua} flex-1 sm:flex-none">Reset ke Default</button>
@@ -4762,7 +4762,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) kirim
 setInterval(() => { if (S.rute.nama === 'beranda') kirimStatBanner(); }, 120000);
 
 /** Penanda versi frontend — muncul di konsol agar mudah memastikan versi terbaru sudah terpasang */
-const VERSI_FRONTEND = '2.6.4';
+const VERSI_FRONTEND = '3.0.0';
 
 function mulaiAplikasi() {
   console.info('[Kost AB6] Frontend v' + VERSI_FRONTEND + ' siap');
