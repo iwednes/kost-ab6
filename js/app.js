@@ -1327,7 +1327,6 @@ function renderDetailIsi(el, k) {
             ${terisi
               ? `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#e2e8f0] text-[#1d252c] font-label-md text-body-sm font-semibold"><span class="w-2 h-2 rounded-full bg-[#1d252c]"></span>Terisi</span>`
               : `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#DCFCE7] text-[#166534] font-label-md text-body-sm font-semibold"><span class="w-2 h-2 rounded-full bg-status-available animate-pulse"></span>Tersedia Siap Huni</span>`}
-            <span class="inline-flex items-center gap-1 font-label-md text-body-sm text-on-surface-variant">${ikon('door_front', 'text-[16px]')}No. Kamar ${esc(k.kode)}</span>
           </div>
           <div><h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-on-surface tracking-tight">${esc(k.nama)}</h1><p class="font-body-md text-body-md text-on-surface-variant mt-0.5">Kost AB6 Unit Lantai ${esc(k.lantai)}${k.label ? ' · ' + esc(k.label) : ''}</p></div>
           <div class="p-space-md bg-surface-subtle rounded-xl flex items-baseline justify-between gap-2 flex-wrap">
@@ -3495,7 +3494,7 @@ RENDER['admin-kamar'] = function (el) {
             <td class="py-3 px-4"><div class="flex items-center gap-3">
               <div class="relative w-14 h-12 rounded-lg overflow-hidden shrink-0 shadow-sm bg-surface-container">${gambarAdmin((k.foto[0] || {}).id, 200, 'w-full h-full object-cover group-hover:scale-105 transition-transform', k.nama)}</div>
               <div class="flex flex-col min-w-0"><div class="flex items-center gap-1.5"><span class="font-headline-sm text-[15px] leading-5 text-on-surface font-semibold truncate">${esc(k.nama)}</span>${k.label ? `<span class="inline-flex items-center px-1.5 text-[10px] font-bold rounded ${/balkon/i.test(k.label) ? 'bg-[#FEF3C7] text-[#92400E]' : 'bg-tertiary-fixed text-on-tertiary-fixed'} whitespace-nowrap">${esc(k.label)}</span>` : ''}</div>
-                <span class="inline-flex items-center gap-1 font-label-md text-[12px] text-on-surface-variant">${ikon('door_front', 'text-[14px]')}No. Kamar ${esc(k.kode)}</span></div></div></td>
+                </div></div></td>
             <td class="py-3 px-4"><div class="flex flex-col"><span class="font-label-numeric text-[16px] leading-5 text-primary-container">${rupiah(k.harga)}</span><span class="font-body-sm text-[11px] text-on-surface-variant">${hargaKeterangan(k)}</span></div></td>
             <td class="py-3 px-4"><div class="flex flex-col gap-0.5 text-on-surface"><span class="font-medium text-[12px]">${desimal(k.panjang)} x ${desimal(k.lebar)} meter (${String(Math.round(k.panjang * k.lebar * 10) / 10).replace('.', ',')} m²)</span><span class="text-on-surface-variant text-[12px]">${esc(kasur.tabel || '-')}${k.sirkulasi === 'balkon' ? ' · Balkon' : ''}</span></div></td>
             <td class="py-3 px-4"><div class="flex flex-wrap gap-1">${fas.slice(0, 5).map(f => `<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant text-[11px] font-medium">${esc(f)}</span>`).join('')}${fas.length > 5 ? `<span class="px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant text-[11px]">+${fas.length - 5}</span>` : ''}</div></td>
@@ -4696,7 +4695,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) kirim
 setInterval(() => { if (S.rute.nama === 'beranda') kirimStatBanner(); }, 120000);
 
 /** Penanda versi frontend — muncul di konsol agar mudah memastikan versi terbaru sudah terpasang */
-const VERSI_FRONTEND = '3.2.3';
+const VERSI_FRONTEND = '3.2.4';
 
 function mulaiAplikasi() {
   console.info('[Kost AB6] Frontend v' + VERSI_FRONTEND + ' siap');
