@@ -4094,10 +4094,6 @@ RENDER['admin-testimoni'] = function (el) {
     panggil('adminTandaiTestimoniDilihat', tokenAdmin()).catch(() => { /* tidak kritis */ });
   }
   const semua = d.testimoni;
-  const tampil = semua.filter(t => t.status === 'Tampil').length;
-  const sembunyi = semua.length - tampil;
-  const customer = semua.filter(t => t.sumber === 'Customer').length;
-  const admin = semua.length - customer;
   const daftar = testiTersaring();
   const per = 10;
   const totalHal = Math.max(1, Math.ceil(daftar.length / per));
@@ -4118,15 +4114,6 @@ RENDER['admin-testimoni'] = function (el) {
     <div class="flex flex-wrap items-center gap-space-sm shrink-0">
       <button type="button" data-aksi="testi-tambah" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary-container hover:bg-primary text-on-primary font-label-md text-label-md shadow-md transition-all">${ikon('add_circle', 'text-[20px]')}<span>+ Tambah Testimoni Baru</span></button>
     </div>
-  </div>
-
-  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-space-md mb-space-lg">
-    <div class="bg-surface-page rounded-xl p-space-md shadow-sm flex items-center justify-between gap-2"><div class="flex flex-col"><span class="font-body-sm text-body-sm text-on-surface-variant">Total Ulasan Masuk</span><span class="font-headline-lg text-headline-lg text-on-surface mt-0.5">${semua.length}</span><span class="font-body-sm text-[11px] text-on-surface-variant mt-1">Terdaftar di sistem</span></div><div class="w-11 h-11 rounded-xl bg-surface-container flex items-center justify-center text-primary-container shrink-0">${ikon('rate_review', 'text-[24px]')}</div></div>
-    <div class="bg-surface-page rounded-xl p-space-md shadow-sm flex items-center justify-between gap-2"><div class="flex flex-col"><span class="font-body-sm text-body-sm text-on-surface-variant">Status Tampil Publik</span><div class="flex items-baseline gap-2 mt-0.5"><span class="font-headline-lg text-headline-lg text-status-available">${tampil}</span><span class="font-label-md text-[11px] px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container">${teksPersen(persen(tampil, semua.length))}</span></div><span class="font-body-sm text-[11px] text-on-surface-variant mt-1">Aktif di etalase web</span></div><div class="w-11 h-11 rounded-xl bg-secondary-container/40 flex items-center justify-center text-secondary shrink-0">${ikon('visibility', 'text-[24px]', true)}</div></div>
-    <div class="bg-surface-page rounded-xl p-space-md shadow-sm flex items-center justify-between gap-2"><div class="flex flex-col"><span class="font-body-sm text-body-sm text-on-surface-variant">Status Disembunyikan</span><div class="flex items-baseline gap-2 mt-0.5"><span class="font-headline-lg text-headline-lg text-outline">${sembunyi}</span><span class="font-label-md text-[11px] px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant">Moderasi</span></div><span class="font-body-sm text-[11px] text-on-surface-variant mt-1">Disembunyikan dari publik</span></div><div class="w-11 h-11 rounded-xl bg-surface-container flex items-center justify-center text-outline shrink-0">${ikon('visibility_off', 'text-[24px]')}</div></div>
-    <div class="bg-surface-page rounded-xl p-space-md shadow-sm flex items-center justify-between"><div class="flex flex-col w-full"><span class="font-body-sm text-body-sm text-on-surface-variant">Komposisi Kanal</span>
-      <div class="flex flex-wrap items-center gap-2 mt-2"><div class="flex items-center gap-1.5 px-2 py-1 rounded bg-primary-fixed text-on-primary-fixed font-label-md text-label-md">${ikon('person', 'text-[14px]')}<span>${customer} Penghuni</span></div><div class="flex items-center gap-1.5 px-2 py-1 rounded bg-tertiary-fixed text-on-tertiary-fixed font-label-md text-label-md">${ikon('shield_person', 'text-[14px]')}<span>${admin} Admin</span></div></div>
-      <div class="w-full bg-surface-container h-1.5 rounded-full mt-2.5 overflow-hidden flex"><div class="bg-primary-container h-full" style="width:${persen(customer, semua.length)}%"></div><div class="bg-tertiary h-full" style="width:${persen(admin, semua.length)}%"></div></div></div></div>
   </div>
 
   <div class="bg-surface-page rounded-xl p-space-md shadow-sm mb-space-md">
@@ -4755,7 +4742,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) kirim
 setInterval(() => { if (S.rute.nama === 'beranda') kirimStatBanner(); }, 120000);
 
 /** Penanda versi frontend — muncul di konsol agar mudah memastikan versi terbaru sudah terpasang */
-const VERSI_FRONTEND = '3.1.0';
+const VERSI_FRONTEND = '3.1.1';
 
 function mulaiAplikasi() {
   console.info('[Kost AB6] Frontend v' + VERSI_FRONTEND + ' siap');
