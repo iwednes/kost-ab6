@@ -22,11 +22,6 @@
 // ════════════════════════════════════════════════════════════
 
 const KONST = {
-  LANTAI: {
-    1: 'Lantai 1',
-    2: 'Lantai 2',
-    3: 'Lantai 3'
-  },
   KASUR: {
     'single-120': { label: 'Single Bed (120 × 200 cm)', ringkas: 'Kasur Single (120×200)', spek: 'Single Bed (120×200)', tabel: 'Kasur Single (120×200 cm)', ukuran: '120×200', jenis: 'single' },
     'queen-160': { label: 'Queen Bed (160 × 200 cm)', ringkas: 'Kasur Queen (160×200)', spek: 'Queen Bed (160×200)', tabel: 'Kasur Queen (160×200 cm)', ukuran: '160×200', jenis: 'queen' },
@@ -3405,7 +3400,7 @@ KIRIM.visi = async form => {
 // BAGIAN 20: KELOLA KAMAR (TABEL)
 // ════════════════════════════════════════════════════════════
 
-S.adm.kamar = { cari: '', status: 'semua', lantai: 'semua', urut: 'default', hal: 1, pilih: [] };
+S.adm.kamar = { cari: '', status: 'semua', urut: 'default', hal: 1, pilih: [] };
 
 function hargaKeterangan(k) {
   const t = [];
@@ -3421,10 +3416,9 @@ function kamarTersaring() {
   S.adm.data.fasilitas.forEach(f => { master[f.kode] = f; });
   let daftar = S.adm.data.kamar.filter(k => {
     if (F.status !== 'semua' && k.status !== F.status) return false;
-    if (F.lantai !== 'semua' && String(k.lantai) !== F.lantai) return false;
     if (!q) return true;
     const fas = (k.fasilitas || []).map(c => (master[c] ? master[c].ringkas + ' ' + master[c].label : c)).join(' ') + ' ' + (k.kustom || []).join(' ');
-    return [k.nama, k.kode, 'lantai ' + k.lantai, k.posisi, k.label, fas].join(' ').toLowerCase().indexOf(q) >= 0;
+    return [k.nama, k.kode, k.posisi, k.label, fas].join(' ').toLowerCase().indexOf(q) >= 0;
   });
   if (F.urut === 'harga-naik') daftar.sort((a, b) => a.harga - b.harga);
   else if (F.urut === 'harga-turun') daftar.sort((a, b) => b.harga - a.harga);
@@ -3437,7 +3431,6 @@ RENDER['admin-kamar'] = function (el) {
   if (!d) { el.innerHTML = kerangkaAdmin(); return; }
   const F = S.adm.kamar;
   const st = statistikKamar(d.kamar);
-  const lantaiAda = Array.from(new Set(d.kamar.map(k => k.lantai))).sort((a, b) => a - b);
   const master = {};
   d.fasilitas.forEach(f => { master[f.kode] = f; });
   const daftar = kamarTersaring();
@@ -3466,7 +3459,6 @@ RENDER['admin-kamar'] = function (el) {
       <input id="kamar-cari" type="search" data-masukan="kamar-cari" value="${esc(F.cari)}" placeholder="Cari nama kamar, lantai, atau fasilitas..." aria-label="Cari kamar" class="w-full pl-10 pr-4 py-2.5 rounded-lg bg-surface-subtle text-on-surface font-body-md text-body-md placeholder:text-outline focus:outline-none focus:bg-surface-page shadow-inner transition-colors"></div>
     <div class="grid grid-cols-2 sm:flex items-center gap-space-sm">
       ${pilihan('data-ubah="kamar-filter" data-kunci="status" aria-label="Filter status"', [['semua', `Semua Status (${st.total})`], ['Tersedia', `Tersedia (${st.tersedia})`], ['Terisi', `Terisi (${st.terisi})`]], F.status)}
-      ${pilihan('data-ubah="kamar-filter" data-kunci="lantai" aria-label="Filter lantai"', [['semua', 'Semua Lantai']].concat(lantaiAda.map(l => [String(l), 'Lantai ' + l])), F.lantai)}
       ${pilihan('data-ubah="kamar-filter" data-kunci="urut" aria-label="Urutkan"', [['default', 'Urutan Default'], ['harga-naik', 'Harga Terendah'], ['harga-turun', 'Harga Tertinggi']], F.urut)}
       <button type="button" data-aksi="kamar-reset" title="Reset Filter" aria-label="Reset filter & muat ulang" class="p-2.5 rounded-lg bg-surface-subtle hover:bg-surface-container text-on-surface-variant transition-colors flex items-center justify-center">${ikon('refresh', 'text-[20px]')}</button>
     </div>
@@ -3487,7 +3479,7 @@ RENDER['admin-kamar'] = function (el) {
       <table class="w-full min-w-[1100px] text-left border-collapse">
         <thead><tr class="bg-surface-container-low text-on-surface-variant font-label-md text-label-md">
           <th class="py-3.5 pl-4 pr-2 w-10 text-center"><input type="checkbox" data-ubah="kamar-pilih-semua" ${semuaDipilih ? 'checked' : ''} aria-label="Pilih semua kamar di halaman ini" class="rounded w-4 h-4 cursor-pointer accent-primary"></th>
-          <th class="py-3.5 px-4 min-w-[240px]">Foto &amp; Nama Kamar</th><th class="py-3.5 px-3 w-28">Lantai</th><th class="py-3.5 px-4 min-w-[170px]">Harga Sewa / Bln</th>
+          <th class="py-3.5 px-4 min-w-[240px]">Foto &amp; Nama Kamar</th><th class="py-3.5 px-4 min-w-[170px]">Harga Sewa / Bln</th>
           <th class="py-3.5 px-4 min-w-[230px]">Spesifikasi</th><th class="py-3.5 px-4 min-w-[240px]">Fasilitas Utama</th><th class="py-3.5 px-4 min-w-[150px]">Status Ketersediaan</th><th class="py-3.5 pl-3 pr-5 text-right w-28">Aksi Cepat</th>
         </tr></thead>
         <tbody class="font-table-data text-table-data divide-y divide-border-subtle">${tampil.map((k, i) => {
@@ -3500,7 +3492,6 @@ RENDER['admin-kamar'] = function (el) {
               <div class="relative w-14 h-12 rounded-lg overflow-hidden shrink-0 shadow-sm bg-surface-container">${gambarAdmin((k.foto[0] || {}).id, 200, 'w-full h-full object-cover group-hover:scale-105 transition-transform', k.nama)}<span class="absolute bottom-0.5 right-0.5 px-1 bg-black/60 text-white text-[9px] rounded font-label-numeric">${esc(k.kode)}</span></div>
               <div class="flex flex-col min-w-0"><div class="flex items-center gap-1.5"><span class="font-headline-sm text-[15px] leading-5 text-on-surface font-semibold truncate">${esc(k.nama)}</span>${k.label ? `<span class="inline-flex items-center px-1.5 text-[10px] font-bold rounded ${/balkon/i.test(k.label) ? 'bg-[#FEF3C7] text-[#92400E]' : 'bg-tertiary-fixed text-on-tertiary-fixed'} whitespace-nowrap">${esc(k.label)}</span>` : ''}</div>
                 <span class="font-body-sm text-[11px] text-on-surface-variant truncate">${esc(k.posisi || 'Lantai ' + k.lantai)}</span></div></div></td>
-            <td class="py-3 px-3"><button type="button" data-aksi="kamar-lantai" data-id="${esc(k.id)}" aria-label="Ubah lantai ${esc(k.nama)}" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-surface-container hover:bg-surface-container-high font-label-md text-label-md text-on-surface whitespace-nowrap">${ikon('edit_square', 'text-[14px] text-tertiary')}Lantai ${esc(k.lantai)}</button></td>
             <td class="py-3 px-4"><div class="flex flex-col"><span class="font-label-numeric text-[16px] leading-5 text-primary-container">${rupiah(k.harga)}</span><span class="font-body-sm text-[11px] text-on-surface-variant">${hargaKeterangan(k)}</span></div></td>
             <td class="py-3 px-4"><div class="flex flex-col gap-0.5 text-on-surface"><span class="font-medium text-[12px]">${desimal(k.panjang)} x ${desimal(k.lebar)} meter (${String(Math.round(k.panjang * k.lebar * 10) / 10).replace('.', ',')} m²)</span><span class="text-on-surface-variant text-[12px]">${esc(kasur.tabel || '-')}${k.sirkulasi === 'balkon' ? ' · Balkon' : ''}</span></div></td>
             <td class="py-3 px-4"><div class="flex flex-wrap gap-1">${fas.slice(0, 5).map(f => `<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant text-[11px] font-medium">${esc(f)}</span>`).join('')}${fas.length > 5 ? `<span class="px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant text-[11px]">+${fas.length - 5}</span>` : ''}</div></td>
@@ -3511,7 +3502,7 @@ RENDER['admin-kamar'] = function (el) {
               <button type="button" data-aksi="kamar-hapus" data-id="${esc(k.id)}" class="p-1.5 rounded-lg text-outline hover:text-error hover:bg-error-container transition-colors" title="Hapus Unit" aria-label="Hapus ${esc(k.nama)}">${ikon('delete', 'text-[18px]')}</button>
             </div></td>
           </tr>`;
-        }).join('') || `<tr><td colspan="8" class="py-10 text-center text-on-surface-variant">${d.kamar.length ? 'Tidak ada kamar yang cocok dengan filter.' : 'Belum ada kamar. Klik "Tambah Kamar Baru".'}</td></tr>`}</tbody>
+        }).join('') || `<tr><td colspan="7" class="py-10 text-center text-on-surface-variant">${d.kamar.length ? 'Tidak ada kamar yang cocok dengan filter.' : 'Belum ada kamar. Klik "Tambah Kamar Baru".'}</td></tr>`}</tbody>
       </table>
     </div>
     <div class="px-4 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 font-body-sm text-body-sm text-on-surface-variant border-t border-border-subtle">
@@ -3539,7 +3530,7 @@ MASUKAN['kamar-cari'] = debounce(el => {
 }, 250);
 UBAH['kamar-filter'] = el => { S.adm.kamar[el.dataset.kunci] = el.value; S.adm.kamar.hal = 1; renderKamarList(); };
 AKSI['kamar-reset'] = () => {
-  Object.assign(S.adm.kamar, { cari: '', status: 'semua', lantai: 'semua', urut: 'default', hal: 1, pilih: [] });
+  Object.assign(S.adm.kamar, { cari: '', status: 'semua', urut: 'default', hal: 1, pilih: [] });
   renderKamarList();
   muatAdmin();
 };
@@ -3603,34 +3594,6 @@ AKSI['kamar-massal'] = el => {
   if (!ids.length) return;
   if (el.dataset.nilai === 'hapus') hapusKamar(ids);
   else ubahStatusKamar(ids, el.dataset.nilai).then(() => { S.adm.kamar.pilih = []; renderKamarList(); });
-};
-
-AKSI['kamar-lantai'] = el => {
-  const k = S.adm.data.kamar.filter(x => x.id === el.dataset.id)[0];
-  if (!k) return;
-  const item = Modal.buka({
-    lebar: 'max-w-sm', label: 'Ubah lantai',
-    isi: `<h3 class="font-headline-sm text-headline-sm text-on-surface mb-1">Ubah Lantai</h3><p class="font-body-sm text-body-sm text-on-surface-variant mb-4">${esc(k.nama)}</p>
-      <div class="flex flex-col gap-2">${Object.keys(KONST.LANTAI).map(l => `<button type="button" data-lt="${l}" class="flex items-center justify-between gap-2 p-3 rounded-lg ${String(k.lantai) === l ? 'bg-primary-fixed text-primary' : 'bg-surface-container-low hover:bg-surface-container text-on-surface'} font-label-md text-label-md text-left">${esc(KONST.LANTAI[l])}${String(k.lantai) === l ? ikon('check', 'text-[18px]') : ''}</button>`).join('')}</div>
-      <div class="flex justify-end pt-4"><button type="button" data-lt="batal" class="${KELAS.tombolKedua}">Batal</button></div>`
-  });
-  $$('[data-lt]', item.panel).forEach(b => b.addEventListener('click', async () => {
-    Modal.tutup(item);
-    const lt = b.dataset.lt;
-    if (lt === 'batal' || String(k.lantai) === lt) return;
-    const lama = k.lantai;
-    k.lantai = Number(lt);
-    renderKamarList();
-    try {
-      await panggil('adminUbahLantaiKamar', tokenAdmin(), k.id, k.lantai);
-      S.json.kamar = '';
-      toast('Lantai diperbarui', k.nama + ' → Lantai ' + lt);
-    } catch (e) {
-      k.lantai = lama;
-      renderKamarList();
-      toastGalat(e, 'Lantai gagal diubah');
-    }
-  }));
 };
 
 // ════════════════════════════════════════════════════════════
@@ -4729,7 +4692,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) kirim
 setInterval(() => { if (S.rute.nama === 'beranda') kirimStatBanner(); }, 120000);
 
 /** Penanda versi frontend — muncul di konsol agar mudah memastikan versi terbaru sudah terpasang */
-const VERSI_FRONTEND = '3.2.0';
+const VERSI_FRONTEND = '3.2.1';
 
 function mulaiAplikasi() {
   console.info('[Kost AB6] Frontend v' + VERSI_FRONTEND + ' siap');
