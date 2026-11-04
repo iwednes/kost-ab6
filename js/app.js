@@ -56,7 +56,6 @@ const S = {
   kegiatan: { items: [], adaLagi: false, halaman: 1, memuat: false },
   testiDaftar: { items: [], adaLagi: false, halaman: 1, jumlah: 0, memuat: false },
   rute: { nama: '', param: {} },
-  katalog: { halaman: 1 },
   stat: { tayang: {}, klik: {} },
   sesi: null,
   kotor: false,
@@ -451,7 +450,7 @@ const KELAS_MENU = {
 const HALAMAN_DISIMPAN = { beranda: true, kamar: true, detail: true, testimoni: true, tentang: true };
 
 function kunciTampilan(nama, param) {
-  return [nama, JSON.stringify(param || {}), S.versiData, nama === 'kamar' ? S.katalog.halaman : ''].join('|');
+  return [nama, JSON.stringify(param || {}), S.versiData].join('|');
 }
 
 function lapisanUntuk(nama) {
@@ -1113,11 +1112,6 @@ RENDER.kamar = function (el) {
   if (!S.kamar) { el.innerHTML = kerangkaHalaman(); return; }
   // Desain revisi: tanpa tab filter — semua kamar tampil, status terlihat di lencana foto
   const daftar = S.kamar.items.slice().sort(urutNamaKamar);
-  const per = 6;
-  const totalHal = Math.max(1, Math.ceil(daftar.length / per));
-  S.katalog.halaman = Math.min(S.katalog.halaman, totalHal);
-  const mulai = (S.katalog.halaman - 1) * per;
-  const tampil = daftar.slice(mulai, mulai + per);
   const kosong = `<p class="col-span-full text-center py-space-xl font-body-md text-body-md text-on-surface-variant">Belum ada data kamar.</p>`;
 
   el.innerHTML = `<div class="flex flex-col w-full">
@@ -1134,7 +1128,7 @@ RENDER.kamar = function (el) {
       </div>
     </section>
     <section class="${WADAH} py-space-md">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">${tampil.length ? tampil.map(kartuKamar).join('') : kosong}</div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">${daftar.length ? daftar.map(kartuKamar).join('') : kosong}</div>
     </section>
     <section class="${WADAH} py-space-md">
       <div class="p-space-lg rounded-[16px] shadow-sm relative overflow-hidden bg-gradient-to-r from-[#E6F4EA] via-[#eef4ea] to-[#e3ede0] flex flex-col md:flex-row items-start md:items-center justify-between gap-space-lg">
@@ -1148,12 +1142,7 @@ RENDER.kamar = function (el) {
         <a ${waAttr(PesanWA.umum())} class="inline-flex items-center gap-space-xs px-space-lg py-3 rounded-full bg-whatsapp-green text-on-primary font-headline-sm text-body-md font-semibold shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all whitespace-nowrap">${ikon('chat', 'text-[20px]')}Chat WhatsApp Admin</a>
       </div>
     </section>
-    ${daftar.length ? `<section class="${WADAH} pt-space-sm pb-space-xl">
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-space-md pt-space-md">
-        <p class="font-body-sm text-body-sm text-on-surface-variant">Menampilkan <span class="font-semibold text-on-surface">${mulai + 1}-${mulai + tampil.length}</span> dari <span class="font-semibold text-on-surface">${daftar.length}</span> tipe kamar</p>
-        ${paginasiKatalog(S.katalog.halaman, totalHal)}
-      </div>
-    </section>` : '<div class="pb-space-xl"></div>'}
+    <div class="pb-space-xl"></div>
   </div>`;
 };
 
@@ -1183,19 +1172,6 @@ function kartuKamar(k) {
       </div>
     </div>
   </article>`;
-}
-
-function paginasiKatalog(hal, total) {
-  const btn = (isi, h, aktif, mati) => mati
-    ? `<button type="button" disabled class="px-3.5 py-1.5 rounded-full bg-surface-container-low text-outline-variant font-headline-sm text-body-sm flex items-center gap-1 cursor-not-allowed">${isi}</button>`
-    : `<button type="button" data-aksi="katalog-hal" data-hal="${h}" ${aktif ? 'aria-current="page"' : ''} class="${typeof isi === 'number' ? 'w-8 h-8' : 'px-3.5 py-1.5'} rounded-full ${aktif ? 'bg-primary-container text-on-primary shadow-sm' : 'bg-surface-container text-on-surface hover:bg-surface-container-high'} transition-colors font-headline-sm text-body-sm font-semibold flex items-center justify-center gap-1">${isi}</button>`;
-  let angkaHal = '';
-  for (let i = 1; i <= total; i++) angkaHal += btn(i, i, i === hal, false);
-  return `<nav aria-label="Pagination" class="flex items-center gap-2">
-    ${btn(ikon('chevron_left', 'text-[16px]') + 'Prev', hal - 1, false, hal <= 1)}
-    ${angkaHal}
-    ${btn('Next' + ikon('chevron_right', 'text-[16px]'), hal + 1, false, hal >= total)}
-  </nav>`;
 }
 
 // ════════════════════════════════════════════════════════════
@@ -1847,7 +1823,7 @@ RENDER['404'] = function (el) {
 };
 
 // ── Aksi publik ──
-AKSI['cek-ketersediaan'] = (el, e) => { e.preventDefault(); S.katalog.halaman = 1; navigasi('kamar'); };
+AKSI['cek-ketersediaan'] = (el, e) => { e.preventDefault(); navigasi('kamar'); };
 AKSI['ke-admin'] = (el, e) => { e.preventDefault(); navigasi(sesiValid() ? 'admin-dashboard' : 'login'); };
 AKSI['buka-menu-hp'] = () => bukaMenuHp();
 AKSI['tutup-menu-hp'] = () => tutupMenuHp();
@@ -1866,11 +1842,6 @@ AKSI['cta-banner'] = (el, e) => {
 };
 AKSI['buka-kegiatan'] = el => bukaKegiatan(el.dataset.id);
 AKSI['muat-kegiatan'] = el => muatLagiKegiatan(el);
-AKSI['katalog-hal'] = el => {
-  S.katalog.halaman = Number(el.dataset.hal) || 1;
-  RENDER.kamar($('#hal-kamar'), {});
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-};
 AKSI['galeri-pilih'] = el => pilihFotoDetail(Number(el.dataset.i) || 0);
 AKSI['galeri-perbesar'] = () => {
   const k = cariKamar(S.rute.param.kode);
@@ -4687,7 +4658,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) kirim
 setInterval(() => { if (S.rute.nama === 'beranda') kirimStatBanner(); }, 120000);
 
 /** Penanda versi frontend — muncul di konsol agar mudah memastikan versi terbaru sudah terpasang */
-const VERSI_FRONTEND = '3.2.5';
+const VERSI_FRONTEND = '3.2.6';
 
 function mulaiAplikasi() {
   console.info('[Kost AB6] Frontend v' + VERSI_FRONTEND + ' siap');
