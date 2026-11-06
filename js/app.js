@@ -39,6 +39,8 @@ const KONST = {
   BULAN_PANJANG: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
   HARI: ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'],
   KUNCI_PUBLIK: 'kab6_publik_v1',
+  KUNCI_TESTI_BERANDA: 'kab6_testi_beranda_v1',
+  MAKS_TESTI_BERANDA: 120,
   KUNCI_TOKEN: 'kab6_token',
   KUNCI_PERANGKAT: 'kab6_perangkat',
   JUDUL: {
@@ -55,6 +57,7 @@ const S = {
   json: {},
   kegiatan: { items: [], adaLagi: false, halaman: 1, memuat: false },
   testiDaftar: { items: [], adaLagi: false, halaman: 1, jumlah: 0, memuat: false },
+  testiSemua: { items: [], json: '', memuat: false },
   rute: { nama: '', param: {} },
   stat: { tayang: {}, klik: {} },
   sesi: null,
@@ -437,9 +440,11 @@ function perbaruiWaMelayang() {
 // BAGIAN 6: ROUTER SPA (tanpa URL, tanpa reload)
 // ════════════════════════════════════════════════════════════
 
+const IKON_WA = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/></svg>';
+
 const KELAS_MENU = {
-  aktif: 'relative flex items-center h-full transition-colors text-primary-container font-headline-sm font-semibold after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:bg-gradient-to-r after:from-gradient-start after:via-gradient-mid after:to-gradient-end after:rounded-full',
-  pasif: 'relative flex items-center h-full text-on-surface-variant hover:text-on-surface font-headline-sm text-body-md transition-colors',
+  aktif: 'aktif',
+  pasif: '',
   hpAktif: 'flex items-center gap-3 px-3 py-3 rounded-lg font-headline-sm text-body-lg bg-primary-fixed/40 text-primary-container',
   hpPasif: 'flex items-center gap-3 px-3 py-3 rounded-lg font-headline-sm text-body-lg text-on-surface hover:bg-surface-container',
   admAktif: 'flex items-center gap-space-xs px-space-md py-3 transition-colors bg-[#24452f] text-on-primary border-l-[3px] border-gradient-mid font-semibold pl-[13px] font-label-md text-label-md',
@@ -501,6 +506,7 @@ async function navigasi(nama, param, opsi) {
   tutupSidebar();
   tutupPanelTopbar();
 
+  aturLatarBeranda(nama === 'beranda');
   const lapisan = lapisanUntuk(nama);
   ['publik', 'login', 'admin'].forEach(l => { $('#lapisan-' + l).hidden = l !== lapisan; });
   $$('.halaman').forEach(h => { h.hidden = h.dataset.halaman !== nama; });
@@ -534,6 +540,13 @@ async function navigasi(nama, param, opsi) {
     perbaruiKerangkaAdmin();
     pastikanDataAdmin();
   }
+}
+
+/** Objek 3D dan kunang-kunang hanya berjalan selama Beranda terbuka, supaya halaman lain tetap ringan */
+function aturLatarBeranda(aktif) {
+  document.body.classList.toggle('di-beranda', aktif);
+  if (window.LatarAB6) LatarAB6.aktif(aktif);
+  if (window.KunangAB6) KunangAB6.aktif(aktif);
 }
 
 function perbaruiMenuAktif(nama) {
@@ -648,19 +661,24 @@ function simpanCachePublik() {
 
 /** Logo bawaan bila logo belum diunggah atau gagal dimuat */
 function logoCadangan() {
-  return `<span class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-container to-secondary flex items-center justify-center text-on-primary shadow-sm">${ikon('apartment', 'text-[20px]')}</span>`;
+  return '<span class="brand-logo" aria-hidden="true">AB6</span>';
 }
 
 /** Isi header/footer dari data umum */
 function perbaruiKerangkaPublik() {
   const u = S.umum || {};
   $('#logo-publik').innerHTML = u.logo
-    ? `<img src="${esc(urlGambar(u.logo, 200))}" alt="Logo Kost AB6" class="h-8 w-auto max-w-[160px] object-contain" referrerpolicy="no-referrer">`
+    ? `<img src="${esc(urlGambar(u.logo, 200))}" alt="Logo Kost AB6" class="brand-logo-img" referrerpolicy="no-referrer">`
     : logoCadangan();
   if (u.alamatSingkat) $('#ftr-alamat').textContent = u.alamatSingkat;
   if (u.waTampil) {
     $('#ftr-wa').textContent = u.waTampil;
     $('#ftr-wa').href = waUrl(PesanWA.umum());
+  }
+  $('#ftr-chat').href = waUrl(PesanWA.umum());
+  if (u.jamKerja) {
+    $('#ftr-jam').textContent = `Jam kerja ${u.jamKerja.buka} - ${u.jamKerja.tutup} WIB`;
+    $('#ftr-jam-baris').hidden = false;
   }
   if (u.email) {
     $('#ftr-email').textContent = u.email;
@@ -669,6 +687,11 @@ function perbaruiKerangkaPublik() {
 }
 
 async function muatPublik() {
+  const testi = Simpan.get(KONST.KUNCI_TESTI_BERANDA);
+  if (Array.isArray(testi) && testi.length) {
+    S.testiSemua.items = testi;
+    S.testiSemua.json = JSON.stringify(testi);
+  }
   const lokal = Simpan.get(KONST.KUNCI_PUBLIK);
   if (lokal && lokal.t && Date.now() - lokal.t < 7 * 864e5) terapkanData(lokal);
   try {
@@ -684,6 +707,7 @@ async function muatPublik() {
     console.warn('Prefetch gagal:', e);
   }
   simpanCachePublik();
+  muatTestiBeranda();
 }
 
 function renderGalatMuat() {
@@ -703,15 +727,21 @@ function renderGalatMuat() {
 // ════════════════════════════════════════════════════════════
 
 const Slider = {
-  el: null, idx: 0, timer: null, jumlah: 0, xAwal: null,
+  el: null, idx: 0, timer: null, jumlah: 0, xAwal: null, disorot: false,
   pasang(el) {
     this.berhenti();
     this.el = el;
-    this.jumlah = el ? $$('.slide-item', el).length : 0;
+    this.jumlah = el ? $$('.slide', el).length : 0;
     this.idx = 0;
+    this.disorot = false;
     if (!el || !this.jumlah) return;
     this.tampil(0);
     this.mulai();
+    const sorot = on => { this.disorot = on; this.mulai(); };
+    el.addEventListener('mouseenter', () => sorot(true));
+    el.addEventListener('mouseleave', () => sorot(false));
+    el.addEventListener('focusin', () => sorot(true));
+    el.addEventListener('focusout', e => { if (!el.contains(e.relatedTarget)) sorot(false); });
     el.addEventListener('touchstart', e => { this.xAwal = e.touches[0].clientX; }, { passive: true });
     el.addEventListener('touchend', e => {
       if (this.xAwal === null) return;
@@ -723,23 +753,19 @@ const Slider = {
   tampil(i) {
     if (!this.el || !this.jumlah) return;
     this.idx = (i + this.jumlah) % this.jumlah;
-    $$('.slide-item', this.el).forEach((s, n) => {
+    $$('.slide', this.el).forEach((s, n) => {
       const on = n === this.idx;
-      s.classList.toggle('opacity-100', on);
-      s.classList.toggle('z-10', on);
-      s.classList.toggle('opacity-0', !on);
-      s.classList.toggle('pointer-events-none', !on);
-      s.classList.toggle('z-0', !on);
-      s.setAttribute('aria-hidden', on ? 'false' : 'true');
+      s.classList.toggle('aktif', on);
+      if (on) s.removeAttribute('aria-hidden'); else s.setAttribute('aria-hidden', 'true');
     });
-    const aktif = $$('.slide-item', this.el)[this.idx];
+    const aktif = $$('.slide', this.el)[this.idx];
     if (aktif && aktif.dataset.id && !document.hidden && S.rute.nama === 'beranda') {
       S.stat.tayang[aktif.dataset.id] = (S.stat.tayang[aktif.dataset.id] || 0) + 1;
     }
   },
   mulai() {
     clearInterval(this.timer);
-    if (this.jumlah > 1) {
+    if (this.jumlah > 1 && !this.disorot) {
       this.timer = setInterval(() => { if (!document.hidden) this.tampil(this.idx + 1); }, 5000);
     }
   },
@@ -874,9 +900,8 @@ function iframeVideo(link, judul) {
 RENDER.beranda = function (el) {
   const b = S.beranda;
   if (!b) {
-    el.innerHTML = `<div class="${WADAH} pt-space-md pb-space-xl flex flex-col gap-space-lg" aria-busy="true">
+    el.innerHTML = `<div class="wrap pt-space-md pb-space-xl flex flex-col gap-space-lg" aria-busy="true">
       ${kerangkaBlok('h-[440px] md:h-[460px]')}
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-space-md">${kerangkaBlok('h-20')}${kerangkaBlok('h-20')}${kerangkaBlok('h-20')}${kerangkaBlok('h-20')}</div>
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-space-lg">${kerangkaBlok('h-72')}${kerangkaBlok('h-72')}</div></div>`;
     return;
   }
@@ -884,15 +909,16 @@ RENDER.beranda = function (el) {
     id: '', label: '', judul: 'Kost AB6', keterangan: 'Hunian modern, tenang, dan strategis untuk mahasiswa dan profesional muda.',
     teksTombol: 'Lihat Katalog Kamar', linkTombol: '/kamar', foto: (S.umum && S.umum.fotoCadangan) || ''
   }];
-  el.innerHTML = `<div class="flex flex-col w-full"><div class="relative ${WADAH} pt-space-md pb-space-xl">
-    ${htmlHero(banner)}
-    ${htmlSorotan(b.sorotan || [])}
+  el.innerHTML = `<h1 class="sr-only">Beranda Kost AB6</h1>
+    <div class="wrap">${htmlHero(banner)}</div>
     ${htmlVisiMisi(b.visiMisi || {})}
-    ${htmlKataMereka(b.testimoni || [])}
+    ${htmlPilar(b.sorotan || [])}
+    ${htmlKataMereka()}
     ${htmlGaleriKegiatan()}
-    ${htmlCtaBeranda()}
-  </div></div>`;
-  Slider.pasang($('#hero-slider', el));
+    ${htmlCtaBeranda()}`;
+  const hero = $('#hero-slider', el);
+  Slider.pasang(hero);
+  if (window.KunangAB6) KunangAB6.pasangBanner(hero);
 };
 
 function htmlHero(banner) {
@@ -901,85 +927,67 @@ function htmlHero(banner) {
     let cta = '';
     if (s.teksTombol) {
       const luar = linkEksternal(s.linkTombol);
-      const kelas = 'inline-flex items-center gap-space-sm px-space-lg py-3 rounded-full bg-status-available text-on-primary font-headline-sm text-body-md shadow-md hover:bg-secondary transition-all hover:gap-space-md';
-      cta = `<div><a ${luar ? `href="${esc(luar)}" target="_blank" rel="noopener noreferrer"` : 'href="#"'} data-aksi="cta-banner" data-id="${esc(s.id)}" data-link="${esc(s.linkTombol)}" class="${kelas}"><span>${esc(s.teksTombol)}</span>${ikon('arrow_forward', 'text-[20px]')}</a></div>`;
+      cta = `<div class="slide-cta"><a ${luar ? `href="${esc(luar)}" target="_blank" rel="noopener noreferrer"` : 'href="#"'} data-aksi="cta-banner" data-id="${esc(s.id)}" data-link="${esc(s.linkTombol)}" class="btn btn-primary"><span>${esc(s.teksTombol)}</span>${ikon('arrow_forward')}</a></div>`;
     }
     const foto = s.foto
-      ? `<img src="${esc(urlGambar(s.foto, 1920))}" alt="" class="absolute inset-0 w-full h-full object-cover" ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" referrerpolicy="no-referrer">`
-      : `<div class="absolute inset-0 bg-gradient-to-br from-[#1a3326] via-primary to-gradient-start"></div>`;
-    return `<div class="slide-item absolute inset-0 transition-opacity duration-700 ease-in-out ${i === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}" data-id="${esc(s.id)}" role="group" aria-roledescription="slide" aria-label="${i + 1} dari ${n}">
+      ? `<img class="slide-bg" src="${esc(urlGambar(s.foto, 1920))}" alt="" ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" referrerpolicy="no-referrer"><div class="slide-overlay"></div>`
+      : '';
+    const label = s.label && s.label !== s.judul ? s.label : 'Info Kost AB6';
+    return `<div class="slide${i === 0 ? ' aktif' : ''}" data-id="${esc(s.id)}" role="group" aria-roledescription="slide" aria-label="${i + 1} dari ${n}"${i === 0 ? '' : ' aria-hidden="true"'}>
       ${foto}
-      <div class="absolute inset-0 bg-gradient-to-r from-on-surface/90 via-on-surface/65 to-transparent w-full md:w-[70%]"></div>
-      <div class="relative z-20 h-full flex flex-col justify-center max-w-[620px] px-space-lg md:px-space-xl text-on-primary">
-        ${s.label ? `<span class="inline-flex items-center gap-space-xs font-label-md text-label-md uppercase tracking-wider text-secondary-fixed mb-space-sm"><span class="w-2 h-2 rounded-full bg-status-available ${i === 0 ? 'animate-pulse' : ''}"></span>${esc(s.label)}</span>` : ''}
-        <${i === 0 ? 'h1' : 'h2'} class="font-display-hero text-headline-lg md:text-display-hero font-bold tracking-tight text-on-primary leading-tight drop-shadow-sm mb-space-sm">${esc(s.judul)}</${i === 0 ? 'h1' : 'h2'}>
-        <p class="font-body-lg text-body-md md:text-body-lg text-surface-container-high max-w-[500px] mb-space-lg leading-relaxed">${esc(s.keterangan)}</p>
+      <div class="slide-card">
+        <span class="lbl">${esc(label)}</span>
+        <h2 class="slide-judul">${esc(s.judul)}</h2>
+        ${s.keterangan ? `<p class="slide-sub">${esc(s.keterangan)}</p>` : ''}
         ${cta}
       </div>
     </div>`;
   }).join('');
   const kontrol = n > 1 ? `
-    <button type="button" data-aksi="slider-prev" aria-label="Slide sebelumnya" class="absolute left-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-surface-container-lowest text-on-surface hidden md:flex items-center justify-center shadow-md hover:bg-surface-bright active:scale-95 transition-all">${ikon('chevron_left', 'text-[24px]')}</button>
-    <button type="button" data-aksi="slider-next" aria-label="Slide berikutnya" class="absolute right-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-surface-container-lowest text-on-surface hidden md:flex items-center justify-center shadow-md hover:bg-surface-bright active:scale-95 transition-all">${ikon('chevron_right', 'text-[24px]')}</button>
-    ` : '';
-  return `<section class="relative w-full rounded-xl overflow-hidden shadow-sm h-[440px] md:h-[460px] select-none group" id="hero-slider" aria-roledescription="carousel" aria-label="Banner Kost AB6">
-    <div class="relative w-full h-full overflow-hidden bg-on-surface">${slides}</div>${kontrol}
+    <button type="button" data-aksi="slider-prev" aria-label="Slide sebelumnya" class="banner-nav prev">${ikon('chevron_left')}</button>
+    <button type="button" data-aksi="slider-next" aria-label="Slide berikutnya" class="banner-nav next">${ikon('chevron_right')}</button>` : '';
+  return `<section class="banner" id="hero-slider" aria-roledescription="carousel" aria-label="Banner Kost AB6">
+    <div class="banner-track">${slides}</div>${kontrol}
   </section>`;
-}
-
-function htmlSorotan(daftar) {
-  if (!daftar.length) return '';
-  return `<div class="grid grid-cols-2 md:grid-cols-4 gap-space-sm sm:gap-space-md mt-space-lg">${daftar.slice(0, 4).map(s => `
-    <div class="bg-surface-container-lowest rounded-xl p-space-sm sm:p-space-md shadow-sm flex flex-col sm:flex-row items-start sm:items-center gap-space-sm sm:gap-space-md">
-      <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-surface-container-low flex items-center justify-center text-primary-container shrink-0">${ikon(s.ikon || 'verified', 'text-[22px] sm:text-[24px]')}</div>
-      <div class="min-w-0"><p class="font-label-numeric text-body-lg sm:text-label-numeric font-bold text-on-surface whitespace-nowrap">${esc(s.nilai)}</p><p class="font-body-sm text-body-sm text-on-surface-variant sm:truncate">${esc(s.label)}</p></div>
-    </div>`).join('')}</div>`;
 }
 
 function htmlVisiMisi(v) {
-  const misi = (v.misi || []).map((m, i) => `
-    <li class="flex items-start gap-space-md">
-      <span class="flex-shrink-0 w-7 h-7 rounded-full bg-status-available text-on-primary font-headline-sm text-body-sm flex items-center justify-center font-bold">${i + 1}</span>
-      <p class="font-body-md text-body-md text-on-surface pt-0.5 leading-snug">${esc(m)}</p>
-    </li>`).join('');
-  return `<section class="mt-space-xl pt-space-lg">
-    <div class="mb-space-lg"><h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-on-surface tracking-tight">Visi &amp; Misi Kost AB6</h2><div class="${GARIS_JUDUL}"></div></div>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-space-lg items-stretch">
-      <div class="bg-primary-fixed/35 rounded-xl p-space-lg md:p-space-xl flex flex-col justify-between shadow-sm relative overflow-hidden">
-        <div class="relative z-10">
-          <div class="flex items-center gap-space-md mb-space-lg">
-            <div class="w-12 h-12 rounded-full bg-primary-container text-on-primary flex items-center justify-center shadow-sm">${ikon('explore', 'text-[24px]')}</div>
-            <div><span class="font-body-sm text-body-sm uppercase tracking-wider text-primary font-semibold">Tujuan Kami</span><h3 class="font-headline-md text-headline-md font-bold text-on-surface">Visi Kami</h3></div>
-          </div>
-          <blockquote class="font-body-lg text-body-lg italic text-on-surface leading-relaxed text-balance pt-space-sm pl-space-md border-l-2 border-primary-container">“${esc(v.visi)}”</blockquote>
+  const misi = (v.misi || []).map((m, i) => `<li><span class="nomor">${String(i + 1).padStart(2, '0')}</span><span>${esc(m)}</span></li>`).join('');
+  return `<section class="sec"><div class="wrap">
+    <div class="sec-head">
+      <span class="lbl">Komitmen Kami</span>
+      <h2 class="h2">Visi &amp; Misi <em>Kost AB6</em></h2>
+      <p class="muted">Modern Indonesian Living &amp; Hospitality</p>
+    </div>
+    <div class="g2">
+      <div class="kartu visi-card">
+        <div class="kartu-ikon">${ikon('visibility')}</div><span class="lbl">Visi</span>
+        <p class="visi-teks">${esc(v.visi)}</p>
+        <div class="pil-baris">
+          ${v.tahun ? `<span class="pil">Dikelola sejak ${esc(v.tahun)}</span>` : ''}
+          ${v.visiLabel ? `<span class="pil">${esc(v.visiLabel)}</span>` : ''}
         </div>
-        ${v.visiLabel ? `<div class="mt-space-xl pt-space-md flex items-center gap-space-sm font-label-md text-label-md text-primary relative z-10">${ikon('verified', 'text-[18px]')}<span>${esc(v.visiLabel)}</span></div>` : ''}
-        <svg class="absolute -right-8 -bottom-8 w-44 h-44 text-primary/5 pointer-events-none" fill="currentColor" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" fill="none" opacity="0.4" r="48" stroke="currentColor" stroke-width="4"></circle><polygon points="50,15 58,42 85,50 58,58 50,85 42,58 15,50 42,42"></polygon></svg>
       </div>
-      <div class="bg-surface-container-lowest rounded-xl p-space-lg md:p-space-xl shadow-sm flex flex-col justify-between">
-        <div>
-          <div class="flex items-center gap-space-md mb-space-lg">
-            <div class="w-12 h-12 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center">${ikon('task_alt', 'text-[24px]')}</div>
-            <div><span class="font-body-sm text-body-sm uppercase tracking-wider text-secondary font-semibold">Komitmen Operasional</span><h3 class="font-headline-md text-headline-md font-bold text-on-surface">Misi Kami</h3></div>
-          </div>
-          <ul class="space-y-space-md">${misi}</ul>
-        </div>
-        <div class="mt-space-lg pt-space-sm flex items-center justify-between gap-2 text-on-surface-variant font-body-sm text-body-sm">
-          <span>${v.tahun ? 'Dikelola secara profesional sejak ' + esc(v.tahun) : ''}</span>
-          ${v.misiLabel ? `<span class="inline-flex items-center gap-1 text-status-available font-semibold">${ikon('check_circle', 'text-[16px]')} ${esc(v.misiLabel)}</span>` : ''}
+      <div class="kartu misi-card">
+        <div class="kartu-ikon hijau">${ikon('flag')}</div><span class="lbl">Misi</span>
+        <ol class="misi-list">${misi}</ol>
+        <div class="misi-bawah">
+          <a href="#" data-nav="tentang" class="btn btn-ghost"><span>Selengkapnya tentang kami</span>${ikon('arrow_forward')}</a>
+          ${v.misiLabel ? `<span class="pil">${esc(v.misiLabel)}</span>` : ''}
         </div>
       </div>
     </div>
-  </section>`;
+  </div></section>`;
 }
 
-function chipSorotanTesti(t, i) {
-  if (t.tag) {
-    const kelas = i % 2 ? 'text-secondary bg-secondary-container/50' : 'text-primary bg-primary-fixed/50';
-    return `<span class="inline-flex items-center gap-1 font-body-sm text-body-sm ${kelas} px-2 py-1 rounded-full">${ikon(t.ikonTag || 'verified', 'text-[14px]')} ${esc(t.tag)}</span>`;
-  }
-  if (t.fotoBukti) return `<span class="inline-flex items-center gap-1 font-body-sm text-body-sm text-primary bg-primary-fixed/50 px-2 py-1 rounded-full">${ikon('photo_camera', 'text-[14px]')} Foto Terverifikasi</span>`;
-  return '<span></span>';
+function htmlPilar(daftar) {
+  if (!daftar.length) return '';
+  return `<section class="sec"><div class="wrap">
+    <div class="sec-head"><span class="lbl">Keunggulan Kami</span><h2 class="h2">4 Pilar <em>Layanan</em></h2></div>
+    <div class="pilar-grid">${daftar.slice(0, 4).map((s, i) => `
+      <div class="pilar"><span class="pilar-no">${String(i + 1).padStart(2, '0')}</span>${ikon(s.ikon || 'verified')}<h3>${esc(s.nilai)}</h3><p class="small muted">${esc(s.label)}</p></div>`).join('')}
+    </div>
+  </div></section>`;
 }
 
 /**
@@ -993,47 +1001,73 @@ function htmlBerjalan(kartu, arah, kelasLebar) {
   for (let i = 0; i < Math.max(1, Math.ceil(6 / kartu.length)); i++) putaran.push(...kartu);
   const item = (h, salinan) => `<div class="berjalan-item ${kelasLebar} shrink-0 pr-6"${salinan ? ' aria-hidden="true" data-salinan' : ''}>${salinan ? h.replace(/tabindex="0"/g, 'tabindex="-1"') : h}</div>`;
   const isi = putaran.map((h, i) => item(h, i >= kartu.length)).join('') + putaran.map(h => item(h, true)).join('');
-  return `<div class="berjalan overflow-hidden py-2"><div class="berjalan-trek berjalan-${arah} flex w-max" style="animation-duration:${putaran.length * 8}s">${isi}</div></div>`;
+  return `<div class="berjalan overflow-hidden"><div class="berjalan-trek berjalan-${arah} flex w-max" style="animation-duration:${putaran.length * 12}s">${isi}</div></div>`;
 }
 
-function htmlKataMereka(daftar) {
-  if (!daftar.length) return '';
-  return `<section class="mt-space-xl pt-space-lg">
-    <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-space-lg gap-space-sm">
-      <div><h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-on-surface tracking-tight">Kata Mereka</h2><div class="${GARIS_JUDUL}"></div></div>
-      <a href="#" data-nav="testimoni" class="inline-flex items-center gap-1 font-headline-sm text-body-md text-primary-container hover:text-primary transition-colors font-semibold"><span>Lihat Semua Testimoni</span>${ikon('arrow_forward', 'text-[18px]')}</a>
+function kartuTesti(t) {
+  let avatar = `<span class="tava" aria-hidden="true">${t.tipe === 'Official' ? ikon('apartment', 'text-[20px]') : esc(inisial(t.nama))}</span>`;
+  if (t.fotoProfil) avatar = gambar(t.fotoProfil, 200, 'tava', 'Foto profil ' + t.nama);
+  const info = [t.tag, t.fotoBukti ? 'Foto Terverifikasi' : '', namaKamarPendek(t.kamar)].filter(Boolean);
+  return `<article class="tcard">
+    <div class="thead">${avatar}<div class="tmeta"><strong class="tnama">${esc(t.nama)}</strong><span class="tinst">${esc(labelPenulis(t))}</span><span class="ttgl">${fTgl(t.tanggal)}</span></div></div>
+    <blockquote class="tisi">“${esc(t.isi)}”</blockquote>
+    ${info.length ? `<div class="tprod-baris">${info.map(x => `<span class="tprod">${esc(x)}</span>`).join('')}</div>` : ''}
+  </article>`;
+}
+
+/** Dua baris testimoni berjalan berlawanan arah, berisi semua testimoni yang tampil */
+function htmlKataMereka() {
+  const t = S.testiSemua.items.length ? S.testiSemua.items : ((S.beranda && S.beranda.testimoni) || []);
+  if (!t.length) return '';
+  const lebar = 'w-[300px] md:w-[380px]';
+  const baris = daftar => daftar.map(kartuTesti);
+  const atas = t.filter((x, i) => i % 2 === 0);
+  const bawah = t.filter((x, i) => i % 2 === 1);
+  return `<section class="sec" id="bagian-testi"><div class="wrap">
+    <div class="sec-head">
+      <span class="lbl">Kepercayaan Penghuni</span>
+      <h2 class="h2">Kata <em>Mereka</em></h2>
+      <p class="muted">Testimoni dari penghuni yang telah tinggal di Kost AB6.</p>
     </div>
-    ${htmlBerjalan(daftar.map((t, i) => `
-      <div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
-        <div>
-          <div class="flex items-center gap-space-md mb-space-md">
-            ${avatarTesti(t, 'w-12 h-12')}
-            <div class="min-w-0"><h3 class="font-headline-sm text-headline-sm text-on-surface font-bold leading-snug truncate">${esc(t.nama)}</h3><p class="font-body-sm text-body-sm text-on-surface-variant">${fTgl(t.tanggal, 'panjang')} • ${esc(labelPenulis(t))}</p></div>
-          </div>
-          <p class="font-body-md text-body-md text-on-surface leading-relaxed line-clamp-4">${esc(t.isi)}</p>
-        </div>
-        <div class="mt-space-md pt-space-sm flex items-center justify-between gap-2">
-          ${chipSorotanTesti(t, i)}
-          ${t.kamar ? `<span class="font-body-sm text-body-sm text-on-surface-variant text-right whitespace-nowrap shrink-0">${esc(namaKamarPendek(t.kamar))}</span>` : ''}
-        </div>
-      </div>`), 'kanan', 'w-[300px] md:w-[380px]')}
-  </section>`;
+    ${htmlBerjalan(baris(atas), 'kanan', lebar)}
+    ${bawah.length ? htmlBerjalan(baris(bawah), 'kiri', lebar) : ''}
+    <div class="center mt-24"><a href="#" data-nav="testimoni" class="btn btn-outline">${ikon('rate_review')}<span>Lihat Semua Testimoni</span></a></div>
+  </div></section>`;
+}
+
+/** Mengambil semua testimoni tampil di belakang layar; bagian ini digambar ulang hanya bila isinya berubah. */
+async function muatTestiBeranda() {
+  const ts = S.testiSemua;
+  if (ts.memuat) return;
+  ts.memuat = true;
+  try {
+    const ada = {};
+    let items = [], halaman = 1, lagi = true;
+    while (lagi && items.length < KONST.MAKS_TESTI_BERANDA) {
+      const d = halaman === 1 && S.testimoni ? S.testimoni : await panggil('ambilTestimoni', halaman);
+      items = items.concat(d.items.filter(t => !ada[t.id] && (ada[t.id] = true)));
+      lagi = d.adaLagi;
+      halaman++;
+    }
+    const json = JSON.stringify(items);
+    if (json === ts.json) return;
+    ts.json = json;
+    ts.items = items;
+    Simpan.set(KONST.KUNCI_TESTI_BERANDA, items);
+    const bagian = $('#bagian-testi');
+    if (bagian) bagian.outerHTML = htmlKataMereka();
+  } catch (e) {
+    console.warn('Testimoni Beranda gagal dimuat:', e);
+  } finally {
+    ts.memuat = false;
+  }
 }
 
 function kartuKegiatan(g) {
   const foto = (g.foto || [])[0];
-  return `<article class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:-translate-y-1 hover:shadow-md transition-all duration-300 flex flex-col group cursor-pointer" data-aksi="buka-kegiatan" data-id="${esc(g.id)}" tabindex="0" role="button" aria-label="Lihat detail dokumentasi ${esc(g.judul)}">
-    <div class="relative w-full aspect-[16/10] overflow-hidden bg-surface-container">
-      ${gambar(foto && foto.id, 800, 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500', g.judul)}
-      <div class="absolute top-3 left-3 bg-status-available text-on-primary font-label-md text-body-sm px-2.5 py-1 rounded-full shadow-sm flex items-center gap-1">${ikon('calendar_today', 'text-[14px]')}<span>${fTgl(g.tanggal)}</span></div>
-    </div>
-    <div class="p-space-md flex-1 flex flex-col justify-between">
-      <div>
-        <h3 class="font-headline-sm text-headline-sm font-bold text-on-surface group-hover:text-primary transition-colors line-clamp-2 mb-1">${esc(g.judul)}</h3>
-        <p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 leading-relaxed">${esc(g.ringkas)}</p>
-      </div>
-      <div class="mt-space-md pt-space-xs flex items-center text-primary font-label-md text-body-sm gap-1"><span>Lihat Detail Dokumentasi</span>${ikon('arrow_forward', 'text-[16px] group-hover:translate-x-1 transition-transform')}</div>
-    </div>
+  return `<article class="tcard gcard" data-aksi="buka-kegiatan" data-id="${esc(g.id)}" tabindex="0" role="button" aria-label="Lihat detail dokumentasi ${esc(g.judul)}">
+    <div class="gfoto">${gambar(foto && foto.id, 800, 'gfoto-img', g.judul)}<span class="gtgl">${fTgl(g.tanggal)}</span></div>
+    <div class="gteks"><h3>${esc(g.judul)}</h3><p class="small muted">${esc(g.ringkas)}</p></div>
   </article>`;
 }
 
@@ -1041,30 +1075,37 @@ function htmlGaleriKegiatan() {
   const g = S.kegiatan;
   const isi = g.items.length
     ? htmlBerjalan(g.items.map(kartuKegiatan), 'kiri', 'w-[300px] md:w-[360px]')
-    : `<p class="text-center font-body-md text-body-md text-on-surface-variant py-space-lg">Belum ada dokumentasi kegiatan.</p>`;
-  return `<section class="mt-space-xl pt-space-lg" id="bagian-kegiatan">
-    <div class="mb-space-lg text-center max-w-2xl mx-auto">
-      <h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-on-surface tracking-tight">Galeri Kegiatan</h2>
-      <div class="w-12 h-[3px] mx-auto mt-2 mb-3 rounded-full bg-gradient-to-r from-gradient-start via-gradient-mid to-gradient-end"></div>
-      <p class="font-body-md text-body-md text-on-surface-variant">Momen kebersamaan dan perawatan fasilitas Kost AB6</p>
+    : '<p class="muted center">Belum ada dokumentasi kegiatan.</p>';
+  return `<section class="sec" id="bagian-kegiatan"><div class="wrap">
+    <div class="sec-head">
+      <span class="lbl">Dokumentasi</span>
+      <h2 class="h2">Galeri <em>Kegiatan</em></h2>
+      <p class="muted">Momen kebersamaan dan perawatan fasilitas Kost AB6.</p>
     </div>
     ${isi}
-    ${g.adaLagi ? `<div class="mt-space-xl text-center"><button type="button" data-aksi="muat-kegiatan" class="inline-flex items-center justify-center gap-space-sm px-space-xl py-3 rounded-full bg-surface-container-lowest text-primary-container font-headline-sm text-body-md shadow-sm hover:bg-primary hover:text-on-primary transition-all">${ikon('cached', 'text-[18px]')}<span>Muat Lebih Banyak</span></button></div>` : ''}
-  </section>`;
+    ${g.adaLagi ? `<div class="center mt-24"><button type="button" data-aksi="muat-kegiatan" class="btn btn-outline">${ikon('cached')}<span>Muat Lebih Banyak</span></button></div>` : ''}
+  </div></section>`;
 }
 
 function htmlCtaBeranda() {
-  return `<section class="mt-space-xl mb-space-md bg-gradient-to-r from-[#1a3326] to-primary rounded-xl p-space-lg md:p-space-xl text-on-primary flex flex-col md:flex-row items-start md:items-center justify-between gap-space-lg shadow-sm">
-    <div class="max-w-xl">
-      <span class="font-label-md text-label-md uppercase tracking-wider text-secondary-fixed">Siap Pindah Hunian?</span>
-      <h3 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-on-primary mt-1">Jadwalkan Kunjungan Survei Lokasi Sekarang</h3>
-      <p class="font-body-md text-body-md text-surface-container-high mt-space-xs">Konsultasikan ketersediaan kamar, tipe ruangan, dan nikmati diskon khusus masa sewa tahunan bersama manajer operasional kami.</p>
+  const u = S.umum || {};
+  const wifi = ((S.beranda && S.beranda.sorotan) || []).filter(s => s.ikon === 'wifi')[0];
+  const aman = (u.testimoniStat || []).filter(s => s.ikon === 'security')[0];
+  const poin = [
+    wifi && 'Wi-Fi ' + wifi.nilai,
+    aman && aman.label + ' ' + aman.nilai,
+    u.responMenit && 'Admin membalas ±' + u.responMenit + ' menit'
+  ].filter(Boolean);
+  return `<section class="sec"><div class="wrap"><div class="cta">
+    <span class="lbl">Siap Pindah Hunian?</span>
+    <h2 class="h2">Jadwalkan Kunjungan <em>Survei Lokasi</em> <span class="h2-sub">Sekarang</span></h2>
+    <p class="muted">Konsultasikan ketersediaan kamar, tipe ruangan, dan nikmati diskon khusus masa sewa tahunan bersama manajer operasional kami.</p>
+    <div class="cta-btn">
+      <a href="#" data-nav="kamar" class="btn btn-primary btn-lg">${ikon('grid_view')}<span>Cek Katalog Kamar</span></a>
+      <a ${waAttr(PesanWA.umum())} class="btn btn-outline btn-lg">${IKON_WA}<span>Hubungi Pengelola</span></a>
     </div>
-    <div class="flex flex-wrap items-center gap-space-md flex-shrink-0">
-      <a href="#" data-nav="kamar" class="px-space-lg py-3 rounded-full bg-surface-container-lowest text-primary font-headline-sm text-body-md shadow hover:bg-surface-bright transition-all">Cek Katalog Kamar</a>
-      <a ${waAttr(PesanWA.umum())} aria-label="Tanya langsung di WhatsApp" class="px-space-lg py-3 rounded-full bg-status-available text-on-primary font-headline-sm text-body-md shadow hover:bg-secondary transition-all flex items-center gap-1.5">${ikon('chat', 'text-[18px]')}<span>Hubungi Pengelola</span></a>
-    </div>
-  </section>`;
+    ${poin.length ? `<ul class="cta-poin">${poin.map(p => `<li>${ikon('check')}${esc(p)}</li>`).join('')}</ul>` : ''}
+  </div></div></section>`;
 }
 
 function bukaKegiatan(id) {
@@ -4658,7 +4699,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) kirim
 setInterval(() => { if (S.rute.nama === 'beranda') kirimStatBanner(); }, 120000);
 
 /** Penanda versi frontend — muncul di konsol agar mudah memastikan versi terbaru sudah terpasang */
-const VERSI_FRONTEND = '3.2.6';
+const VERSI_FRONTEND = '3.3.0';
 
 function mulaiAplikasi() {
   console.info('[Kost AB6] Frontend v' + VERSI_FRONTEND + ' siap');

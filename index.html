@@ -31,41 +31,40 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://script.google.com" crossorigin>
   <link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
   <!-- Ikon: sumbu dikunci ke nilai yang dipakai style.css (opsz 24, wght 400, GRAD 0; FILL 0–1) → ±450 KB, bukan 3,9 MB -->
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&display=block" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <!-- Tailwind v3.4.16 yang sudah dikompilasi (bukan Play CDN) — lihat README.md bagian Tailwind -->
   <link rel="stylesheet" href="css/tailwind.css">
+  <link rel="stylesheet" href="css/beranda.css">
 </head>
 <body class="bg-surface font-body-md text-on-surface antialiased selection:bg-primary selection:text-on-primary">
   <a href="#konten-utama" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[1300] focus:bg-surface-page focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-md">Lewati ke konten utama</a>
 
+  <canvas id="latar3d" aria-hidden="true"></canvas>
+
   <!-- ═══════════════ LAPISAN PUBLIK ═══════════════ -->
   <div id="lapisan-publik">
-    <header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/95 shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
-      <div class="h-[72px] max-w-[1240px] mx-auto px-margin-mobile md:px-margin flex items-center justify-between">
-        <a href="#" data-nav="beranda" class="flex items-center gap-space-sm md:gap-space-md" aria-label="Kost AB6 — Beranda">
-          <span id="logo-publik" class="h-8 flex items-center"></span>
-          <span class="font-headline-sm text-headline-sm text-on-surface tracking-tight hover:text-primary transition-colors">Kost AB6</span>
+    <header class="hdr">
+      <div class="wrap hdr-in">
+        <a href="#" data-nav="beranda" class="brand" aria-label="Kost AB6 — Beranda">
+          <span id="logo-publik" class="logo-wadah"></span>
+          <span class="brand-teks"><strong>Kost AB6</strong><small>Residence Living</small></span>
         </a>
-        <nav class="hidden md:flex items-center gap-space-lg h-full" aria-label="Menu utama">
-          <a href="#" data-nav="beranda" data-menu-publik="beranda" class="relative flex items-center h-full">Beranda</a>
-          <a href="#" data-nav="kamar" data-menu-publik="kamar" class="relative flex items-center h-full">Kamar</a>
-          <a href="#" data-nav="testimoni" data-menu-publik="testimoni" class="relative flex items-center h-full">Testimoni</a>
-          <a href="#" data-nav="tentang" data-menu-publik="tentang" class="relative flex items-center h-full">Tentang Kami</a>
+        <nav class="nav" aria-label="Menu utama">
+          <a href="#" data-nav="beranda" data-menu-publik="beranda">Beranda</a>
+          <a href="#" data-nav="kamar" data-menu-publik="kamar">Kamar</a>
+          <a href="#" data-nav="testimoni" data-menu-publik="testimoni">Testimoni</a>
+          <a href="#" data-nav="tentang" data-menu-publik="tentang">Tentang Kami</a>
         </nav>
-        <div class="flex items-center gap-space-sm md:gap-space-md">
-          <a href="#" data-aksi="cek-ketersediaan" class="hidden md:inline-flex items-center justify-center px-space-md py-space-sm rounded-full bg-primary-container text-on-primary font-headline-sm text-body-md shadow-sm hover:opacity-95 transition-all">Cek Ketersediaan</a>
-          <button type="button" data-aksi="ke-admin" aria-label="Masuk panel pengelola" class="w-11 h-11 -m-1.5 flex items-center justify-center rounded-full group">
-            <span class="w-8 h-8 rounded-full bg-primary flex items-center justify-center group-hover:bg-primary-container transition-colors"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></span>
-          </button>
-          <button type="button" data-aksi="buka-menu-hp" aria-label="Buka menu" aria-expanded="false" aria-controls="laci-hp" class="md:hidden w-11 h-11 -mr-2 flex items-center justify-center rounded-lg text-on-surface hover:bg-surface-container transition-colors">
-            <span class="material-symbols-outlined text-[26px]">menu</span>
-          </button>
+        <div class="hdr-aksi">
+          <a href="#" data-aksi="cek-ketersediaan" class="btn btn-primary btn-sm hdr-cek">Cek Ketersediaan</a>
+          <button type="button" data-aksi="ke-admin" aria-label="Masuk panel pengelola" class="ikon-btn ikon-admin"><span class="material-symbols-outlined">lock</span></button>
+          <button type="button" data-aksi="buka-menu-hp" aria-label="Buka menu" aria-expanded="false" aria-controls="laci-hp" class="ikon-btn burger"><span class="material-symbols-outlined">menu</span></button>
         </div>
       </div>
-      <div class="h-[4px] w-full bg-gradient-to-r from-gradient-start via-gradient-mid to-gradient-end"></div>
+      <div class="garis-gradasi"></div>
     </header>
 
     <!-- Laci menu ponsel (tidak ada di desain; memakai token yang sama) -->
@@ -92,7 +91,7 @@
       </nav>
     </div>
 
-    <main id="konten-utama" class="w-full pt-[72px] bg-surface min-h-[calc(100vh-72px)]">
+    <main id="konten-utama" class="w-full bg-surface min-h-[calc(100vh-72px)]">
       <section id="hal-beranda" class="halaman" data-halaman="beranda" hidden></section>
       <section id="hal-kamar" class="halaman" data-halaman="kamar" hidden></section>
       <section id="hal-detail" class="halaman" data-halaman="detail" hidden></section>
@@ -105,44 +104,42 @@
       <section id="hal-404" class="halaman" data-halaman="404" hidden></section>
     </main>
 
-    <a id="wa-melayang" href="#" target="_blank" rel="noopener noreferrer" aria-label="Hubungi via WhatsApp" class="fixed bottom-space-lg right-space-lg z-[1000] w-14 h-14 rounded-full bg-whatsapp-green text-on-primary flex items-center justify-center shadow-[0_16px_36px_-6px_rgba(28,40,32,0.16)] hover:scale-105 active:scale-95 transition-transform"><span class="material-symbols-outlined text-[28px]">chat</span></a>
+    <a id="wa-melayang" href="#" target="_blank" rel="noopener noreferrer" aria-label="Hubungi via WhatsApp" class="wa-float"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/></svg></a>
 
-    <footer class="w-full bg-[#1d252c] text-on-primary relative">
-      <div class="h-[4px] w-full bg-gradient-to-r from-gradient-start via-gradient-mid to-gradient-end"></div>
-      <div class="max-w-[1240px] mx-auto px-margin-mobile md:px-margin py-space-xl">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-space-xl">
-          <div class="space-y-space-md">
-            <div class="flex items-center gap-space-sm"><span class="font-headline-md text-headline-md font-bold tracking-tight text-on-primary">Kost AB6</span></div>
-            <p class="font-body-md text-body-md text-surface-container-high leading-relaxed">Hunian modern, tenang, dan strategis dengan fasilitas premium standar editorial modern untuk mahasiswa dan profesional muda.</p>
-          </div>
-          <div class="space-y-space-sm">
-            <h3 class="font-headline-sm text-headline-sm text-on-primary">Navigasi Cepat</h3>
-            <ul class="space-y-space-xs font-body-md text-body-md">
-              <li class="py-0.5"><a href="#" data-nav="beranda" class="text-surface-container-high hover:text-secondary-fixed transition-colors">Beranda</a></li>
-              <li class="py-0.5"><a href="#" data-nav="kamar" class="text-surface-container-high hover:text-secondary-fixed transition-colors">Daftar Kamar</a></li>
-              <li class="py-0.5"><a href="#" data-nav="testimoni" class="text-surface-container-high hover:text-secondary-fixed transition-colors">Testimoni Penghuni</a></li>
-              <li class="py-0.5"><a href="#" data-nav="tentang" class="text-surface-container-high hover:text-secondary-fixed transition-colors">Tentang Kost AB6</a></li>
-            </ul>
-          </div>
-          <div class="space-y-space-sm">
-            <h3 class="font-headline-sm text-headline-sm text-on-primary">Kontak Kami</h3>
-            <div class="space-y-space-xs font-body-md text-body-md text-surface-container-high">
-              <p class="flex items-center gap-space-sm py-0.5"><span class="material-symbols-outlined text-[18px] text-secondary-fixed">location_on</span><span id="ftr-alamat">Jl. Siwalankerto VIII No. AB-6, Surabaya</span></p>
-              <p class="flex items-center gap-space-sm py-0.5"><span class="material-symbols-outlined text-[18px] text-secondary-fixed">call</span><a id="ftr-wa" href="#" target="_blank" rel="noopener noreferrer" class="hover:text-secondary-fixed transition-colors">+62 812-3456-7890</a></p>
-              <p class="flex items-center gap-space-sm py-0.5"><span class="material-symbols-outlined text-[18px] text-secondary-fixed">mail</span><a id="ftr-email" href="mailto:info@kostab6.id" target="_blank" rel="noopener noreferrer" class="hover:text-secondary-fixed transition-colors">info@kostab6.id</a></p>
-            </div>
-          </div>
-          <div class="space-y-space-sm">
-            <h3 class="font-headline-sm text-headline-sm text-on-primary">Akses Manajemen</h3>
-            <p class="font-body-md text-body-md text-surface-container-high">Portal pengelolaan operasional dan pemeliharaan kamar bagi pengelola.</p>
-            <div class="pt-space-xs"><a href="#" data-aksi="ke-admin" class="inline-flex items-center gap-space-xs font-label-md text-label-md text-outline-variant hover:text-on-primary transition-colors"><span class="material-symbols-outlined text-[16px]">lock</span><span>Admin Login</span></a></div>
-          </div>
+    <footer class="ftr">
+      <div class="wrap ftr-grid">
+        <div>
+          <span class="ftr-brand">Kost AB6</span>
+          <p>Hunian modern, tenang, dan strategis untuk mahasiswa dan profesional muda.</p>
+          <a id="ftr-chat" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-wa btn-sm mt-16"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/></svg><span>Chat Admin WhatsApp</span></a>
         </div>
-        <div class="mt-space-xl pt-space-lg flex flex-col sm:flex-row items-center justify-between gap-space-md font-body-sm text-body-sm text-outline-variant">
-          <p>© <span class="tahun-berjalan">2026</span> Kost AB6. Seluruh hak cipta dilindungi.</p>
-          <p class="text-outline-variant">Modern Indonesian Living &amp; Hospitality</p>
+        <div>
+          <h2 class="ftr-judul">Navigasi</h2>
+          <ul class="ftr-list">
+            <li><a href="#" data-nav="beranda">Beranda</a></li>
+            <li><a href="#" data-nav="kamar">Daftar Kamar</a></li>
+            <li><a href="#" data-nav="testimoni">Testimoni Penghuni</a></li>
+            <li><a href="#" data-nav="tentang">Tentang Kost AB6</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="ftr-judul">Akses Manajemen</h2>
+          <ul class="ftr-list">
+            <li>Portal pengelolaan operasional dan pemeliharaan kamar bagi pengelola.</li>
+            <li><a href="#" data-aksi="ke-admin">Admin Login</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="ftr-judul">Kontak</h2>
+          <ul class="ftr-list ftr-kontak">
+            <li><span class="material-symbols-outlined">location_on</span><span id="ftr-alamat">Jl. Siwalankerto VIII No. AB-6, Surabaya</span></li>
+            <li><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/></svg><a id="ftr-wa" href="#" target="_blank" rel="noopener noreferrer">+62 812-3456-7890</a></li>
+            <li><span class="material-symbols-outlined">mail</span><a id="ftr-email" href="mailto:info@kostab6.id" target="_blank" rel="noopener noreferrer">info@kostab6.id</a></li>
+            <li id="ftr-jam-baris" hidden><span class="material-symbols-outlined">schedule</span><span id="ftr-jam"></span></li>
+          </ul>
         </div>
       </div>
+      <div class="ftr-bawah"><div class="wrap">© <span class="tahun-berjalan">2026</span> Kost AB6. Seluruh hak cipta dilindungi.</div></div>
     </footer>
   </div>
 
@@ -296,6 +293,8 @@
   <!-- Urutan wajib: config (GAS_URL) → api (fetch ke GAS) → app (SPA) -->
   <script src="js/config.js"></script>
   <script src="js/api.js"></script>
+  <script src="js/latar3d.js"></script>
+  <script src="js/kunang.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

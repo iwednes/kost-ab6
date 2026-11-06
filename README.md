@@ -6,9 +6,13 @@ Situs publik + panel pengelola Kost AB6. Frontend statis (HTML/CSS/JS vanilla + 
 index.html        ← kerangka halaman (publik, login, admin)
 css/style.css     ← CSS tambahan di atas Tailwind
 css/tailwind.css  ← Tailwind v3.4.16 hasil kompilasi (JANGAN diedit manual)
+css/beranda.css   ← tampilan header, footer, dan Beranda
 js/config.js      ← GAS_URL (URL /exec Apps Script) — satu-satunya yang perlu diubah
 js/api.js         ← panggil(): fetch ke GAS (GET untuk data publik, POST text/plain untuk lainnya)
 js/app.js         ← seluruh logika SPA
+js/latar3d.js     ← objek 3D di belakang Beranda
+js/bentuk3d.js    ← bentuk dan shader partikel objek 3D
+js/kunang.js      ← kunang-kunang di Beranda
 .nojekyll         ← matikan pemrosesan Jekyll di GitHub Pages
 ```
 
@@ -24,7 +28,7 @@ git commit -m "Deskripsi perubahan"
 git push
 ```
 
-GitHub Pages memperbarui situs dalam 1–2 menit. Jika masih tampil versi lama, tekan Ctrl+Shift+R. Versi yang aktif tercetak di konsol browser: `[Kost AB6] Frontend v3.2.6 siap`.
+GitHub Pages memperbarui situs dalam 1–2 menit. Jika masih tampil versi lama, tekan Ctrl+Shift+R. Versi yang aktif tercetak di konsol browser: `[Kost AB6] Frontend v3.3.0 siap`.
 
 ## Tailwind
 
