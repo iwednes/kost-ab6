@@ -1,6 +1,26 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+  <script>
+    // Kunjungan baru melihat cover 3D dulu, sekali per sesi browser. ?dari=cover = baru saja melewati cover.
+    (function () {
+      try {
+        var q = new URLSearchParams(location.search);
+        if (q.get('dari') === 'cover') {
+          sessionStorage.setItem('kab6_cover', '1');
+          // alamat tetap bersih: tanpa index.html dan tanpa ?dari=cover
+          history.replaceState(null, '', location.pathname.replace(/index\.html$/, '') + location.hash);
+          return;
+        }
+        if (sessionStorage.getItem('kab6_cover')) return;
+        // hanya beranda yang dialihkan; /kamar, /tentang-kami, dan halaman admin tetap langsung terbuka
+        if (location.pathname !== '/' && !/\/index\.html$/.test(location.pathname)) return;
+        // pratinjau tautan (WhatsApp, Facebook, Google) tetap membaca beranda
+        if (/bot|crawl|spider|slurp|facebookexternalhit|whatsapp|telegram/i.test(navigator.userAgent)) return;
+        location.replace('cover.html');
+      } catch (e) { /* jika browser memblokir penyimpanan, beranda tetap tampil */ }
+    })();
+  </script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kost AB6</title>

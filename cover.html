@@ -1,0 +1,1110 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kost AB6</title>
+<meta name="description" content="Kost AB6 di Siwalankerto, Surabaya: kamar bersih dan terawat dengan WiFi 100 Mbps, CCTV 24 jam, dan kamar mandi dalam.">
+<meta name="theme-color" content="#0b140f">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231e3a2b'/%3E%3Ctext x='16' y='21' font-family='Arial' font-size='13' font-weight='700' fill='white' text-anchor='middle'%3EAB6%3C/text%3E%3C/svg%3E">
+<script>
+  // alamat tetap bersih saat cover tampil: tanpa /cover.html
+  try { if (location.protocol !== 'file:') history.replaceState(null, '', '/'); } catch (e) {}
+  document.documentElement.classList.add('is-loading');
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Jost:wght@400;500&family=Playfair+Display:ital,wght@0,500;1,500;1,600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0&icon_names=ac_unit,bed,chair,checkroom,cleaning_services,desk,local_convenience_store,local_hospital,school,shelves,shield,shower,storefront,wifi&display=block">
+<style>
+/* Cover 3D Kost AB6: kanvas partikel tetap di belakang; tiap bab "dipaku" (sticky) dan digerakkan oleh scroll. */
+:root{
+  --void:#0b140f; --forest:#16291f; --pine:#2a4f3b; --mist:#e6eadf; --lamp:#efc98a; --leaf:#5fd3a1;
+  --muted:rgba(230,234,223,.62); --faint:rgba(230,234,223,.4); --line:rgba(230,234,223,.14); --lamp-line:rgba(239,201,138,.42);
+  --veil:rgba(11,20,15,.88); --veil-0:rgba(11,20,15,0);
+  --display:"Playfair Display","Didot",Georgia,serif;
+  --body:"Cormorant Garamond","Garamond",Georgia,serif;
+  --label:"Jost","Futura","Century Gothic",system-ui,sans-serif;
+  --gut-l:max(16px, env(safe-area-inset-left,0px));
+  --gut-r:max(16px, env(safe-area-inset-right,0px));
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{background:var(--void)}
+html.lenis, html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto !important}
+.lenis.lenis-stopped{overflow:hidden}
+body{margin:0;background:var(--void);color:var(--mist);font-family:var(--body);font-weight:500;font-size:1.25rem;line-height:1.55;-webkit-font-smoothing:antialiased;padding-left:var(--gut-l);padding-right:var(--gut-r)}
+img{max-width:100%}
+[hidden]{display:none!important}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--lamp);outline-offset:3px;border-radius:4px}
+::selection{background:var(--lamp);color:var(--void)}
+.sky{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(110% 75% at 50% 38%, var(--forest) 0%, var(--void) 64%)}
+.grain{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.05;background-image:radial-gradient(var(--mist) .5px, transparent .6px);background-size:3px 3px}
+#gl{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;display:block}
+main{position:relative;z-index:1;overflow-x:clip}
+h1,h2,h3{font-family:var(--display);font-weight:500;margin:0;text-wrap:balance;letter-spacing:-.01em}
+em{font-style:italic;color:var(--lamp)}
+p{margin:0}
+.eyebrow{font-family:var(--label);font-size:.7rem;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--lamp)}
+.ms{font-family:"Material Symbols Outlined";font-weight:300;font-style:normal;font-size:22px;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;-webkit-font-feature-settings:"liga";font-feature-settings:"liga";color:var(--lamp);display:inline-block;width:1em;overflow:hidden}
+
+/* layar pembuka */
+.loader{display:none}
+.is-loading .loader{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:var(--void);transition:opacity .9s ease, visibility .9s;animation:loaderSafety .01s 7s forwards}
+.loader.done{opacity:0;visibility:hidden;pointer-events:none}
+.lw{display:grid;justify-items:center;gap:18px;padding-inline:var(--gut-l) var(--gut-r)}
+.lw .badge{width:52px;height:52px;border-radius:14px;font-size:.9rem}
+.lt{font-family:var(--display);font-style:italic;font-size:1.6rem}
+.bar{width:min(220px,60vw);height:1px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--lamp);transform:scaleX(0);transform-origin:0 50%;transition:transform .4s ease}
+.lp{font-family:var(--label);font-size:.7rem;letter-spacing:.26em;color:var(--muted);font-variant-numeric:tabular-nums}
+@keyframes loaderSafety{to{opacity:0;visibility:hidden;pointer-events:none}}
+
+/* header */
+.prog{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;height:2px;z-index:12;background:var(--lamp);transform-origin:0 50%;transform:scaleX(var(--sp,0));opacity:.85;pointer-events:none}
+.top{position:fixed;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding-top:calc(env(safe-area-inset-top,0px) + 18px);padding-bottom:30px;
+  padding-left:max(clamp(16px,3vw,44px), env(safe-area-inset-left,0px));padding-right:max(clamp(16px,3vw,44px), env(safe-area-inset-right,0px));
+  background:linear-gradient(to bottom, var(--veil) 0%, var(--veil-0) 100%)}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;font-family:var(--display);font-size:1.15rem;line-height:1.1}
+.brand small{display:block;font-family:var(--label);font-size:.58rem;letter-spacing:.28em;text-transform:uppercase;color:var(--muted)}
+.badge{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:var(--pine);font-family:var(--label);font-weight:500;font-size:.7rem;letter-spacing:.04em;color:var(--mist);box-shadow:inset 0 0 0 1px rgba(239,201,138,.25)}
+.masuk{display:inline-flex;align-items:center;gap:10px;color:var(--void);background:var(--mist);border-radius:999px;padding:12px 22px;font-family:var(--label);font-size:.7rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;text-decoration:none;transition:background .2s}
+.masuk:hover{background:var(--lamp)}
+@media (max-width:520px){.brand small{display:none}.masuk{padding:11px 16px;letter-spacing:.14em}}
+
+/* bab yang dipaku */
+.scene{position:relative;height:var(--h,260vh);--p:0}
+.pin{position:sticky;top:0;height:100vh;height:100svh;display:flex;padding-block:clamp(88px,13vh,124px) clamp(28px,7vh,72px)}
+
+/* pembuka */
+#awal .pin{flex-direction:column;justify-content:flex-end;gap:clamp(22px,4vh,40px)}
+.mark{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%) scale(calc(1 + var(--p) * .25));font-family:var(--display);font-style:italic;font-weight:600;font-size:clamp(8rem,32vw,30rem);line-height:.8;letter-spacing:-.04em;color:transparent;-webkit-text-stroke:1px var(--lamp-line);white-space:nowrap;pointer-events:none;opacity:calc(1 - var(--p) * 2.6)}
+.hero-row{display:flex;justify-content:space-between;align-items:flex-end;gap:28px;flex-wrap:wrap;opacity:calc(1 - var(--p) * 3.2);transform:translateY(calc(var(--p) * -50px))}
+.hero{display:grid;gap:16px;min-width:0;max-width:min(100%,44rem)}
+.hero h1{font-size:clamp(2.3rem,4.8vw,4.4rem);line-height:1.04;max-width:13ch}
+.hero .sub{font-size:clamp(1.12rem,1.5vw,1.32rem);color:var(--muted);max-width:34ch}
+.facts{margin:0;display:grid;min-width:min(100%,17rem)}
+.facts div{display:flex;justify-content:space-between;align-items:baseline;gap:24px;padding:10px 0;border-top:1px solid var(--line)}
+.facts div:last-child{border-bottom:1px solid var(--line)}
+.facts dt{font-family:var(--label);font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.facts dd{margin:0;font-family:var(--display);font-style:italic;font-size:1.15rem;color:var(--mist);font-variant-numeric:tabular-nums}
+.cue{position:absolute;left:50%;bottom:clamp(20px,4vh,40px);transform:translateX(-50%);display:grid;justify-items:center;gap:10px;opacity:calc(1 - var(--p) * 5)}
+.cue span{font-family:var(--label);font-size:.62rem;letter-spacing:.32em;text-transform:uppercase;color:var(--faint)}
+.cue i{width:1px;height:44px;background:linear-gradient(var(--lamp),var(--veil-0));transform-origin:50% 0;animation:cue 2.4s ease-in-out infinite}
+@keyframes cue{0%{transform:scaleY(0)}55%{transform:scaleY(1)}100%{transform:scaleY(1);opacity:0}}
+@media (max-width:720px){.cue{display:none}.mark{top:36%}}
+
+/* visi */
+#cerita .pin{align-items:center;justify-content:center;text-align:center}
+.visi{display:grid;gap:26px;justify-items:center;max-width:24em}
+.visi p.big{font-family:var(--display);font-size:clamp(1.6rem,3.4vw,2.9rem);line-height:1.3;text-wrap:balance}
+.visi .w{opacity:max(.18, min(1, calc((var(--p) * 1.35 - var(--i) / var(--n)) * 7 + .18)));transition:opacity .2s linear}
+.visi .sig{font-family:var(--label);font-size:.66rem;letter-spacing:.26em;text-transform:uppercase;color:var(--faint)}
+
+/* bab sisi */
+.side{align-items:center}
+.copy{display:grid;gap:18px;max-width:min(32rem, 38vw);min-width:0}
+.copy h2{font-size:clamp(2.2rem,4.4vw,4rem);line-height:1.05}
+.copy .lead{color:var(--muted);max-width:34ch}
+.rule{width:56px;height:1px;background:var(--lamp-line)}
+@media (max-aspect-ratio: 17/20){
+  .side{align-items:flex-end}
+  .copy{max-width:100%;gap:11px;padding:20px 0 4px;background:linear-gradient(to bottom, var(--veil-0), var(--veil) 18%)}
+  .copy h2{font-size:clamp(2rem,9vw,2.8rem)}
+  .rule{display:none}
+}
+
+/* bingkai foto asli */
+.frame{position:fixed;left:0;top:0;width:0;height:0;z-index:1;pointer-events:none;border:1px solid var(--lamp-line);opacity:0;will-change:transform,opacity}
+.frame::before,.frame::after{content:"";position:absolute;width:14px;height:14px;border:1px solid var(--lamp)}
+.frame::before{left:-1px;top:-1px;border-right:0;border-bottom:0}
+.frame::after{right:-1px;bottom:-1px;border-left:0;border-top:0}
+.frame span{position:absolute;left:14px;bottom:14px;font-family:var(--label);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--mist);background:var(--veil);padding:7px 12px;border-radius:999px;white-space:nowrap}
+
+/* sorotan */
+.specs{list-style:none;margin:6px 0 0;padding:0;display:grid}
+.specs li{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 0;border-top:1px solid var(--line);
+  opacity:max(.3, min(1, calc((var(--p) * 1.3 - var(--i) * .2) * 5)))}
+.specs li:last-child{border-bottom:1px solid var(--line)}
+.specs .k{font-family:var(--label);font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.specs .v{font-family:var(--display);font-style:italic;font-size:1.5rem;color:var(--lamp);font-variant-numeric:tabular-nums}
+
+/* kamar */
+.room .head{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.room .count{font-family:var(--label);font-size:.68rem;letter-spacing:.2em;color:var(--faint);font-variant-numeric:tabular-nums}
+.room .name{font-size:clamp(2.8rem,5.6vw,5.2rem);line-height:.98}
+.price{display:grid;gap:2px}
+.price span{font-family:var(--label);font-size:.64rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.price strong{font-family:var(--display);font-style:italic;font-weight:500;font-size:clamp(1.8rem,2.8vw,2.4rem);line-height:1.1;color:var(--lamp);font-variant-numeric:tabular-nums}
+.spec{margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-top:1px solid var(--line)}
+.spec div{padding:11px 0;border-bottom:1px solid var(--line);display:grid;gap:2px;min-width:0}
+.spec div:nth-child(odd){padding-right:16px}
+.spec div:nth-child(even){padding-left:16px;border-left:1px solid var(--line)}
+.spec dt{font-family:var(--label);font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--faint)}
+.spec dd{margin:0;font-size:1.12rem;line-height:1.3}
+.extra{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.extra b{font-family:var(--label);font-weight:500;font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--lamp);margin-right:4px}
+.extra span{font-family:var(--label);font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;border:1px solid var(--lamp-line);border-radius:999px;padding:5px 11px}
+.room-foot{display:flex;flex-wrap:wrap;gap:12px 22px;align-items:center;margin-top:2px}
+.status{display:inline-flex;align-items:center;gap:8px;font-family:var(--label);font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:var(--leaf)}
+.status i{width:7px;height:7px;border-radius:50%;background:var(--leaf);box-shadow:0 0 10px var(--leaf)}
+.status.off{color:var(--muted)}
+.status.off i{background:var(--muted);box-shadow:none}
+.btn{display:inline-flex;justify-content:center;align-items:center;gap:10px;background:var(--mist);color:var(--void);text-decoration:none;font-family:var(--label);font-size:.7rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;border-radius:999px;padding:13px 22px;transition:background .2s}
+.btn:hover{background:var(--lamp)}
+.btn.ghost{background:transparent;color:var(--mist);box-shadow:inset 0 0 0 1px var(--lamp-line)}
+.btn.ghost:hover{box-shadow:inset 0 0 0 1px var(--lamp);background:transparent;color:var(--lamp)}
+@media (max-aspect-ratio: 17/20){
+  .room .name{font-size:2.5rem}
+  .room .lead{display:none}
+  .spec dd{font-size:1.02rem}
+  .spec div{padding:8px 0}
+  .btn{padding:11px 18px}
+}
+
+/* blok biasa */
+.block{position:relative;padding-block:clamp(96px,17vh,180px)}
+.wrap{max-width:74rem;margin:0 auto;display:grid;gap:clamp(30px,5.5vh,56px)}
+.block-head{display:grid;gap:16px;max-width:42rem}
+.block-head h2{font-size:clamp(2.2rem,4.4vw,3.9rem);line-height:1.06}
+.block-head p{color:var(--muted);max-width:46ch}
+
+/* fasilitas kamar */
+.fas{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--line)}
+.fas li{display:grid;grid-template-columns:34px minmax(0,1fr);gap:4px 14px;padding:24px 24px 24px 0;border-bottom:1px solid var(--line);min-width:0}
+.fas li:not(:nth-child(3n+1)){padding-left:24px;border-left:1px solid var(--line)}
+.fas .ms{grid-row:span 2;font-size:26px;margin-top:2px}
+.fas h3{font-style:italic;font-size:1.28rem;color:var(--mist)}
+.fas p{color:var(--muted);font-size:1.06rem;line-height:1.45}
+@media (max-width:900px){.fas{grid-template-columns:repeat(2,minmax(0,1fr))}.fas li:not(:nth-child(3n+1)){padding-left:0;border-left:0}.fas li:nth-child(even){padding-left:20px;border-left:1px solid var(--line)}}
+@media (max-width:560px){.fas{grid-template-columns:minmax(0,1fr)}.fas li:nth-child(even){padding-left:0;border-left:0}.fas li{padding-right:0}}
+
+/* area bersama */
+#ruang .pin{flex-direction:column;justify-content:center;gap:clamp(20px,4vh,34px);overflow:hidden}
+.ruang-top{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
+.counter{font-family:var(--label);font-size:.7rem;letter-spacing:.22em;color:var(--muted);font-variant-numeric:tabular-nums}
+.track{display:flex;gap:clamp(14px,2vw,26px);will-change:transform;transform:translate3d(var(--tx,0px),0,0);width:max-content}
+.track figure{margin:0;display:grid;gap:12px;flex:none}
+.track img{display:block;height:min(50vh,29rem);width:auto;max-width:none;border-radius:2px;box-shadow:0 34px 60px -34px rgba(0,0,0,.8)}
+.track figcaption{display:flex;gap:12px;align-items:baseline;font-family:var(--label);font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.track figcaption b{font-weight:500;color:var(--lamp);font-variant-numeric:tabular-nums}
+.notes{display:flex;flex-wrap:wrap;gap:10px}
+.notes span{font-family:var(--label);font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:7px 13px;color:var(--mist)}
+@media (max-aspect-ratio: 17/20){.track img{height:38vh}#ruang .block-head p{display:none}}
+
+/* catatan perawatan */
+.log{list-style:none;margin:0;padding:0;display:grid}
+.log li{display:grid;grid-template-columns:8rem minmax(0,15rem) minmax(0,1fr);gap:6px 30px;align-items:baseline;padding:18px 0;border-top:1px solid var(--line)}
+.log li:last-child{border-bottom:1px solid var(--line)}
+.log time{font-family:var(--label);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);font-variant-numeric:tabular-nums}
+.log b{font-family:var(--display);font-style:italic;font-weight:500;font-size:1.3rem}
+.log span{color:var(--muted)}
+@media (max-width:720px){.log li{grid-template-columns:minmax(0,1fr)}}
+
+/* ulasan */
+.stat{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.stat div{display:grid;gap:4px;padding:22px 0}
+.stat div+div{padding-left:28px;border-left:1px solid var(--line)}
+.stat strong{font-family:var(--display);font-style:italic;font-weight:500;font-size:clamp(2.4rem,4.6vw,3.8rem);color:var(--lamp);line-height:1;font-variant-numeric:tabular-nums}
+.stat small{font-family:var(--label);font-size:.64rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.quotes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:44px 48px}
+.quotes figure{margin:0;display:grid;gap:14px;align-content:start;min-width:0}
+.quotes figure::before{content:"“";font-family:var(--display);font-size:3rem;line-height:.6;color:var(--lamp)}
+.quotes blockquote{margin:0;font-family:var(--display);font-style:italic;font-size:clamp(1.18rem,1.6vw,1.42rem);line-height:1.4}
+.quotes figcaption{font-family:var(--label);font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+@media (max-width:980px){.quotes{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){.quotes{grid-template-columns:minmax(0,1fr)}.stat{grid-template-columns:minmax(0,1fr)}.stat div+div{padding-left:0;border-left:0;border-top:1px solid var(--line)}}
+
+/* lokasi */
+.visit{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:clamp(28px,5vw,64px);align-items:start}
+.info{display:grid;gap:24px}
+.info address{font-style:normal;font-family:var(--display);font-size:clamp(1.3rem,2vw,1.6rem);line-height:1.4;max-width:28ch}
+.rows{margin:0;display:grid}
+.rows div{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-top:1px solid var(--line)}
+.rows div:last-child{border-bottom:1px solid var(--line)}
+.rows dt{font-family:var(--label);font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.rows dd{margin:0;font-variant-numeric:tabular-nums}
+.poi{list-style:none;margin:0;padding:0;display:grid;gap:10px;color:var(--mist)}
+.poi li{display:flex;gap:12px;align-items:center}
+.coord{font-family:var(--label);font-size:.7rem;letter-spacing:.16em;color:var(--muted);font-variant-numeric:tabular-nums;text-decoration:none;border-bottom:1px solid var(--line);justify-self:start;padding-bottom:3px}
+.coord:hover{color:var(--lamp);border-color:var(--lamp)}
+.call{background:var(--pine);border-radius:20px;padding:clamp(24px,3vw,36px);display:grid;gap:18px;box-shadow:inset 0 0 0 1px rgba(239,201,138,.2)}
+.call h3{font-size:clamp(1.7rem,2.6vw,2.1rem);line-height:1.12}
+.call p{color:var(--mist);opacity:.86}
+@media (max-width:820px){.visit{grid-template-columns:minmax(0,1fr)}}
+
+/* penutup */
+#penutup .pin{flex-direction:column;justify-content:flex-end;align-items:center;text-align:center}
+.end{display:grid;gap:16px;justify-items:center;opacity:calc(var(--p) * 2.4 - .5)}
+.end h2{font-size:clamp(2.4rem,5.2vw,4.4rem)}
+.end p{color:var(--muted)}
+.end .acts{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:6px}
+.auto{font-family:var(--label);font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:var(--lamp);min-height:1.2em;font-variant-numeric:tabular-nums}
+
+footer{position:relative;z-index:1;border-top:1px solid var(--line);padding-block:clamp(44px,8vh,72px) calc(28px + env(safe-area-inset-bottom,0px));display:grid;gap:40px;background:var(--void)}
+.foot{max-width:74rem;width:100%;margin:0 auto;display:grid;grid-template-columns:minmax(0,1.4fr) repeat(2,minmax(0,1fr));gap:32px}
+.foot h4{margin:0 0 10px;font-family:var(--label);font-weight:500;font-size:.64rem;letter-spacing:.24em;text-transform:uppercase;color:var(--lamp)}
+.foot p,.foot a{font-size:1.05rem;color:var(--muted);text-decoration:none}
+.foot a:hover{color:var(--mist)}
+.foot .brand{margin-bottom:12px}
+.legal{max-width:74rem;width:100%;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px 24px;padding-top:20px;border-top:1px solid var(--line);font-family:var(--label);font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
+@media (max-width:760px){.foot{grid-template-columns:minmax(0,1fr)}}
+
+/* cadangan tanpa WebGL */
+.fb{display:none}
+.no-gl .fb{display:block;position:absolute;right:0;top:50%;transform:translateY(-50%);width:min(44vw,540px);height:auto;border-radius:2px}
+@media (max-aspect-ratio: 17/20){.no-gl .fb{top:14vh;transform:none;left:0;right:0;margin:auto;width:min(86vw,420px)}}
+
+@media (prefers-reduced-motion: reduce){.visi .w{transition:none}.cue i{animation:none}.is-loading .loader{transition:none}}
+</style>
+</head>
+<body>
+<div class="loader" id="loader" role="status" aria-live="polite">
+  <div class="lw">
+    <span class="badge">AB6</span>
+    <p class="lt">Kost AB6</p>
+    <div class="bar"><i id="bar"></i></div>
+    <p class="lp"><span id="pct">0</span>% · Menyiapkan ruangan</p>
+  </div>
+</div>
+
+<div class="sky" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+<canvas id="gl" aria-hidden="true"></canvas>
+<div class="frame" id="frame" aria-hidden="true"><span id="frame-cap"></span></div>
+<div class="prog" aria-hidden="true"></div>
+
+<header class="top">
+  <a class="brand" href="#awal"><span class="badge">AB6</span><span>Kost AB6<small>Siwalankerto · Surabaya</small></span></a>
+  <a class="masuk js-masuk" href="/?dari=cover">Masuk Website →</a>
+</header>
+
+<main>
+  <section class="scene" id="awal" data-scene="awal" style="--h:300vh">
+    <div class="pin">
+      <div class="mark" aria-hidden="true">AB6</div>
+      <div class="hero-row">
+        <div class="hero">
+          <p class="eyebrow">Hunian kost · Surabaya Selatan</p>
+          <h1>Pulang ke tempat yang <em>tenang</em>.</h1>
+          <p class="sub">Kamar yang bersih dan terawat di Siwalankerto, beberapa menit dari kampus dan kuliner.</p>
+        </div>
+        <dl class="facts" id="facts"></dl>
+      </div>
+      <div class="cue" aria-hidden="true"><span>Gulir</span><i></i></div>
+    </div>
+  </section>
+
+  <section class="scene" id="cerita" data-scene="cerita" style="--h:230vh">
+    <div class="pin">
+      <div class="visi">
+        <p class="eyebrow">Visi Kost AB6</p>
+        <p class="big" id="visi-text"></p>
+        <p class="sig">Pengelola Kost AB6 · sejak 2021</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="scene" id="fasad" data-scene="fasad" style="--h:250vh">
+    <div class="pin side">
+      <div class="copy">
+        <p class="eyebrow">I · Fasad</p>
+        <h2>Rumah kedua, sejak <em>2021</em>.</h2>
+        <span class="rule"></span>
+        <p class="lead">Bangunan tiga lantai di Jl. Siwalankerto VIII, dengan halaman depan untuk parkir motor dan mobil tamu.</p>
+      </div>
+      <img class="fb" src="cover/img/fasad.jpg" alt="Fasad Kost AB6">
+    </div>
+  </section>
+
+  <section class="scene" id="sorotan" data-scene="sorotan" style="--h:260vh">
+    <div class="pin side">
+      <div class="copy">
+        <p class="eyebrow">II · Fasilitas utama</p>
+        <h2>Tenang itu <em>dijaga</em>.</h2>
+        <ul class="specs" id="specs"></ul>
+      </div>
+    </div>
+  </section>
+
+  <div id="rooms"></div>
+
+  <section class="block" id="fasilitas" data-scene="fasilitas">
+    <div class="wrap">
+      <div class="block-head">
+        <p class="eyebrow">IV · Standar setiap kamar</p>
+        <h2>Sembilan hal yang <em>selalu</em> ada.</h2>
+        <p>Keempat tipe kamar berukuran 3 × 3 m, dengan kamar mandi dalam dan jendela. Inilah perlengkapan yang sudah tersedia saat Anda pindah.</p>
+      </div>
+      <ul class="fas" id="fas"></ul>
+    </div>
+  </section>
+
+  <section class="scene" id="ruang" data-scene="ruang" style="--h:380vh">
+    <div class="pin">
+      <div class="ruang-top">
+        <div class="block-head">
+          <p class="eyebrow">V · Area bersama</p>
+          <h2>Ruang untuk <em>bertemu</em>.</h2>
+          <p id="ruang-intro"></p>
+        </div>
+        <p class="counter" id="counter"></p>
+      </div>
+      <div class="track" id="track"></div>
+      <div class="notes" id="notes"></div>
+    </div>
+  </section>
+
+  <section class="block" id="perawatan" data-scene="plain">
+    <div class="wrap">
+      <div class="block-head">
+        <p class="eyebrow">VI · Catatan perawatan</p>
+        <h2>Dirawat sebelum <em>musim</em> berganti.</h2>
+        <p>Pekerjaan perawatan terbaru dari pengelola, dicatat di galeri kegiatan Kost AB6.</p>
+      </div>
+      <ul class="log" id="log"></ul>
+    </div>
+  </section>
+
+  <section class="block" id="ulasan" data-scene="plain">
+    <div class="wrap">
+      <div class="block-head">
+        <p class="eyebrow">VII · Kata penghuni</p>
+        <h2><em>Rumah kedua</em>, kata mereka.</h2>
+      </div>
+      <div class="stat" id="stat"></div>
+      <div class="quotes" id="quotes"></div>
+    </div>
+  </section>
+
+  <section class="block" id="lokasi" data-scene="plain">
+    <div class="wrap">
+      <div class="block-head">
+        <p class="eyebrow">VIII · Lokasi &amp; kunjungan</p>
+        <h2>Datang, lihat <em>sendiri</em>.</h2>
+      </div>
+      <div class="visit">
+        <div class="info">
+          <address id="alamat"></address>
+          <ul class="poi" id="poi"></ul>
+          <dl class="rows" id="jadwal"></dl>
+          <a class="coord" id="peta" target="_blank" rel="noopener"></a>
+        </div>
+        <div class="call">
+          <p class="eyebrow">Jadwalkan survei</p>
+          <h3>Cek kamar yang <em>kosong</em>.</h3>
+          <p id="respon"></p>
+          <a class="btn js-wa" target="_blank" rel="noopener">Chat admin di WhatsApp ↗</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="scene" id="penutup" data-scene="penutup" style="--h:260vh">
+    <div class="pin">
+      <div class="end">
+        <p class="eyebrow">Kost AB6</p>
+        <h2>Selamat <em>pulang</em>.</h2>
+        <p>Siwalankerto, Surabaya</p>
+        <div class="acts">
+          <a class="btn js-masuk" href="/?dari=cover">Masuk Website →</a>
+          <a class="btn ghost js-wa" target="_blank" rel="noopener">Tanya kamar kosong ↗</a>
+        </div>
+        <p class="auto" id="auto" aria-live="polite"></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="foot">
+    <div>
+      <a class="brand" href="#awal"><span class="badge">AB6</span><span>Kost AB6</span></a>
+      <p>Hunian kost yang nyaman, bersih, dan terawat untuk mahasiswa dan pekerja muda di Surabaya.</p>
+    </div>
+    <div>
+      <h4>Alamat</h4>
+      <p id="foot-alamat"></p>
+    </div>
+    <div>
+      <h4>Kunjungan</h4>
+      <p id="foot-jam"></p>
+      <p><a class="js-wa" target="_blank" rel="noopener">Chat WhatsApp ↗</a></p>
+    </div>
+  </div>
+  <div class="legal">
+    <span>© 2026 Kost AB6</span>
+    <a class="js-masuk" href="/?dari=cover">Masuk ke website utama →</a>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<!-- API milik website AB6 sendiri: dipakai untuk membaca data terbaru dan memuat data website utama selama cover tampil -->
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script>
+(() => {
+'use strict';
+
+/* ---------- Alamat masuk ke website utama ---------- */
+const ENTER = location.protocol === 'file:' ? 'index.html?dari=cover' : '/?dari=cover';
+const CACHE_KEY = 'kab6_publik_v1';
+
+/* ---------- Data cadangan (salinan 6 Nov 2026). Harga, status, testimoni, dan kontak diperbarui dari database saat tersedia. ---------- */
+const DATA = {
+  wa: '6282229083481',
+  waPesan: 'Halo Admin Kost AB6, saya ingin menanyakan ketersediaan kamar dan jadwal survei.',
+  alamat: 'Jl. Siwalankerto VIII No. AB-6, Dukuh Menanggal, Kec. Gayungan, Surabaya, Jawa Timur 60234',
+  koor: { lat: -7.340602, lng: 112.734488, teks: '7.3406° S · 112.7345° E' },
+  jadwal: [['Senin – Sabtu', '08.00 – 20.00 WIB'], ['Minggu', '09.00 – 17.00 WIB']],
+  respon: 15,
+  poi: [['school', '3 menit ke kampus utama'], ['storefront', '2 menit ke kuliner & swalayan'], ['local_hospital', '7 menit ke rumah sakit']],
+  visi: 'Menjadi pilihan hunian kost terbaik yang menghadirkan kenyamanan, keamanan, dan kehangatan seperti rumah sendiri bagi setiap penghuni.',
+  sorotan: [['wifi', 'Wi-Fi fiber dedicated', '100 Mbps'], ['shield', 'CCTV & smart access', '24/7'], ['cleaning_services', 'Housekeeping rutin', 'Berkala'], ['local_convenience_store', 'Ke kampus & kuliner', '3 menit']],
+  kamar: [
+    { kode: '101', nama: 'Tipe A', lantai: 1, harga: 950000, status: 'Tersedia', kustom: [], img: 'tipe-a',
+      lead: 'Tipe yang paling sering dicari penghuni, lengkap dengan sembilan fasilitas standar Kost AB6.' },
+    { kode: '201', nama: 'Tipe B', lantai: 2, harga: 1000000, status: 'Tersedia', kustom: ['Jendela lebih besar'], img: 'tipe-b',
+      lead: 'Favorit penghuni karena berada di depan balkon, dengan jendela yang lebih besar.' },
+    { kode: '301', nama: 'Tipe C', lantai: 3, harga: 1100000, status: 'Tersedia', kustom: ['Water heater', 'Kulkas mini'], img: 'tipe-c',
+      lead: 'Banyak diminati calon penghuni, dengan tambahan water heater dan kulkas mini.' },
+    { kode: '118', nama: 'Tipe D', lantai: 1, harga: 1200000, status: 'Tersedia', kustom: ['Water heater', 'TV', 'Kulkas mini'], img: 'tipe-d',
+      lead: 'Dinding berwallpaper dan perlengkapan terlengkap: water heater, TV, dan kulkas mini.' }
+  ],
+  spec: [['Ukuran', '3 × 3 m'], ['Tempat tidur', 'Single 90 × 120'], ['Kamar mandi', 'Dalam'], ['Sudah termasuk', 'Air & sampah']],
+  fasilitas: [
+    ['ac_unit', 'AC terawat', 'AC 1/2 PK, hemat daya dan dingin merata.'],
+    ['wifi', 'WiFi fiber 100 Mbps', 'Jaringan dedicated dengan access point terpisah.'],
+    ['bed', 'Springbed 90 × 120', 'Matras orthopedic tebal dan set sprei bersih.'],
+    ['shelves', 'Rak buku gantung', 'Muat untuk berkas dan buku kuliah.'],
+    ['checkroom', 'Lemari 2 pintu', 'Dilengkapi cermin rias dan gantungan.'],
+    ['desk', 'Meja kerja ergonomis', 'Panjang 120 cm dengan stopkontak dinding.'],
+    ['chair', 'Kursi putar', 'Sandaran mesh ergonomis penopang punggung.'],
+    ['shower', 'Kamar mandi dalam', 'Shower dan kloset duduk.'],
+    ['cleaning_services', 'Cleaning service', 'Dua kali sebulan, tanpa biaya tambahan.']
+  ],
+  areaIntro: 'Setiap sudut dirancang untuk belajar, bersosialisasi, dan beristirahat dengan nyaman.',
+  area: [['parkir', 'Area parkir'], ['akses', 'Lorong kamar'], ['tunggu', 'Ruang tunggu'], ['atrium', 'Balkon tengah'],
+         ['balkon', 'Area balkon'], ['dapur', 'Dapur bersama'], ['ruangtamu', 'Ruang tamu tengah']],
+  catatan: ['Parkir tamu mobil & motor', 'Zona bebas banjir', 'CCTV 24 jam', 'Laundry kiloan'],
+  kegiatan: [
+    ['2026-11-04', 'Saluran air', 'Got dibersihkan dan diperiksa agar tidak tersumbat menjelang musim hujan.'],
+    ['2026-11-04', 'Atap & genteng', 'Pemeriksaan dan perbaikan atap sebelum musim hujan tiba.'],
+    ['2026-11-04', 'Jaringan WiFi', 'Pengecekan kabel rutin agar koneksi tetap stabil.'],
+    ['2026-11-04', 'Perawatan AC', 'Pembersihan AC kamar secara berkala.'],
+    ['2026-11-04', 'Unit AC baru', 'Penggantian unit AC secara bertahap.'],
+    ['2026-11-04', 'Internet', 'Kecepatan dan kestabilan WiFi dijaga untuk belajar dan bekerja.']
+  ],
+  stat: [['99%', 'Kepuasan fasilitas'], ['24 jam', 'Akses & CCTV aktif'], ['28', 'Ulasan penghuni']],
+  testi: [
+    ['Wulandari', 'Alumni', 'Kost AB6 memberikan nilai lebih dari sekadar tempat tinggal; ini adalah rumah kedua bagi saya.'],
+    ['Widi', 'Alumni', 'Kalau cari kost lengkap, bersih, dan strategis, Kost AB6 adalah jawaban paling tepat!'],
+    ['Utami', 'Penghuni', 'Tinggal di Kost AB6 adalah salah satu keputusan terbaik saya selama merantau.'],
+    ['Siti', 'Penghuni', 'Pengelola Kost AB6 selalu memastikan semua fasilitas berfungsi dengan baik setiap saat.'],
+    ['Sri', 'Alumni', 'Sangat merekomendasikan Kost AB6 untuk siapa saja yang mencari hunian nyaman, aman, dan berkualitas.'],
+    ['Sekar', 'Penghuni', 'Servis dan fasilitas yang diberikan Kost AB6 benar-benar sebanding dengan harganya.']
+  ]
+};
+const CAPTION = { fasad: 'Fasad Kost AB6 · Foto asli' };
+DATA.kamar.forEach(k => { CAPTION[k.img] = `Kamar ${k.nama} · Foto asli`; });
+
+/* ---------- Isi halaman ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const rp = n => 'Rp' + new Intl.NumberFormat('id-ID').format(n);
+const two = n => String(n).padStart(2, '0');
+const capFirst = s => { s = String(s || '').trim(); return s.charAt(0).toUpperCase() + s.slice(1); };
+const norm = s => String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
+const waUrl = msg => 'https://wa.me/' + DATA.wa + '?text=' + encodeURIComponent(msg);
+const tgl = s => new Date(s + 'T00:00:00+07:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Jakarta' });
+const icon = n => `<span class="ms" aria-hidden="true">${n}</span>`;
+
+$$('.js-masuk').forEach(a => { a.href = ENTER; });
+
+const hangat = ['kenyamanan,', 'keamanan,', 'kehangatan'];
+const words = DATA.visi.split(' ');
+$('#visi-text').innerHTML = words.map((w, i) =>
+  `<span class="w" style="--i:${i};--n:${words.length}">${hangat.includes(w) ? `<em>${esc(w.replace(',', ''))}</em>${w.endsWith(',') ? ',' : ''}` : esc(w)}</span>`
+).join(' ');
+$('#specs').innerHTML = DATA.sorotan.map(([ic, k, v], i) => `<li style="--i:${i}">${icon(ic)}<span class="k">${esc(k)}</span><span class="v">${esc(v)}</span></li>`).join('');
+
+$('#rooms').innerHTML = DATA.kamar.map((k, i) => `
+  <section class="scene" id="kamar-${i + 1}" data-scene="room" data-from="${i === 0 ? 'wifi' : DATA.kamar[i - 1].img}" data-to="${k.img}" data-first="${i === 0 ? 1 : 0}" style="--h:290vh">
+    <div class="pin side">
+      <div class="copy room">
+        <div class="head"><p class="eyebrow js-eb"></p><span class="count">${two(i + 1)} / ${two(DATA.kamar.length)}</span></div>
+        <h2 class="name">${esc(k.nama)}</h2>
+        <p class="lead">${esc(k.lead)}</p>
+        <div class="price"><span>Sewa per bulan</span><strong class="js-harga"></strong></div>
+        <dl class="spec">${DATA.spec.map(([a, b]) => `<div><dt>${esc(a)}</dt><dd>${esc(b)}</dd></div>`).join('')}</dl>
+        <p class="extra js-extra"></p>
+        <div class="room-foot">
+          <span class="status js-status"><i></i><span></span></span>
+          <a class="btn js-tanya" target="_blank" rel="noopener">Tanyakan ${esc(k.nama)} ↗</a>
+        </div>
+      </div>
+      <img class="fb" src="cover/img/${k.img}.jpg" alt="Foto kamar ${esc(k.nama)}">
+    </div>
+  </section>`).join('');
+
+function fillRooms() {
+  DATA.kamar.forEach((k, i) => {
+    const sec = document.getElementById('kamar-' + (i + 1));
+    if (!sec) return;
+    $('.js-eb', sec).textContent = `III · Kamar ${k.kode} · Lantai ${k.lantai}`;
+    $('.js-harga', sec).textContent = rp(k.harga);
+    const ex = $('.js-extra', sec);
+    ex.hidden = !k.kustom.length;
+    ex.innerHTML = k.kustom.length ? `<b>Tambahan</b>${k.kustom.map(x => `<span>${esc(x)}</span>`).join('')}` : '';
+    const st = $('.js-status', sec);
+    st.classList.toggle('off', norm(k.status) !== 'tersedia');
+    $('span', st).textContent = k.status;
+    $('.js-tanya', sec).href = waUrl(`Halo Admin Kost AB6, saya tertarik dengan kamar ${k.nama} (${rp(k.harga)}/bulan). Apakah masih tersedia, dan kapan bisa survei?`);
+  });
+  const termurah = Math.min(...DATA.kamar.map(k => k.harga));
+  $('#facts').innerHTML = [['Berdiri', '2021'], ['Tipe kamar', String(DATA.kamar.length)], ['Mulai', rp(termurah) + ' / bln']]
+    .map(([a, b]) => `<div><dt>${esc(a)}</dt><dd>${esc(b)}</dd></div>`).join('');
+}
+function fillReviews() {
+  $('#stat').innerHTML = DATA.stat.map(([v, l]) => `<div><strong>${esc(v)}</strong><small>${esc(l)}</small></div>`).join('');
+  $('#quotes').innerHTML = DATA.testi.map(([n, t, q]) => `<figure><blockquote>${esc(q)}</blockquote><figcaption>${esc(n)} · ${esc(t)}</figcaption></figure>`).join('');
+}
+function fillContact() {
+  $('#alamat').textContent = DATA.alamat;
+  $('#foot-alamat').textContent = DATA.alamat;
+  $('#jadwal').innerHTML = DATA.jadwal.map(([a, b]) => `<div><dt>${esc(a)}</dt><dd>${esc(b)}</dd></div>`).join('');
+  $('#foot-jam').textContent = DATA.jadwal.map(([a, b]) => `${a}: ${b}`).join(' · ');
+  $('#respon').textContent = `Admin biasanya membalas dalam ±${DATA.respon} menit pada jam kerja. Sebutkan tipe kamar dan rencana tanggal survei Anda.`;
+  $$('.js-wa').forEach(a => { a.href = waUrl(DATA.waPesan); });
+}
+
+$('#fas').innerHTML = DATA.fasilitas.map(([ic, j, k]) => `<li>${icon(ic)}<h3>${esc(j)}</h3><p>${esc(k)}</p></li>`).join('');
+$('#ruang-intro').textContent = DATA.areaIntro;
+$('#track').innerHTML = DATA.area.map(([f, j], i) => `<figure><img src="cover/img/${f}.jpg" alt="${esc(j)} di Kost AB6" decoding="async"><figcaption><b>${two(i + 1)}</b>${esc(j)}</figcaption></figure>`).join('');
+$('#notes').innerHTML = DATA.catatan.map(c => `<span>${esc(c)}</span>`).join('');
+$('#log').innerHTML = DATA.kegiatan.map(([d, j, r]) => `<li><time datetime="${d}">${tgl(d)}</time><b>${esc(j)}</b><span>${esc(r)}</span></li>`).join('');
+$('#poi').innerHTML = DATA.poi.map(([ic, p]) => `<li>${icon(ic)}${esc(p.charAt(0).toUpperCase() + p.slice(1))}</li>`).join('');
+const peta = $('#peta');
+peta.href = `https://www.google.com/maps?q=${DATA.koor.lat},${DATA.koor.lng}`;
+peta.textContent = DATA.koor.teks + ' · Buka di Google Maps ↗';
+
+/* ---------- Data terbaru dari database AB6 ---------- */
+function applyLive(c) {
+  if (!c || typeof c !== 'object') return false;
+  let changed = false;
+  try {
+    const items = (c.kamar && Array.isArray(c.kamar.items)) ? c.kamar.items : [];
+    DATA.kamar.forEach(k => {
+      const it = items.find(x => norm(x.nama) === norm(k.nama));
+      if (!it) return;
+      if (Number(it.harga) > 0) k.harga = Number(it.harga);
+      if (it.status) k.status = String(it.status);
+      if (it.kode) k.kode = String(it.kode);
+      if (it.lantai) k.lantai = it.lantai;
+      if (Array.isArray(it.kustom)) k.kustom = it.kustom.filter(Boolean).map(capFirst);
+      changed = true;
+    });
+  } catch (e) { /* tetap pakai data cadangan */ }
+  try {
+    const t = (c.testimoni && Array.isArray(c.testimoni.items) ? c.testimoni.items : [])
+      .filter(x => x && x.nama && x.isi && !/^\s*\(uji coba\)/i.test(x.isi));
+    if (t.length >= 3) {
+      DATA.testi = t.slice(0, t.length >= 6 ? 6 : 3).map(x => [String(x.nama), String(x.tipe || 'Penghuni'), String(x.isi)]);
+      changed = true;
+    }
+    if (c.testimoni && Number(c.testimoni.jumlah) > 0) DATA.stat[2][0] = String(c.testimoni.jumlah);
+    const ts = c.umum && Array.isArray(c.umum.testimoniStat) ? c.umum.testimoniStat : [];
+    if (ts[0] && ts[0].nilai) DATA.stat[0][0] = String(ts[0].nilai);
+    if (ts[1] && ts[1].nilai) DATA.stat[1][0] = String(ts[1].nilai).toLowerCase();
+  } catch (e) { /* tetap pakai data cadangan */ }
+  try {
+    const u = c.umum || {}, tt = c.tentang || {};
+    if (u.wa) DATA.wa = String(u.wa).replace(/\D/g, '');
+    if (u.waPesan) DATA.waPesan = String(u.waPesan).replace(/\.{2,}$/, '.');
+    if (Number(u.responMenit) > 0) DATA.respon = Number(u.responMenit);
+    const al = (tt.kontak && tt.kontak.alamat) || u.alamatSingkat;
+    if (al) DATA.alamat = String(al).replace(/No\.?\s+No\.?\s*/i, 'No. ');
+    if (Array.isArray(tt.jadwal) && tt.jadwal.length) DATA.jadwal = tt.jadwal.filter(j => j && j.label).map(j => [String(j.label), String(j.teks || '')]);
+  } catch (e) { /* tetap pakai data cadangan */ }
+  return changed;
+}
+function readCache() {
+  try { return JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); } catch (e) { return null; }
+}
+applyLive(readCache());
+fillRooms(); fillReviews(); fillContact();
+
+/* Pramuat: selama cover tampil, ambil data terbaru lalu simpan di tempat yang sama dengan website utama, sehingga website utama langsung terbuka. */
+function pramuat() {
+  if (typeof panggil !== 'function') return Promise.resolve(null);
+  const awal = typeof ambilAwalDini === 'function' ? ambilAwalDini() : panggil('ambilAwal');
+  return Promise.all([awal, panggil('ambilPrefetch')]).then(([a, b]) => {
+    if (!a || !b) return null;
+    const cache = { t: Date.now(), umum: a.umum, beranda: a.beranda, kamar: b.kamar, testimoni: b.testimoni, tentang: b.tentang };
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify(cache)); } catch (e) { /* penyimpanan penuh atau diblokir */ }
+    return cache;
+  }).catch(() => null);
+}
+
+/* ---------- Scroll halus (Lenis) ---------- */
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let lenis = null;
+if (!reduce && typeof Lenis !== 'undefined') {
+  try { lenis = new Lenis({ lerp: 0.085, wheelMultiplier: 0.9 }); lenis.stop(); } catch (err) { lenis = null; }
+}
+document.addEventListener('click', e => {
+  const a = e.target.closest('a[href^="#"]');
+  if (!a) return;
+  const t = document.querySelector(a.getAttribute('href'));
+  if (!t) return;
+  e.preventDefault();
+  if (lenis) lenis.scrollTo(t, { duration: 1.8 }); else t.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' });
+});
+
+/* ---------- Layar pembuka ---------- */
+const PHOTOS = ['fasad', ...DATA.kamar.map(k => k.img)];
+const galleryImgs = $$('#track img');
+const TOTAL = PHOTOS.length + galleryImgs.length + 2;
+let loaded = 0, finished = false;
+function finish() {
+  if (finished) return;
+  finished = true;
+  $('#loader').classList.add('done');
+  setTimeout(() => document.documentElement.classList.remove('is-loading'), 950);
+  if (lenis) lenis.start();
+  measure();
+}
+function tick() {
+  loaded = Math.min(TOTAL, loaded + 1);
+  $('#pct').textContent = Math.round(loaded / TOTAL * 100);
+  $('#bar').style.transform = `scaleX(${loaded / TOTAL})`;
+  if (loaded >= TOTAL) setTimeout(finish, 350);
+}
+galleryImgs.forEach(im => { if (im.complete) tick(); else { im.addEventListener('load', tick, { once: true }); im.addEventListener('error', tick, { once: true }); } });
+(document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(tick, tick);
+/* Data database ikut ditunggu paling lama 3,5 detik, supaya harga dan status yang tampil sudah terbaru */
+Promise.race([pramuat(), new Promise(r => setTimeout(() => r(null), 3500))]).then(cache => {
+  if (cache && !finished && applyLive(cache)) { fillRooms(); fillReviews(); fillContact(); }
+  tick();
+});
+setTimeout(finish, 6000);
+
+/* ---------- Masuk otomatis di akhir cerita ---------- */
+const autoEl = $('#auto');
+let autoTimer = null, autoLeft = 0, autoDone = false;
+function autoCheck(p) {
+  if (autoDone) return;
+  if (p > 0.97 && !autoTimer) {
+    autoLeft = 6;
+    autoEl.textContent = `Masuk ke website dalam ${autoLeft} detik`;
+    autoTimer = setInterval(() => {
+      autoLeft -= 1;
+      if (autoLeft <= 0) {
+        clearInterval(autoTimer); autoDone = true;
+        autoEl.textContent = 'Membuka website…';
+        location.href = ENTER;
+      } else autoEl.textContent = `Masuk ke website dalam ${autoLeft} detik`;
+    }, 1000);
+  } else if (p < 0.9 && autoTimer) {
+    clearInterval(autoTimer); autoTimer = null; autoEl.textContent = '';
+  }
+}
+
+/* ---------- Pengukur bab ---------- */
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const E = x => { x = clamp(x); return x * x * (3 - 2 * x); };
+const scenes = $$('[data-scene]').map(el => ({ el, kind: el.dataset.scene, sticky: el.classList.contains('scene'), top: 0, h: 0, p: -1 }));
+const track = $('#track'), counter = $('#counter'), root = document.documentElement;
+const ruang = scenes.find(s => s.kind === 'ruang');
+const penutup = scenes.find(s => s.kind === 'penutup');
+let maxShift = 0, lastCount = '';
+function measure() {
+  const y = window.scrollY;
+  scenes.forEach(s => { s.top = s.el.getBoundingClientRect().top + y; s.h = s.el.offsetHeight; });
+  maxShift = Math.max(0, track.scrollWidth - track.parentElement.clientWidth);
+}
+function progressOf(s, y, vh) {
+  return s.sticky ? clamp((y - s.top) / Math.max(1, s.h - vh)) : clamp((y + vh * 0.5 - s.top) / vh);
+}
+function updateDom(y, vh) {
+  let active = scenes[0];
+  for (const s of scenes) {
+    const p = progressOf(s, y, vh);
+    if (Math.abs(p - s.p) > 1e-4) { s.p = p; s.el.style.setProperty('--p', p.toFixed(4)); }
+    if (s.top <= y + vh * 0.5) active = s;
+  }
+  track.style.setProperty('--tx', (-ruang.p * maxShift).toFixed(1) + 'px');
+  const n = DATA.area.length, c = `${two(Math.min(n, 1 + Math.floor(ruang.p * n * 0.999)))} / ${two(n)}`;
+  if (c !== lastCount) { counter.textContent = c; lastCount = c; }
+  const max = Math.max(1, document.documentElement.scrollHeight - vh);
+  root.style.setProperty('--sp', clamp(y / max).toFixed(4));
+  if (finished) autoCheck(penutup.p);
+  return active;
+}
+
+/* Keadaan visual tiap bab */
+const LAST = DATA.kamar[DATA.kamar.length - 1].img;
+function stateOf(s, p) {
+  switch (s.kind) {
+    case 'awal': { const m = E(p / 0.72); return { a: 'dust', b: 'fasad', mix: m, flat: 0, photo: null, photoO: 0, turb: 1 - 0.85 * m, dim: 0, lay: 'center' }; }
+    case 'cerita': return { a: 'fasad', b: 'fasad', mix: 1, flat: 0, photo: null, photoO: 0, turb: 0.18, dim: 0.74, lay: 'center' };
+    case 'fasad': return { a: 'fasad', b: 'fasad', mix: 1, flat: E((p - 0.05) / 0.35), photo: 'fasad', photoO: E((p - 0.32) / 0.28), turb: 0.12, dim: 0, lay: 'side' };
+    case 'sorotan': return { a: 'fasad', b: 'wifi', mix: E((p - 0.12) / 0.45), flat: 1 - E(p / 0.14), photo: 'fasad', photoO: 1 - E(p / 0.1), turb: 0.25, dim: 0, lay: 'side' };
+    case 'room': {
+      const from = s.el.dataset.from, to = s.el.dataset.to, first = s.el.dataset.first === '1';
+      if (first) {
+        const f = E((p - 0.5) / 0.15);
+        return { a: from, b: to, mix: E(p / 0.45), flat: f, photo: to, photoO: E((p - 0.6) / 0.2), turb: 0.2 * (1 - f), dim: 0, lay: 'side' };
+      }
+      const early = p < 0.3;
+      const f = early ? 1 - E(p / 0.14) : E((p - 0.55) / 0.15);
+      return { a: from, b: to, mix: E((p - 0.12) / 0.4), flat: f, photo: early ? from : to,
+               photoO: early ? 1 - E(p / 0.1) : E((p - 0.62) / 0.2), turb: 0.2 * (1 - f), dim: 0, lay: 'side' };
+    }
+    case 'fasilitas': return { a: LAST, b: 'dust', mix: E(p / 0.6), flat: 1 - E(p / 0.15), photo: LAST, photoO: 1 - E(p / 0.1), turb: 0.7, dim: 0.66, lay: 'center' };
+    case 'penutup': { const m = E(p / 0.55); return { a: 'dust', b: 'ab6', mix: m, flat: 0, photo: null, photoO: 0, turb: 0.9 - 0.82 * m, dim: 0, lay: 'center' }; }
+    default: return { a: 'dust', b: 'dust', mix: 1, flat: 0, photo: null, photoO: 0, turb: 0.8, dim: 0.76, lay: 'center' };
+  }
+}
+
+/* ---------- Partikel 3D (Three.js) ---------- */
+let renderer = null;
+if (typeof THREE !== 'undefined') {
+  try { renderer = new THREE.WebGLRenderer({ canvas: $('#gl'), antialias: false, alpha: true, powerPreference: 'high-performance' }); } catch (err) { renderer = null; }
+}
+
+if (!renderer) {
+  root.classList.add('no-gl');
+  PHOTOS.forEach(tick);
+  measure();
+  addEventListener('resize', measure);
+  const loop = now => {
+    if (lenis) lenis.raf(now);
+    updateDom(window.scrollY, window.innerHeight);
+    requestAnimationFrame(loop);
+  };
+  requestAnimationFrame(loop);
+  return;
+}
+
+const small = Math.min(window.innerWidth, window.innerHeight * 1.2) < 760;
+const N = small ? 12000 : 28000;
+const VISH = 2 * 6 * Math.tan(THREE.MathUtils.degToRad(20));
+const LAMP = [0.937, 0.788, 0.541], SAGE = [0.66, 0.71, 0.635], MIST = [0.9, 0.918, 0.875];
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+renderer.setClearColor(0x000000, 0);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 60);
+camera.position.z = 6;
+const group = new THREE.Group();
+scene.add(group);
+
+function sortByY(pos, col) {
+  const key = new Float32Array(N);
+  const idx = new Array(N);
+  for (let i = 0; i < N; i++) { idx[i] = i; key[i] = -pos[i * 3 + 1] + Math.random() * 0.04; }
+  idx.sort((a, b) => key[a] - key[b]);
+  const p2 = new Float32Array(N * 3), c2 = new Float32Array(N * 3);
+  for (let d = 0; d < N; d++) { const s = idx[d] * 3; p2[d * 3] = pos[s]; p2[d * 3 + 1] = pos[s + 1]; p2[d * 3 + 2] = pos[s + 2]; c2[d * 3] = col[s]; c2[d * 3 + 1] = col[s + 1]; c2[d * 3 + 2] = col[s + 2]; }
+  return { pos: p2, col: c2 };
+}
+const mixc = (a, b, t, k = 1) => [(a[0] + (b[0] - a[0]) * t) * k, (a[1] + (b[1] - a[1]) * t) * k, (a[2] + (b[2] - a[2]) * t) * k];
+
+function shapeDust() {
+  const pos = new Float32Array(N * 3), col = new Float32Array(N * 3);
+  for (let i = 0; i < N; i++) {
+    pos[i * 3] = (Math.random() * 2 - 1) * 1.7;
+    pos[i * 3 + 1] = (Math.random() * 2 - 1) * 1.8;
+    pos[i * 3 + 2] = (Math.random() * 2 - 1) * 0.85;
+    col.set(mixc(SAGE, LAMP, Math.pow(Math.random(), 2.2), 0.3 + Math.random() * 0.5), i * 3);
+  }
+  return sortByY(pos, col);
+}
+
+function shapeWifi() {
+  const pos = new Float32Array(N * 3), col = new Float32Array(N * 3);
+  const radii = [0.27, 0.52, 0.77], th = 0.075, a0 = Math.PI * 0.23, a1 = Math.PI * 0.77, cy = -0.36, dotR = 0.08;
+  const w = [Math.PI * dotR * dotR * 2.2, ...radii.map(r => (a1 - a0) * r * th)];
+  const tot = w.reduce((s, v) => s + v, 0);
+  for (let i = 0; i < N; i++) {
+    let u = Math.random() * tot, k = 0;
+    while (k < w.length - 1 && u > w[k]) { u -= w[k]; k++; }
+    let x, y, edge;
+    if (k === 0) {
+      const rr = Math.sqrt(Math.random()) * dotR, an = Math.random() * Math.PI * 2;
+      x = Math.cos(an) * rr; y = cy + Math.sin(an) * rr; edge = rr / dotR;
+    } else {
+      const an = a0 + Math.random() * (a1 - a0), off = (Math.random() - 0.5) * th, rad = radii[k - 1] + off;
+      x = Math.cos(an) * rad; y = cy + Math.sin(an) * rad; edge = Math.abs(off) / (th * 0.5);
+    }
+    pos[i * 3] = x; pos[i * 3 + 1] = y; pos[i * 3 + 2] = (Math.random() - 0.5) * 0.09;
+    col.set(mixc(LAMP, SAGE, edge * 0.55, 0.78 + Math.random() * 0.3), i * 3);
+  }
+  return sortByY(pos, col);
+}
+
+function shapeFromImage(img) {
+  const asp = img.naturalWidth / img.naturalHeight;
+  let W, H;
+  if (asp >= 1.3) { W = 1.3; H = 1.3 / asp; } else { H = 1; W = asp; }
+  const cols = Math.max(8, Math.round(Math.sqrt(N * asp)));
+  const rows = Math.max(8, Math.floor(N / cols));
+  const cv = document.createElement('canvas');
+  cv.width = cols; cv.height = rows;
+  const g = cv.getContext('2d', { willReadFrequently: true });
+  g.drawImage(img, 0, 0, cols, rows);
+  const d = g.getImageData(0, 0, cols, rows).data;
+  const pos = new Float32Array(N * 3), col = new Float32Array(N * 3);
+  const grid = cols * rows;
+  for (let k = 0; k < N; k++) {
+    const i = k < grid ? k % cols : (Math.random() * cols) | 0;
+    const j = k < grid ? (k / cols) | 0 : (Math.random() * rows) | 0;
+    const o = (j * cols + i) * 4;
+    const r = d[o] / 255, gg = d[o + 1] / 255, b = d[o + 2] / 255;
+    const lum = 0.2126 * r + 0.7152 * gg + 0.0722 * b;
+    pos[k * 3] = ((i + 0.5 + (Math.random() - 0.5) * 0.8) / cols - 0.5) * W;
+    pos[k * 3 + 1] = (0.5 - (j + 0.5 + (Math.random() - 0.5) * 0.8) / rows) * H;
+    pos[k * 3 + 2] = (lum - 0.5) * 0.22 + (Math.random() - 0.5) * 0.02;
+    col[k * 3] = r * 0.95 + 0.03; col[k * 3 + 1] = gg * 0.95 + 0.03; col[k * 3 + 2] = b * 0.95 + 0.03;
+  }
+  const out = sortByY(pos, col);
+  const tex = new THREE.Texture(img);
+  tex.minFilter = THREE.LinearFilter; tex.generateMipmaps = false; tex.needsUpdate = true;
+  return Object.assign(out, { W, H, tex });
+}
+
+async function shapeText(txt) {
+  try { await document.fonts.load('italic 600 300px "Playfair Display"'); } catch (err) { /* pakai font cadangan */ }
+  const CW = 1000, CH = 380;
+  const cv = document.createElement('canvas');
+  cv.width = CW; cv.height = CH;
+  const g = cv.getContext('2d', { willReadFrequently: true });
+  g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.font = 'italic 600 300px "Playfair Display", Georgia, serif';
+  g.fillText(txt, CW / 2, CH / 2 + 10);
+  const d = g.getImageData(0, 0, CW, CH).data;
+  const cand = [];
+  let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+  for (let y = 0; y < CH; y += 2) for (let x = 0; x < CW; x += 2) {
+    if (d[(y * CW + x) * 4 + 3] > 140) { cand.push(x, y); if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+  }
+  if (cand.length < 20) return null;
+  const sc = 1.3 / (x1 - x0), cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+  const pos = new Float32Array(N * 3), col = new Float32Array(N * 3);
+  for (let i = 0; i < N; i++) {
+    const c = ((Math.random() * cand.length / 2) | 0) * 2;
+    const x = (cand[c] - cx + (Math.random() - 0.5) * 2.2) * sc;
+    pos[i * 3] = x;
+    pos[i * 3 + 1] = -(cand[c + 1] - cy + (Math.random() - 0.5) * 2.2) * sc;
+    pos[i * 3 + 2] = (Math.random() - 0.5) * 0.1;
+    col.set(mixc(LAMP, MIST, clamp(x / 1.3 + 0.5) * 0.55, 0.75 + Math.random() * 0.35), i * 3);
+  }
+  return sortByY(pos, col);
+}
+
+const SH = { dust: shapeDust(), wifi: shapeWifi() };
+let shapeVersion = 1;
+
+const geo = new THREE.BufferGeometry();
+const attr = size => new THREE.BufferAttribute(new Float32Array(N * size), size);
+const aFrom = attr(3), aTo = attr(3), cFrom = attr(3), cTo = attr(3), aRand = attr(1);
+for (let i = 0; i < N; i++) aRand.array[i] = Math.random();
+geo.setAttribute('position', aFrom);
+geo.setAttribute('aTo', aTo);
+geo.setAttribute('cFrom', cFrom);
+geo.setAttribute('cTo', cTo);
+geo.setAttribute('aRand', aRand);
+geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(), 20);
+
+const uniforms = {
+  uMix: { value: 0 }, uTime: { value: 0 }, uSize: { value: 3 }, uFlat: { value: 0 }, uTurb: { value: 1 },
+  uAlpha: { value: 1 }, uDim: { value: 0 }, uPR: { value: renderer.getPixelRatio() },
+  uMouse: { value: new THREE.Vector3(9, 9, 0) }, uLamp: { value: new THREE.Vector3(...LAMP) }
+};
+const VS = `
+  attribute vec3 aTo; attribute vec3 cFrom; attribute vec3 cTo; attribute float aRand;
+  uniform float uMix, uTime, uSize, uFlat, uTurb, uAlpha, uDim, uPR;
+  uniform vec3 uMouse; uniform vec3 uLamp;
+  varying vec3 vCol; varying float vA;
+  void main(){
+    float d = aRand * 0.35;
+    float p = smoothstep(d, d + 0.65, uMix);
+    vec3 pos = mix(position, aTo, p);
+    float fly = sin(p * 3.14159265);
+    vec3 dir = normalize(vec3(sin(aRand * 91.7), cos(aRand * 53.3), sin(aRand * 27.1 + 1.3)) + 0.0001);
+    pos += dir * fly * (0.22 + aRand * 0.42);
+    pos.z *= 1.0 - uFlat;
+    float t = uTime * 0.3;
+    vec3 n = vec3(sin(pos.y * 2.1 + t + aRand * 6.283), cos(pos.x * 1.7 + t * 1.13 + aRand * 4.0), sin((pos.x + pos.y) * 1.4 + t * 0.8 + aRand * 2.0));
+    pos += n * uTurb * (0.03 + 0.09 * aRand);
+    vec2 dm = pos.xy - uMouse.xy;
+    float dl = length(dm);
+    pos.xy += (dm / max(dl, 0.001)) * smoothstep(0.13, 0.0, dl) * uMouse.z * 0.045 * (1.0 - uFlat);
+    vec4 mv = modelViewMatrix * vec4(pos, 1.0);
+    gl_Position = projectionMatrix * mv;
+    float spark = step(0.966, aRand) * (1.0 - uFlat * 0.85);
+    float tw = 0.55 + 0.45 * sin(uTime * 2.2 + aRand * 60.0);
+    gl_PointSize = uSize * uPR * (1.0 + spark * 1.8 * tw) * (6.0 / -mv.z);
+    vCol = mix(mix(cFrom, cTo, p), uLamp * 1.15, spark * 0.75 * tw);
+    vA = uAlpha * (1.0 - uDim * 0.72);
+  #ifdef HALO
+    if (aRand < 0.6 && spark < 0.5) { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); gl_PointSize = 0.0; }
+    gl_PointSize *= 3.4;
+    vA *= (0.07 + spark * 0.12) * (1.0 - uFlat * 0.9);
+  #endif
+  }`;
+const FS = `
+  varying vec3 vCol; varying float vA;
+  void main(){
+    vec2 c = gl_PointCoord - 0.5;
+  #ifdef HALO
+    float a = exp(-dot(c, c) * 16.0);
+  #else
+    float a = smoothstep(0.5, 0.06, length(c));
+  #endif
+    if (a < 0.02) discard;
+    gl_FragColor = vec4(vCol, a * vA);
+  }`;
+const mat = new THREE.ShaderMaterial({ uniforms, vertexShader: VS, fragmentShader: FS, transparent: true, depthWrite: false, depthTest: false, blending: THREE.NormalBlending });
+const haloMat = new THREE.ShaderMaterial({ uniforms, vertexShader: VS, fragmentShader: FS, defines: { HALO: '' }, transparent: true, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending });
+const halo = new THREE.Points(geo, haloMat);
+halo.frustumCulled = false; halo.renderOrder = 3;
+const points = new THREE.Points(geo, mat);
+points.frustumCulled = false; points.renderOrder = 2;
+group.add(points, halo);
+
+const photoMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false, depthTest: false, toneMapped: false });
+const photoMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), photoMat);
+photoMesh.renderOrder = 1;
+photoMesh.visible = false;
+group.add(photoMesh);
+
+let curA = null, curB = null, curVer = 0;
+function setPair(a, b) {
+  const A = SH[a] || SH.dust, B = SH[b] || SH.dust;
+  aFrom.array.set(A.pos); aTo.array.set(B.pos); cFrom.array.set(A.col); cTo.array.set(B.col);
+  aFrom.needsUpdate = aTo.needsUpdate = cFrom.needsUpdate = cTo.needsUpdate = true;
+  curA = a; curB = b; curVer = shapeVersion;
+}
+
+const loadImg = src => new Promise((res, rej) => { const im = new Image(); im.decoding = 'async'; im.onload = () => res(im); im.onerror = rej; im.src = src; });
+(async () => {
+  for (const name of PHOTOS) {
+    try { SH[name] = shapeFromImage(await loadImg(`cover/img/${name}.jpg`)); shapeVersion++; } catch (err) { /* tetap pakai debu */ }
+    tick();
+  }
+  const t = await shapeText('AB6');
+  if (t) { SH.ab6 = t; shapeVersion++; }
+})();
+
+function layoutTarget(lay) {
+  const asp = window.innerWidth / window.innerHeight, visW = VISH * asp, wide = asp >= 0.85;
+  if (lay === 'side') return wide ? { x: visW * 0.19, y: -0.02, s: Math.min(VISH * 0.74, visW * 0.47 / 1.3) } : { x: 0, y: VISH * 0.19, s: Math.min(VISH * 0.42, visW * 0.9 / 1.3) };
+  return wide ? { x: 0, y: 0.05, s: Math.min(VISH * 0.78, visW * 0.8 / 1.3) } : { x: 0, y: VISH * 0.07, s: Math.min(VISH * 0.6, visW * 0.92 / 1.3) };
+}
+
+function resize() {
+  const w = window.innerWidth, h = window.innerHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  uniforms.uPR.value = renderer.getPixelRatio();
+  measure();
+}
+addEventListener('resize', resize);
+resize();
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+addEventListener('load', measure);
+
+const ndc = new THREE.Vector2(), ray = new THREE.Raycaster(), plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0), hit = new THREE.Vector3();
+let mx = 0, my = 0, lastMove = -10, hasMouse = false;
+addEventListener('pointermove', e => {
+  if (e.pointerType !== 'mouse') return;
+  mx = (e.clientX / window.innerWidth) * 2 - 1; my = -(e.clientY / window.innerHeight) * 2 + 1;
+  lastMove = performance.now() / 1000; hasMouse = true;
+}, { passive: true });
+
+const frame = $('#frame'), frameCap = $('#frame-cap'), corner = new THREE.Vector3();
+let frameKey = '';
+function placeFrame(key) {
+  const o = clamp((cur.photoO - 0.55) / 0.4);
+  if (o <= 0.001) { if (frame.style.opacity !== '0') frame.style.opacity = '0'; return; }
+  if (key && key !== frameKey) { frameKey = key; frameCap.textContent = CAPTION[key] || ''; }
+  let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+  for (const [sx, sy] of [[-0.5, -0.5], [0.5, -0.5], [0.5, 0.5], [-0.5, 0.5]]) {
+    corner.set(sx, sy, 0); photoMesh.localToWorld(corner); corner.project(camera);
+    const px = (corner.x + 1) / 2 * window.innerWidth, py = (1 - corner.y) / 2 * window.innerHeight;
+    x0 = Math.min(x0, px); x1 = Math.max(x1, px); y0 = Math.min(y0, py); y1 = Math.max(y1, py);
+  }
+  const pad = 12;
+  frame.style.transform = `translate3d(${(x0 - pad).toFixed(1)}px,${(y0 - pad).toFixed(1)}px,0)`;
+  frame.style.width = (x1 - x0 + pad * 2).toFixed(1) + 'px';
+  frame.style.height = (y1 - y0 + pad * 2).toFixed(1) + 'px';
+  frame.style.opacity = o.toFixed(3);
+}
+
+const cur = { flat: 0, photoO: 0, turb: 1, dim: 0, x: 0, y: 0, s: 1, rx: 0, ry: 0, mz: 0 };
+let prev = performance.now(), photoKey = null;
+function frameLoop(now) {
+  if (lenis) lenis.raf(now);
+  const dt = Math.min(0.05, (now - prev) / 1000); prev = now;
+  const t = now / 1000;
+  const y = window.scrollY, vh = window.innerHeight;
+  const active = updateDom(y, vh);
+
+  const st = stateOf(active, active.p);
+  if (st.a !== curA || st.b !== curB || curVer !== shapeVersion) setPair(st.a, st.b);
+
+  const k = 1 - Math.pow(0.0015, dt);
+  cur.flat += (st.flat - cur.flat) * k;
+  cur.turb += ((reduce ? 0 : st.turb) - cur.turb) * k;
+  cur.dim += (st.dim - cur.dim) * k;
+  const ph = st.photo && SH[st.photo] && SH[st.photo].tex ? SH[st.photo] : null;
+  if (ph && photoMat.map !== ph.tex) { photoMat.map = ph.tex; photoMat.needsUpdate = true; photoMesh.scale.set(ph.W, ph.H, 1); photoKey = st.photo; }
+  cur.photoO += ((ph ? st.photoO : 0) - cur.photoO) * Math.min(1, k * 1.6);
+  photoMat.opacity = cur.photoO;
+  photoMesh.visible = cur.photoO > 0.003;
+
+  const L = layoutTarget(st.lay);
+  const kl = 1 - Math.pow(0.02, dt);
+  cur.x += (L.x - cur.x) * kl; cur.y += (L.y - cur.y) * kl; cur.s += (L.s - cur.s) * kl;
+  group.position.set(cur.x, cur.y, 0);
+  group.scale.setScalar(cur.s);
+
+  const free = 1 - cur.flat;
+  const idle = reduce ? 0 : Math.sin(t * 0.25) * 0.1;
+  cur.ry += ((hasMouse ? mx * 0.22 : 0) + idle - cur.ry) * k;
+  cur.rx += ((hasMouse ? -my * 0.1 : 0) - cur.rx) * k;
+  group.rotation.set(cur.rx * free, cur.ry * free, 0);
+  group.updateMatrixWorld();
+
+  const px = vh / VISH;
+  uniforms.uSize.value = clamp(cur.s * Math.sqrt(1.1 / N) * px * 1.6, 1.4, 6.5);
+  uniforms.uMix.value = st.mix;
+  uniforms.uTime.value = reduce ? 0 : t;
+  uniforms.uFlat.value = cur.flat;
+  uniforms.uTurb.value = cur.turb;
+  uniforms.uDim.value = cur.dim;
+  uniforms.uAlpha.value = 1 - cur.photoO * 0.95;
+
+  const mTarget = hasMouse && t - lastMove < 1.6 ? 1 : 0;
+  cur.mz += (mTarget - cur.mz) * k;
+  if (hasMouse) {
+    ndc.set(mx, my); ray.setFromCamera(ndc, camera);
+    if (ray.ray.intersectPlane(plane, hit)) { group.worldToLocal(hit); uniforms.uMouse.value.set(hit.x, hit.y, cur.mz); }
+  }
+
+  placeFrame(photoKey);
+  renderer.render(scene, camera);
+  requestAnimationFrame(frameLoop);
+}
+requestAnimationFrame(frameLoop);
+})();
+</script>
+</body>
+</html>
