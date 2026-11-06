@@ -30,7 +30,8 @@
   color-scheme:dark;
 }
 *{box-sizing:border-box}
-html{background:var(--void)}
+html{background:var(--void);scrollbar-width:none}
+html::-webkit-scrollbar{display:none}
 html.lenis, html.lenis body{height:auto}
 .lenis.lenis-smooth{scroll-behavior:auto !important}
 .lenis.lenis-stopped{overflow:hidden}
@@ -73,12 +74,7 @@ p{margin:0}
 .badge{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:var(--pine);font-family:var(--label);font-weight:500;font-size:.7rem;letter-spacing:.04em;color:var(--mist);box-shadow:inset 0 0 0 1px rgba(239,201,138,.25)}
 .masuk{display:inline-flex;align-items:center;gap:10px;color:var(--void);background:var(--mist);border-radius:999px;padding:12px 22px;font-family:var(--label);font-size:.7rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;text-decoration:none;transition:background .2s}
 .masuk:hover{background:var(--lamp)}
-.top-aksi{display:flex;align-items:center;gap:10px;flex:none}
-.gulir{display:inline-flex;align-items:center;justify-content:center;gap:9px;color:var(--mist);background:var(--veil);border:0;box-shadow:inset 0 0 0 1px var(--lamp-line);border-radius:999px;padding:12px 18px;font-family:var(--label);font-size:.7rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:color .2s,box-shadow .2s}
-.gulir:hover{color:var(--lamp);box-shadow:inset 0 0 0 1px var(--lamp)}
-.gulir svg{width:10px;height:10px;fill:currentColor;flex:none}
-@media (max-width:520px){.brand small{display:none}.masuk{padding:11px 16px;letter-spacing:.14em}.gulir{width:40px;height:40px;padding:0}.gulir span{display:none}}
-@media (max-width:360px){.brand>span:last-child{display:none}}
+@media (max-width:520px){.brand small{display:none}.masuk{padding:11px 16px;letter-spacing:.14em}}
 
 /* bab yang dipaku */
 .scene{position:relative;height:var(--h,260vh);--p:0}
@@ -284,10 +280,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--line);padding-bloc
 
 <header class="top">
   <a class="brand" href="#awal"><span class="badge">AB6</span><span>Kost AB6<small>Siwalankerto · Surabaya</small></span></a>
-  <div class="top-aksi">
-    <button class="gulir" id="gulir" type="button"><svg viewBox="0 0 12 12" aria-hidden="true"><path/></svg><span></span></button>
-    <a class="masuk js-masuk" href="/?dari=cover">Masuk Website →</a>
-  </div>
+  <a class="masuk js-masuk" href="/?dari=cover">Masuk Website →</a>
 </header>
 
 <main>
@@ -711,7 +704,6 @@ function autoCheck(p) {
     autoLeft = 6;
     autoEl.textContent = `Masuk ke website dalam ${autoLeft} detik`;
     autoTimer = setInterval(() => {
-      if (gulirDijeda && !reduce) { autoEl.textContent = 'Hitung mundur dijeda'; return; }
       autoLeft -= 1;
       if (autoLeft <= 0) {
         clearInterval(autoTimer); autoDone = true;
@@ -758,34 +750,21 @@ function updateDom(y, vh) {
 
 /* ---------- Gulir otomatis ---------- */
 /* Cerita berjalan sendiri sampai "Selamat pulang", lalu hitung mundur di atas membawa pengunjung masuk.
-   Menggulir atau menyentuh layar menahannya sebentar; tombol Jeda menghentikannya sampai ditekan lagi. */
+   Selama pengunjung menggulir, kendali ada di tangannya; begitu berhenti, cerita berjalan lagi perlahan dari posisi itu. */
 const DETIK_BAB = { awal: 5.5, cerita: 7, fasad: 6.5, sorotan: 6, room: 7.5, ruang: 12, penutup: 6 }; // lama tiap bab dipaku
 const LAJU_PINDAH = 0.55;  // layar per detik saat berpindah bab
 const LAJU_BACA = 0.16;    // layar per detik pada blok yang dibaca sambil berjalan
 const TUNGGU_AWAL = 3.5;   // detik sebelum mulai, memberi waktu membaca judul
-const TUNGGU_SENTUH = 5;   // detik sebelum lanjut setelah pengunjung berhenti menggulir
-const IKON_GULIR = { jeda: 'M2 1h3v10H2zM7 1h3v10H7z', lanjut: 'M2.5 1v10l8-5z' };
-const tombolGulir = $('#gulir');
-let gulirDijeda = reduce, gulirTunggu = TUNGGU_AWAL, gulirPos = window.scrollY, gulirLaju = 0, gulirWaktu = 0;
+const TUNGGU_SENTUH = 1.2; // detik sebelum berjalan lagi setelah pengunjung berhenti menggulir
+let gulirTunggu = TUNGGU_AWAL, gulirPos = window.scrollY, gulirLaju = 0, gulirWaktu = 0, jariDiLayar = false;
 
-function tandaiGulir() {
-  const label = gulirDijeda ? 'Lanjutkan gulir otomatis' : 'Jeda gulir otomatis';
-  $('span', tombolGulir).textContent = gulirDijeda ? 'Lanjut' : 'Jeda';
-  $('path', tombolGulir).setAttribute('d', gulirDijeda ? IKON_GULIR.lanjut : IKON_GULIR.jeda);
-  tombolGulir.setAttribute('aria-label', label);
-  tombolGulir.title = label;
-}
 function tahanGulir() {
   gulirTunggu = Math.max(gulirTunggu, TUNGGU_SENTUH);
   gulirLaju = 0;
 }
 ['wheel', 'touchstart', 'pointerdown', 'keydown'].forEach(n => addEventListener(n, tahanGulir, { passive: true }));
-tombolGulir.addEventListener('click', () => {
-  gulirDijeda = !gulirDijeda;
-  gulirTunggu = 0;
-  tandaiGulir();
-});
-tandaiGulir();
+addEventListener('touchstart', () => { jariDiLayar = true; }, { passive: true });
+['touchend', 'touchcancel'].forEach(n => addEventListener(n, () => { jariDiLayar = false; }, { passive: true }));
 
 /* Laju dalam piksel per detik: pelan selama blok teks ada di area baca layar, mengikuti DETIK_BAB saat bab dipaku, lebih cepat saat berpindah bab. */
 function lajuDi(y, vh) {
@@ -797,14 +776,14 @@ function gulirOtomatis(now) {
   const dt = Math.min(0.1, (now - gulirWaktu) / 1000);
   gulirWaktu = now;
   const y = window.scrollY, vh = window.innerHeight;
-  // posisi berubah bukan oleh langkah di bawah: scrollbar diseret atau sisa gerak halus Lenis
-  if (Math.abs(y - gulirPos) > 2) tahanGulir();
+  // jari masih di layar, atau posisi berubah bukan oleh langkah di bawah (sisa gerak halus Lenis, dorongan layar sentuh)
+  if (jariDiLayar || Math.abs(y - gulirPos) > 2) tahanGulir();
   const batas = penutup.top + penutup.h - vh;
-  if (!finished || gulirDijeda || y >= batas) { gulirPos = y; gulirLaju = 0; return; }
+  if (reduce || !finished || y >= batas) { gulirPos = y; gulirLaju = 0; return; }
   if (gulirTunggu > 0) { gulirTunggu -= dt; gulirPos = y; return; }
-  const sasaran = Math.min(lajuDi(y, vh), (batas - y) * 1.2 + vh * 0.02);
-  gulirLaju += (sasaran - gulirLaju) * (1 - Math.exp(-dt / 0.8));
-  gulirPos = Math.min(batas, gulirPos + gulirLaju * dt);
+  // laju naik pelan setelah ditahan dan melambat halus menjelang akhir
+  gulirLaju += (lajuDi(y, vh) - gulirLaju) * (1 - Math.exp(-dt / 1.2));
+  gulirPos = Math.min(batas, gulirPos + Math.min(gulirLaju, (batas - gulirPos) * 1.2 + vh * 0.02) * dt);
   if (lenis) lenis.scrollTo(gulirPos, { immediate: true }); else window.scrollTo(0, gulirPos);
 }
 
