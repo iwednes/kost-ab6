@@ -1,9 +1,8 @@
 /* ============================================================
-   KOST AB6 — Kunang-kunang Beranda
+   KOST AB6 — Kunang-kunang seluruh halaman
    Bola cahaya melayang ke kanan-kiri, berkelip, punya kedalaman 3D, dan menghindar
-   dari kursor. Di banner gelap menyala hijau kekuningan seperti kunang-kunang asli;
+   dari kursor. Di bidang gelap (banner Beranda, menu samping admin) menyala hijau kekuningan;
    di latar hijau sage berpendar krem muda.
-   Hanya berjalan selama Beranda terbuka (KunangAB6.aktif dipanggil dari app.js).
    Bidang yang tidak tampak dilewati, dan jumlah bola turun sendiri bila perangkat
    kewalahan. Canvas 2D supaya ringan.
    ============================================================ */
@@ -105,6 +104,13 @@
     lapisan.push(hero);
   }
 
+  var sisiAdmin = document.getElementById('sidebar-admin');
+  if (sisiAdmin) {
+    var kanvasSisi = buatKanvas('kunang-sisi');
+    sisiAdmin.insertBefore(kanvasSisi, sisiAdmin.firstChild);
+    lapisan.push(pantau(buatLapisan(kanvasSisi, { tambah: true, ukur: [8, 30], gulir: false, dpr: 1.5, bola: kecil ? 24 : 36, debu: kecil ? 40 : 80, sinar: SINAR_GELAP }), sisiAdmin));
+  }
+
   /* ---------- Kursor: bola menghindar, seluruh lapisan sedikit bergeser mengikuti (terasa 3D) ---------- */
   var kx = -9999, ky = -9999, geserX = 0, geserY = 0, geserTX = 0, geserTY = 0;
   window.addEventListener('pointermove', function (e) {
@@ -179,10 +185,10 @@
     g.globalCompositeOperation = 'source-over';
   }
 
-  var lalu = performance.now(), waktu = 0, nyala = false, berjalan = false;
+  var lalu = performance.now(), waktu = 0;
   function langkah(now) {
-    if (!nyala) { berjalan = false; return; }
     requestAnimationFrame(langkah);
+    if (document.body.classList.contains('modal-terbuka')) { lalu = now; return; }   // tertutup jendela modal
     var ms = now - lalu, dt = Math.min(0.05, ms / 1000);
     lalu = now;
     waktu += dt;
@@ -198,16 +204,6 @@
     }
   }
 
-  window.KunangAB6 = {
-    pasangBanner: pasangBanner,
-    aktif: function (on) {
-      nyala = on;
-      if (!on || berjalan) return;
-      berjalan = true;
-      lapisan.forEach(function (L) { L.perluUkur = true; });
-      lalu = performance.now();
-      gulirLalu = window.scrollY;
-      requestAnimationFrame(langkah);
-    }
-  };
+  window.KunangAB6 = { pasangBanner: pasangBanner };
+  requestAnimationFrame(langkah);
 })();

@@ -12,6 +12,7 @@
           history.replaceState(null, '', location.pathname.replace(/index\.html$/, '') + location.hash);
           return;
         }
+        if (q.has('cekvideo')) { sessionStorage.setItem('kab6_cover', '1'); return; } // pemeriksaan video banner dari HP
         if (sessionStorage.getItem('kab6_cover')) return;
         // hanya beranda yang dialihkan; /kamar, /tentang-kami, dan halaman admin tetap langsung terbuka
         if (location.pathname !== '/' && !/\/index\.html$/.test(location.pathname)) return;
@@ -37,7 +38,8 @@
   <link rel="stylesheet" href="css/style.css">
   <!-- Tailwind v3.4.16 yang sudah dikompilasi (bukan Play CDN) — lihat README.md bagian Tailwind -->
   <link rel="stylesheet" href="css/tailwind.css">
-  <link rel="stylesheet" href="css/beranda.css">
+  <link rel="stylesheet" href="css/situs.css">
+  <link rel="stylesheet" href="css/admin.css">
 </head>
 <body class="bg-surface font-body-md text-on-surface antialiased selection:bg-primary selection:text-on-primary">
   <a href="#konten-utama" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[1300] focus:bg-surface-page focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-md">Lewati ke konten utama</a>
@@ -97,8 +99,8 @@
       <section id="hal-detail" class="halaman" data-halaman="detail" hidden></section>
       <section id="hal-testimoni" class="halaman" data-halaman="testimoni" hidden>
         <div id="testi-atas"></div>
-        <div id="testi-daftar"></div>
         <div id="testi-form"></div>
+        <div id="testi-daftar"></div>
       </section>
       <section id="hal-tentang" class="halaman" data-halaman="tentang" hidden></section>
       <section id="hal-404" class="halaman" data-halaman="404" hidden></section>
@@ -293,8 +295,15 @@
   <!-- Urutan wajib: config (GAS_URL) → api (fetch ke GAS) → app (SPA) -->
   <script src="js/config.js"></script>
   <script src="js/api.js"></script>
+  <!-- Gerak situs: GSAP + ScrollTrigger + SplitText + gulir halus Lenis -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/SplitText.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.4/dist/lenis.min.js"></script>
+  <script src="js/gerak-situs.js"></script>
   <script src="js/latar3d.js"></script>
   <script src="js/kunang.js"></script>
+  <script src="js/video-banner.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

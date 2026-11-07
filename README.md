@@ -6,13 +6,16 @@ Situs publik + panel pengelola Kost AB6. Frontend statis (HTML/CSS/JS vanilla + 
 index.html        ← kerangka halaman (publik, login, admin)
 css/style.css     ← CSS tambahan di atas Tailwind
 css/tailwind.css  ← Tailwind v3.4.16 hasil kompilasi (JANGAN diedit manual)
-css/beranda.css   ← tampilan header, footer, dan Beranda
+css/situs.css     ← tampilan seluruh halaman publik (mengikuti website Mixmax Souvenir)
+css/admin.css     ← tampilan login dan panel admin
 js/config.js      ← GAS_URL (URL /exec Apps Script) — satu-satunya yang perlu diubah
 js/api.js         ← panggil(): fetch ke GAS (GET untuk data publik, POST text/plain untuk lainnya)
 js/app.js         ← seluruh logika SPA
-js/latar3d.js     ← objek 3D di belakang Beranda
+js/gerak-situs.js ← animasi situs: header, menu samping, gulir halus, kemunculan isi
+js/video-banner.js ← video banner 5 detik: unggah di admin dan pemutaran di Beranda
+js/latar3d.js     ← objek 3D di belakang semua halaman
 js/bentuk3d.js    ← bentuk dan shader partikel objek 3D
-js/kunang.js      ← kunang-kunang di Beranda
+js/kunang.js      ← kunang-kunang di semua halaman, termasuk menu admin
 .nojekyll         ← matikan pemrosesan Jekyll di GitHub Pages
 ```
 
@@ -28,10 +31,14 @@ git commit -m "Deskripsi perubahan"
 git push
 ```
 
-GitHub Pages memperbarui situs dalam 1–2 menit. Jika masih tampil versi lama, tekan Ctrl+Shift+R. Versi yang aktif tercetak di konsol browser: `[Kost AB6] Frontend v3.3.0 siap`.
+GitHub Pages memperbarui situs dalam 1–2 menit. Jika masih tampil versi lama, tekan Ctrl+Shift+R. Versi yang aktif tercetak di konsol browser: `[Kost AB6] Frontend v3.4.0 siap`.
 
 ## Tailwind
 
 `css/tailwind.css` berisi semua kelas Tailwind yang tertulis di `index.html` dan `js/app.js`, dikompilasi dengan konfigurasi token desain proyek. Ini menggantikan Tailwind Play CDN, yang mengunduh compiler ±450 KB dan merakit CSS di browser setiap kali halaman berganti. Bila menambah kelas Tailwind baru, bangkitkan ulang berkas ini dengan `migrasi-api/alat-dev/buat-tailwind.html` (di luar repository ini).
 
 Panduan lengkap: [PANDUAN-INSTALASI.md](PANDUAN-INSTALASI.md).
+
+## Video banner
+
+Video banner butuh `Kode.gs` v3.1.0 (tempel ke Apps Script, lalu Deploy → Manage deployments → New version). Di panel admin: Konten → Banner → ubah banner → Video Banner. Video maksimal 5 detik, otomatis dikecilkan ke 1080p tanpa suara, dan cuplikannya menjadi gambar sampul. ID video tersimpan di Script Properties (`VIDEO_BANNER`), jadi sheet Banner tidak berubah. Untuk memeriksa pemutaran dari HP, buka situs dengan `/?cekvideo`.

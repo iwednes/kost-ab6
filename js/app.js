@@ -506,7 +506,7 @@ async function navigasi(nama, param, opsi) {
   tutupSidebar();
   tutupPanelTopbar();
 
-  aturLatarBeranda(nama === 'beranda');
+  aturLatarHalaman(nama);
   const lapisan = lapisanUntuk(nama);
   ['publik', 'login', 'admin'].forEach(l => { $('#lapisan-' + l).hidden = l !== lapisan; });
   $$('.halaman').forEach(h => { h.hidden = h.dataset.halaman !== nama; });
@@ -536,17 +536,17 @@ async function navigasi(nama, param, opsi) {
   perbaruiWaMelayang();
   document.title = (KONST.JUDUL[nama] || 'Kost AB6') + ' — Kost AB6';
   if (!opsi.tanpaGulir) window.scrollTo(0, 0);
+  if (window.GerakAB6) GerakAB6.halaman(nama);
   if (lapisan === 'admin') {
     perbaruiKerangkaAdmin();
     pastikanDataAdmin();
   }
 }
 
-/** Objek 3D dan kunang-kunang hanya berjalan selama Beranda terbuka, supaya halaman lain tetap ringan */
-function aturLatarBeranda(aktif) {
-  document.body.classList.toggle('di-beranda', aktif);
-  if (window.LatarAB6) LatarAB6.aktif(aktif);
-  if (window.KunangAB6) KunangAB6.aktif(aktif);
+/** Objek 3D berganti bentuk mengikuti halaman yang terbuka */
+function aturLatarHalaman(nama) {
+  document.body.classList.toggle('di-beranda', nama === 'beranda');
+  if (window.LatarAB6) LatarAB6.bentuk(nama);
 }
 
 function perbaruiMenuAktif(nama) {
@@ -650,6 +650,7 @@ function terapkanData(d) {
     else RENDER[nama]($('#hal-' + nama), S.rute.param);
     $('#hal-' + nama).dataset.kunci = kunciTampilan(nama, S.rute.param);
     perbaruiWaMelayang();
+    if (window.GerakAB6) GerakAB6.halaman(nama);
   }
 }
 
@@ -735,11 +736,9 @@ const Slider = {
     this.idx = 0;
     this.disorot = false;
     if (!el || !this.jumlah) return;
-    this.tampil(0);
+    this.tampil(0, true);
     this.mulai();
     const sorot = on => { this.disorot = on; this.mulai(); };
-    el.addEventListener('mouseenter', () => sorot(true));
-    el.addEventListener('mouseleave', () => sorot(false));
     el.addEventListener('focusin', () => sorot(true));
     el.addEventListener('focusout', e => { if (!el.contains(e.relatedTarget)) sorot(false); });
     el.addEventListener('touchstart', e => { this.xAwal = e.touches[0].clientX; }, { passive: true });
@@ -750,7 +749,7 @@ const Slider = {
       if (Math.abs(dx) > 40) this.geser(dx < 0 ? 1 : -1);
     }, { passive: true });
   },
-  tampil(i) {
+  tampil(i, pertama) {
     if (!this.el || !this.jumlah) return;
     this.idx = (i + this.jumlah) % this.jumlah;
     $$('.slide', this.el).forEach((s, n) => {
@@ -759,17 +758,29 @@ const Slider = {
       if (on) s.removeAttribute('aria-hidden'); else s.setAttribute('aria-hidden', 'true');
     });
     const aktif = $$('.slide', this.el)[this.idx];
+    if (aktif && window.GerakAB6 && S.rute.nama === 'beranda') GerakAB6.slide(aktif, !pertama);
+    this.mulaiPada = Date.now();
+    if (window.VideoBanner) VideoBanner.slideBaru();
     if (aktif && aktif.dataset.id && !document.hidden && S.rute.nama === 'beranda') {
       S.stat.tayang[aktif.dataset.id] = (S.stat.tayang[aktif.dataset.id] || 0) + 1;
     }
   },
   mulai() {
     clearInterval(this.timer);
+    if (window.VideoBanner) VideoBanner.aktif(true);
+    this.mulaiPada = Date.now();
     if (this.jumlah > 1 && !this.disorot) {
-      this.timer = setInterval(() => { if (!document.hidden) this.tampil(this.idx + 1); }, 5000);
+      this.timer = setInterval(() => {
+        if (document.hidden) return;
+        const lama = Date.now() - this.mulaiPada;
+        if (window.VideoBanner ? VideoBanner.bolehGanti(lama) : lama >= 5000) this.tampil(this.idx + 1);
+      }, 250);
     }
   },
-  berhenti() { clearInterval(this.timer); },
+  berhenti() {
+    clearInterval(this.timer);
+    if (window.VideoBanner) VideoBanner.aktif(false);
+  },
   geser(arah) {
     this.tampil(this.idx + arah);
     this.mulai();
@@ -790,6 +801,28 @@ function kirimStatBanner() {
 
 const WADAH = 'max-w-[1240px] w-full mx-auto px-margin-mobile md:px-margin';
 const GARIS_JUDUL = 'w-12 h-[3px] mt-2 rounded-full bg-gradient-to-r from-gradient-start via-gradient-mid to-gradient-end';
+
+/** Kepala halaman: aksen besar "Kost" di belakang, judul di kiri, keterangan di kanan */
+function htmlKepala(o) {
+  return `<div class="gs-kepala">
+    <div class="gs-aksen" aria-hidden="true">Kost</div>
+    <div class="wrap">
+      <div class="crumb"><a href="#" data-nav="beranda">Beranda</a> / <span>${esc(o.crumb)}</span></div>
+      <div class="page-head">
+        <div><span class="lbl">${esc(o.label)}</span><h1 class="h1">${o.judul}</h1></div>
+        <div class="gs-kanan">${o.kanan}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+/** Ajakan terbelah dua kolom di bawah halaman */
+function htmlAjakan(o) {
+  return `<section class="gp-cta"><div class="wrap"><div class="gp-cta-panel" data-gs-panel>
+    <div class="gp-cta-kiri"><span class="lbl">${esc(o.label)}</span><h2 class="h2">${o.judul}</h2></div>
+    <div class="gp-cta-kanan"><span class="gp-cta-garis" aria-hidden="true"></span><p class="muted">${esc(o.teks)}</p>${o.tombol}</div>
+  </div></div></section>`;
+}
 
 function kerangkaBlok(kelas) { return `<div class="kerangka rounded-xl ${kelas}"></div>`; }
 
@@ -910,7 +943,7 @@ RENDER.beranda = function (el) {
     teksTombol: 'Lihat Katalog Kamar', linkTombol: '/kamar', foto: (S.umum && S.umum.fotoCadangan) || ''
   }];
   el.innerHTML = `<h1 class="sr-only">Beranda Kost AB6</h1>
-    <div class="wrap">${htmlHero(banner)}</div>
+    ${htmlHero(banner)}
     ${htmlVisiMisi(b.visiMisi || {})}
     ${htmlPilar(b.sorotan || [])}
     ${htmlKataMereka()}
@@ -918,7 +951,9 @@ RENDER.beranda = function (el) {
     ${htmlCtaBeranda()}`;
   const hero = $('#hero-slider', el);
   Slider.pasang(hero);
+  if (window.VideoBanner) VideoBanner.rapikan(banner.map(b => b.video).filter(Boolean));
   if (window.KunangAB6) KunangAB6.pasangBanner(hero);
+  pasangTestiBeranda();
 };
 
 function htmlHero(banner) {
@@ -930,11 +965,12 @@ function htmlHero(banner) {
       cta = `<div class="slide-cta"><a ${luar ? `href="${esc(luar)}" target="_blank" rel="noopener noreferrer"` : 'href="#"'} data-aksi="cta-banner" data-id="${esc(s.id)}" data-link="${esc(s.linkTombol)}" class="btn btn-primary"><span>${esc(s.teksTombol)}</span>${ikon('arrow_forward')}</a></div>`;
     }
     const foto = s.foto
-      ? `<img class="slide-bg" src="${esc(urlGambar(s.foto, 1920))}" alt="" ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" referrerpolicy="no-referrer"><div class="slide-overlay"></div>`
+      ? `<img class="slide-bg" src="${esc(urlGambar(s.foto, 1920))}" alt="" ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" referrerpolicy="no-referrer">`
       : '';
+    const video = s.video ? `<video class="slide-video" data-vid="${esc(s.video)}"${s.foto ? ` poster="${esc(urlGambar(s.foto, 1920))}"` : ''} muted loop playsinline preload="none" disablepictureinpicture aria-hidden="true"></video>` : '';
     const label = s.label && s.label !== s.judul ? s.label : 'Info Kost AB6';
     return `<div class="slide${i === 0 ? ' aktif' : ''}" data-id="${esc(s.id)}" role="group" aria-roledescription="slide" aria-label="${i + 1} dari ${n}"${i === 0 ? '' : ' aria-hidden="true"'}>
-      ${foto}
+      ${foto}${video}${foto || video ? '<div class="slide-overlay"></div>' : ''}
       <div class="slide-card">
         <span class="lbl">${esc(label)}</span>
         <h2 class="slide-judul">${esc(s.judul)}</h2>
@@ -959,7 +995,7 @@ function htmlVisiMisi(v) {
       <h2 class="h2">Visi &amp; Misi <em>Kost AB6</em></h2>
       <p class="muted">Modern Indonesian Living &amp; Hospitality</p>
     </div>
-    <div class="g2">
+    <div class="g2" data-gs-kolom>
       <div class="kartu visi-card">
         <div class="kartu-ikon">${ikon('visibility')}</div><span class="lbl">Visi</span>
         <p class="visi-teks">${esc(v.visi)}</p>
@@ -984,7 +1020,7 @@ function htmlPilar(daftar) {
   if (!daftar.length) return '';
   return `<section class="sec"><div class="wrap">
     <div class="sec-head"><span class="lbl">Keunggulan Kami</span><h2 class="h2">4 Pilar <em>Layanan</em></h2></div>
-    <div class="pilar-grid">${daftar.slice(0, 4).map((s, i) => `
+    <div class="pilar-grid" data-gs-kolom>${daftar.slice(0, 4).map((s, i) => `
       <div class="pilar"><span class="pilar-no">${String(i + 1).padStart(2, '0')}</span>${ikon(s.ikon || 'verified')}<h3>${esc(s.nilai)}</h3><p class="small muted">${esc(s.label)}</p></div>`).join('')}
     </div>
   </div></section>`;
@@ -1004,35 +1040,38 @@ function htmlBerjalan(kartu, arah, kelasLebar) {
   return `<div class="berjalan overflow-hidden"><div class="berjalan-trek berjalan-${arah} flex w-max" style="animation-duration:${putaran.length * 12}s">${isi}</div></div>`;
 }
 
-function kartuTesti(t) {
-  let avatar = `<span class="tava" aria-hidden="true">${t.tipe === 'Official' ? ikon('apartment', 'text-[20px]') : esc(inisial(t.nama))}</span>`;
-  if (t.fotoProfil) avatar = gambar(t.fotoProfil, 200, 'tava', 'Foto profil ' + t.nama);
-  const info = [t.tag, t.fotoBukti ? 'Foto Terverifikasi' : '', namaKamarPendek(t.kamar)].filter(Boolean);
-  return `<article class="tcard">
-    <div class="thead">${avatar}<div class="tmeta"><strong class="tnama">${esc(t.nama)}</strong><span class="tinst">${esc(labelPenulis(t))}</span><span class="ttgl">${fTgl(t.tanggal)}</span></div></div>
-    <blockquote class="tisi">“${esc(t.isi)}”</blockquote>
-    ${info.length ? `<div class="tprod-baris">${info.map(x => `<span class="tprod">${esc(x)}</span>`).join('')}</div>` : ''}
-  </article>`;
-}
-
-/** Dua baris testimoni berjalan berlawanan arah, berisi semua testimoni yang tampil */
+/** Testimoni Beranda tampil satu per satu, berganti sendiri */
 function htmlKataMereka() {
   const t = S.testiSemua.items.length ? S.testiSemua.items : ((S.beranda && S.beranda.testimoni) || []);
   if (!t.length) return '';
-  const lebar = 'w-[300px] md:w-[380px]';
-  const baris = daftar => daftar.map(kartuTesti);
-  const atas = t.filter((x, i) => i % 2 === 0);
-  const bawah = t.filter((x, i) => i % 2 === 1);
   return `<section class="sec" id="bagian-testi"><div class="wrap">
     <div class="sec-head">
       <span class="lbl">Kepercayaan Penghuni</span>
       <h2 class="h2">Kata <em>Mereka</em></h2>
       <p class="muted">Testimoni dari penghuni yang telah tinggal di Kost AB6.</p>
     </div>
-    ${htmlBerjalan(baris(atas), 'kanan', lebar)}
-    ${bawah.length ? htmlBerjalan(baris(bawah), 'kiri', lebar) : ''}
-    <div class="center mt-24"><a href="#" data-nav="testimoni" class="btn btn-outline">${ikon('rate_review')}<span>Lihat Semua Testimoni</span></a></div>
+    <div class="gs-testi" id="gs-testi" role="region" aria-roledescription="carousel" aria-label="Testimoni penghuni">
+      <div class="gs-testi-panggung"><figure class="gs-testi-slide" aria-live="polite"><span class="gs-garis" aria-hidden="true"></span>
+        <blockquote class="gs-testi-kutip"></blockquote><figcaption class="gs-testi-orang"></figcaption></figure></div>
+    </div>
+    <div class="mt-24"><a href="#" data-nav="testimoni" class="btn btn-outline">${ikon('rate_review')}<span>Lihat Semua Testimoni</span></a></div>
   </div></section>`;
+}
+
+/** Testimoni Beranda digerakkan js/gerak-situs.js; tanpa skrip itu, testimoni pertama tetap tampil */
+function pasangTestiBeranda() {
+  const akar = $('#gs-testi');
+  if (!akar) return;
+  const t = S.testiSemua.items.length ? S.testiSemua.items : ((S.beranda && S.beranda.testimoni) || []);
+  const data = t.map(x => ({
+    nama: x.nama, isi: x.isi, sub: labelPenulis(x), tgl: fTgl(x.tanggal),
+    avatar: x.fotoProfil ? gambar(x.fotoProfil, 200, 'tava', 'Foto profil ' + x.nama) : `<span class="tava" aria-hidden="true">${x.tipe === 'Official' ? ikon('apartment', 'text-[20px]') : esc(inisial(x.nama))}</span>`
+  }));
+  if (window.GerakAB6) GerakAB6.pasangTesti(akar, data);
+  else if (data[0]) {
+    $('.gs-testi-kutip', akar).textContent = '“' + data[0].isi + '”';
+    $('.gs-testi-orang', akar).innerHTML = data[0].avatar + '<span class="gs-testi-nama"><strong>' + esc(data[0].nama) + '</strong></span>';
+  }
 }
 
 /** Mengambil semua testimoni tampil di belakang layar; bagian ini digambar ulang hanya bila isinya berubah. */
@@ -1054,8 +1093,7 @@ async function muatTestiBeranda() {
     ts.json = json;
     ts.items = items;
     Simpan.set(KONST.KUNCI_TESTI_BERANDA, items);
-    const bagian = $('#bagian-testi');
-    if (bagian) bagian.outerHTML = htmlKataMereka();
+    if ($('#bagian-testi')) pasangTestiBeranda();
   } catch (e) {
     console.warn('Testimoni Beranda gagal dimuat:', e);
   } finally {
@@ -1096,7 +1134,7 @@ function htmlCtaBeranda() {
     aman && aman.label + ' ' + aman.nilai,
     u.responMenit && 'Admin membalas ±' + u.responMenit + ' menit'
   ].filter(Boolean);
-  return `<section class="sec"><div class="wrap"><div class="cta">
+  return `<section class="sec"><div class="wrap"><div class="cta" data-gs-panel>
     <span class="lbl">Siap Pindah Hunian?</span>
     <h2 class="h2">Jadwalkan Kunjungan <em>Survei Lokasi</em> <span class="h2-sub">Sekarang</span></h2>
     <p class="muted">Konsultasikan ketersediaan kamar, tipe ruangan, dan nikmati diskon khusus masa sewa tahunan bersama manajer operasional kami.</p>
@@ -1105,6 +1143,7 @@ function htmlCtaBeranda() {
       <a ${waAttr(PesanWA.umum())} class="btn btn-outline btn-lg">${IKON_WA}<span>Hubungi Pengelola</span></a>
     </div>
     ${poin.length ? `<ul class="cta-poin">${poin.map(p => `<li>${ikon('check')}${esc(p)}</li>`).join('')}</ul>` : ''}
+    ${(S.beranda && S.beranda.banner[0] && S.beranda.banner[0].foto) ? `<div class="gs-cta-media">${gambar(S.beranda.banner[0].foto, 1600, '', 'Kost AB6')}</div>` : ''}
   </div></div></section>`;
 }
 
@@ -1153,66 +1192,46 @@ RENDER.kamar = function (el) {
   if (!S.kamar) { el.innerHTML = kerangkaHalaman(); return; }
   // Desain revisi: tanpa tab filter — semua kamar tampil, status terlihat di lencana foto
   const daftar = S.kamar.items.slice().sort(urutNamaKamar);
-  const kosong = `<p class="col-span-full text-center py-space-xl font-body-md text-body-md text-on-surface-variant">Belum ada data kamar.</p>`;
-
-  el.innerHTML = `<div class="flex flex-col w-full">
-    <section class="${WADAH} pt-space-xl pb-space-lg">
-      ${remah('Katalog Kamar').replace('mb-space-md', 'mb-space-sm')}
-      <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-space-lg pt-space-xs">
-        <div class="space-y-space-xs max-w-2xl">
-          <div class="inline-block relative">
-            <h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface tracking-tight">Katalog Kamar Kost AB6</h1>
-            <div class="h-[4px] w-12 rounded-full bg-gradient-to-r from-gradient-start via-gradient-mid to-gradient-end mt-2"></div>
-          </div>
-          <p class="font-body-md text-body-md text-on-surface-variant pt-1 leading-relaxed">Pilihan kamar nyaman dengan fasilitas lengkap, bersih, dan siap huni. Dirancang dengan ventilasi alami dan tata ruang ergonomis untuk ketenangan istirahat dan produktivitas Anda.</p>
-        </div>
-      </div>
-    </section>
-    <section class="${WADAH} py-space-md">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">${daftar.length ? daftar.map(kartuKamar).join('') : kosong}</div>
-    </section>
-    <section class="${WADAH} py-space-md">
-      <div class="p-space-lg rounded-[16px] shadow-sm relative overflow-hidden bg-gradient-to-r from-[#E6F4EA] via-[#eef4ea] to-[#e3ede0] flex flex-col md:flex-row items-start md:items-center justify-between gap-space-lg">
-        <div class="flex items-center gap-space-md max-w-2xl">
-          <div class="w-14 h-14 shrink-0 rounded-full bg-surface-container-lowest flex items-center justify-center shadow-sm text-primary">${ikon('support_agent', 'text-[28px]')}</div>
-          <div class="space-y-1">
-            <h3 class="font-headline-sm text-headline-sm text-on-surface">Bingung Memilih Tipe Kamar yang Tepat?</h3>
-            <p class="font-body-md text-body-md text-on-surface-variant">Konsultasikan kebutuhan hunian Anda langsung dengan pengelola kami untuk ketersediaan tanggal check-in, durasi sewa, dan kunjungan survei.</p>
-          </div>
-        </div>
-        <a ${waAttr(PesanWA.umum())} class="inline-flex items-center gap-space-xs px-space-lg py-3 rounded-full bg-whatsapp-green text-on-primary font-headline-sm text-body-md font-semibold shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all whitespace-nowrap">${ikon('chat', 'text-[20px]')}Chat WhatsApp Admin</a>
-      </div>
-    </section>
-    <div class="pb-space-xl"></div>
+  el.innerHTML = `<div class="gp">
+    ${htmlKepala({
+      crumb: 'Katalog Kamar', label: 'Katalog Kamar', judul: 'Katalog Kamar <em>Kost AB6</em>',
+      kanan: '<p class="muted">Pilihan kamar nyaman dengan fasilitas lengkap, bersih, dan siap huni. Dirancang dengan ventilasi alami dan tata ruang ergonomis untuk ketenangan istirahat dan produktivitas Anda.</p>'
+    })}
+    <div class="wrap"><div class="garis-gradasi"></div></div>
+    <div class="wrap gp-isi"><div class="pgrid">${daftar.length ? daftar.map(kartuKamar).join('') : '<p class="muted center">Belum ada data kamar.</p>'}</div></div>
+    ${htmlAjakan({
+      label: 'Butuh Bantuan?', judul: 'Bingung Memilih <em>Tipe Kamar</em> yang Tepat?',
+      teks: 'Konsultasikan kebutuhan hunian Anda langsung dengan pengelola kami untuk ketersediaan tanggal check-in, durasi sewa, dan kunjungan survei.',
+      tombol: `<a ${waAttr(PesanWA.umum())} class="btn btn-wa btn-lg">${IKON_WA}<span>Chat WhatsApp Admin</span></a>`
+    })}
   </div>`;
 };
 
 function kartuKamar(k) {
   const terisi = k.status === 'Terisi';
   const foto = (k.foto || [])[0];
-  const tombolKanan = terisi
-    ? `<a ${waAttr(PesanWA.terisi(k))} class="flex-1 h-10 px-3 rounded-lg font-headline-sm text-body-sm font-semibold text-tertiary bg-surface-container hover:bg-surface-container-high transition-colors flex items-center justify-center gap-1 text-center">Tanya Info Kamar</a>`
-    : `<a ${waAttr(PesanWA.tersedia(k))} class="flex-1 h-10 px-3 rounded-lg font-headline-sm text-body-sm font-semibold text-on-primary bg-whatsapp-green hover:opacity-95 transition-all shadow-sm flex items-center justify-center gap-1.5">${ikon('chat', 'text-[18px]')}Tanya via WA</a>`;
-  return `<article class="room-card group flex flex-col bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 ${terisi ? 'opacity-90' : ''}">
-    <a href="#" data-nav="detail" data-kode="${esc(k.kode)}" class="relative block w-full aspect-[4/3] overflow-hidden bg-surface-container-low" aria-label="Lihat detail ${esc(k.nama)}">
-      ${gambar(foto && foto.id, 800, `w-full h-full object-cover ${terisi ? 'grayscale-[25%] contrast-90' : ''} group-hover:scale-105 transition-transform duration-500`, k.nama)}
-      ${terisi ? '<div class="absolute inset-0 bg-on-surface/10"></div>' : ''}
-      ${lencanaStatusFoto(k.status)}
-      ${(k.foto || []).length ? `<div class="absolute bottom-3 right-3 px-2.5 py-1 rounded-lg bg-inverse-surface/80 text-inverse-on-surface font-body-sm text-body-sm flex items-center gap-1">${ikon('photo_camera', 'text-[16px] text-secondary-fixed')}${k.foto.length} Foto</div>` : ''}
+  const pesan = terisi ? PesanWA.terisi(k) : PesanWA.tersedia(k);
+  return `<article class="pcard${terisi ? ' terisi' : ''}">
+    <a href="#" data-nav="detail" data-kode="${esc(k.kode)}" class="pimg" aria-label="Lihat detail ${esc(k.nama)}">
+      <div class="gp-frame">${gambar(foto && foto.id, 800, '', k.nama)}</div>
+      <span class="pstatus${terisi ? ' terisi' : ''}">${esc(k.status)}</span>
+      ${(k.foto || []).length ? `<span class="pjumlah">${k.foto.length} Foto</span>` : ''}
     </a>
-    <div class="flex flex-col flex-1 p-space-md justify-between">
-      <div class="space-y-space-xs">
-        <h2 class="font-headline-md text-headline-md text-on-surface tracking-tight group-hover:text-primary transition-colors"><a href="#" data-nav="detail" data-kode="${esc(k.kode)}">${esc(k.nama)}</a></h2>
-        <div class="flex items-baseline gap-1"><span class="font-label-numeric text-label-numeric font-bold text-primary-container">${rupiah(k.harga)}</span><span class="font-body-sm text-body-sm text-on-surface-variant">/bulan</span></div>
-        <p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1 pt-0.5">${ikon('straighten', 'text-[16px] text-tertiary')}${esc(spekRingkas(k))}</p>
-        <div class="flex flex-wrap gap-1.5 pt-2">${daftarChipKamar(k)}</div>
-      </div>
-      <div class="pt-space-md mt-space-sm flex items-center gap-2">
-        <button type="button" data-nav="detail" data-kode="${esc(k.kode)}" class="flex-1 h-10 px-3 rounded-lg font-headline-sm text-body-sm font-semibold ${terisi ? 'text-on-primary bg-primary-container hover:opacity-95' : 'text-primary-container bg-primary-fixed/30 hover:bg-primary-fixed/60'} transition-colors flex items-center justify-center">Lihat Detail</button>
-        ${tombolKanan}
+    <div class="pbody">
+      <div class="pmeta"><span class="muted">${esc(spekRingkas(k))}</span></div>
+      <h2 class="ptitle"><a href="#" data-nav="detail" data-kode="${esc(k.kode)}">${esc(k.nama)}</a></h2>
+      <p class="pprice">${rupiah(k.harga)} <span>/bulan</span></p>
+      <p class="pdesc">${esc(ringkasFasilitas(k))}</p>
+      <div class="gp-aksi">
+        <button type="button" data-nav="detail" data-kode="${esc(k.kode)}" class="gp-more">Lihat Detail<span class="gp-rule" aria-hidden="true"></span></button>
+        <a ${waAttr(pesan)} class="gp-more">${terisi ? 'Tanya Info Kamar' : 'Tanya via WA'}<span class="gp-rule" aria-hidden="true"></span></a>
       </div>
     </div>
   </article>`;
+}
+
+function ringkasFasilitas(k) {
+  return (k.fasilitas || []).map(f => f.ringkas).concat(k.kustom || []).filter(Boolean).join(' · ');
 }
 
 // ════════════════════════════════════════════════════════════
@@ -1228,7 +1247,7 @@ RENDER.detail = function (el, param) {
       <div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-outline">${ikon('search_off', 'text-[32px]')}</div>
       <h1 class="font-headline-md text-headline-md text-on-surface">Kamar tidak ditemukan</h1>
       <p class="font-body-md text-body-md text-on-surface-variant">Kamar mungkin sudah tidak tersedia di katalog.</p>
-      <a href="#" data-nav="kamar" class="px-space-lg py-3 rounded-full bg-primary-container text-on-primary font-headline-sm text-body-md">Kembali ke Katalog Kamar</a></div>`;
+      <a href="#" data-nav="kamar" class="btn btn-primary">Kembali ke Katalog Kamar</a></div>`;
     return;
   }
   el.innerHTML = kerangkaHalaman();
@@ -1404,26 +1423,12 @@ RENDER.testimoni = function (el) {
 
 function kartuTestiPenuh(t) {
   const sub = labelPenulis(t) + (t.profesi ? ' · ' + t.profesi : '');
-  return `<article class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between group">
-    <div class="space-y-space-md">
-      <div class="flex items-start gap-space-md">
-        ${avatarTesti(t, 'w-[56px] h-[56px]')}
-        <div class="min-w-0 flex-1">
-          <h3 class="font-headline-sm text-headline-sm text-on-surface leading-snug group-hover:text-primary transition-colors">${esc(t.nama)}</h3>
-          <p class="font-body-sm text-body-sm text-on-surface-variant truncate">${esc(sub)}</p>
-          <time class="font-body-sm text-body-sm text-outline block mt-0.5" datetime="${esc(fTgl(t.tanggal, 'iso'))}">${fTgl(t.tanggal, 'panjang')}</time>
-        </div>
-      </div>
-      <div class="relative">
-        ${ikon('format_quote', 'absolute -top-1 -left-2 text-[28px] text-surface-container-highest opacity-70 select-none')}
-        <p class="relative z-10 font-body-md text-body-md text-on-surface leading-relaxed pt-1">“${esc(t.isi)}”</p>
-      </div>
-      ${t.fotoBukti ? `<div class="pt-space-xs"><button type="button" data-aksi="lihat-bukti" data-id="${esc(t.id)}" class="block w-full overflow-hidden rounded-lg aspect-[16/9] bg-surface-container-high relative group/thumb" aria-label="Perbesar foto bukti">
-        ${gambar(t.fotoBukti, 800, 'w-full h-full object-cover transition-transform duration-500 group-hover/thumb:scale-105', t.ketBukti || 'Foto bukti dari ' + t.nama)}
-        <div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/60 via-transparent to-transparent opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-end p-space-sm"><span class="text-on-primary font-body-sm text-body-sm flex items-center gap-1">${ikon('photo_camera', 'text-[14px]')}${esc(t.ketBukti || 'Perbesar foto')}</span></div>
-      </button></div>` : ''}
-    </div>
-    ${t.tag ? `<div class="mt-space-md pt-space-sm flex items-center gap-space-xs text-on-surface-variant font-body-sm text-body-sm">${ikon(t.ikonTag || 'verified', 'text-[16px] text-secondary')}<span>${esc(t.tag)}</span></div>` : ''}
+  const avatar = t.fotoProfil ? gambar(t.fotoProfil, 200, 'tava', 'Foto profil ' + t.nama) : `<span class="tava" aria-hidden="true">${t.tipe === 'Official' ? ikon('apartment', 'text-[20px]') : esc(inisial(t.nama))}</span>`;
+  return `<article class="tcard">
+    <div class="thead">${avatar}<div class="tmeta"><strong class="tnama">${esc(t.nama)}</strong><span class="tinst">${esc(sub)}</span><time class="ttgl" datetime="${esc(fTgl(t.tanggal, 'iso'))}">${fTgl(t.tanggal, 'panjang')}</time></div></div>
+    <blockquote class="tisi">“${esc(t.isi)}”</blockquote>
+    ${t.fotoBukti ? `<button type="button" data-aksi="lihat-bukti" data-id="${esc(t.id)}" class="tbukti" aria-label="Perbesar foto bukti">${gambar(t.fotoBukti, 800, '', t.ketBukti || 'Foto bukti dari ' + t.nama)}</button>` : ''}
+    ${t.tag ? `<div class="tteks">${ikon(t.ikonTag || 'verified')}<span>${esc(t.tag)}</span></div>` : ''}
   </article>`;
 }
 
@@ -1436,115 +1441,87 @@ function renderTestimoniBagian() {
   const daftar = $('#testi-daftar');
   const stat = (S.umum && S.umum.testimoniStat) || [];
   const jumlah = S.testiDaftar.jumlah || 0;
-  atas.innerHTML = `<div class="relative w-full overflow-hidden">
-    <div class="absolute -top-32 right-1/4 w-96 h-96 bg-secondary-fixed/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
-    <div class="absolute top-20 left-10 w-80 h-80 bg-primary-fixed/30 rounded-full blur-3xl pointer-events-none -z-10"></div>
-    <section class="${WADAH} pt-space-xl pb-space-lg">
-      ${remah('Testimoni')}
-      <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-space-lg">
-        <div class="max-w-3xl space-y-space-sm">
-          ${S.testimoni ? `<div class="inline-flex items-center gap-space-xs px-space-md py-1 rounded-full bg-secondary-container/50 text-on-secondary-container shadow-sm">${ikon('verified', 'text-[16px] text-secondary')}<span class="font-label-md text-label-md">${angka(jumlah)} Ulasan Terverifikasi</span></div>` : kerangkaBlok('h-7 w-48')}
-          <h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface tracking-tight leading-snug">Pengalaman Nyata Tinggal di Kost AB6</h1>
-          <div class="w-12 h-1 rounded-full bg-gradient-to-r from-gradient-start via-gradient-mid to-gradient-end mt-space-xs mb-space-sm"></div>
-          <p class="font-body-lg text-body-md md:text-body-lg text-on-surface-variant max-w-2xl leading-relaxed">Simak cerita autentik dan pengalaman sehari-hari dari mahasiswa dan profesional yang memilih Kost AB6 sebagai rumah kedua mereka.</p>
-        </div>
-        ${stat.length ? `<div class="flex items-center gap-space-lg bg-surface-container-lowest p-space-md rounded-xl shadow-sm self-start lg:self-auto">${stat.slice(0, 2).map((s, i) => `
-          ${i ? '<div class="w-[1px] h-8 bg-surface-container-highest"></div>' : ''}
-          <div class="flex items-center gap-space-sm">
-            <div class="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center ${i ? 'text-secondary' : 'text-primary-container'}">${ikon(s.ikon || 'verified', 'text-[20px]')}</div>
-            <div><p class="font-label-numeric text-label-numeric text-on-surface">${esc(s.nilai)}</p><p class="font-body-sm text-body-sm text-on-surface-variant">${esc(s.label)}</p></div>
-          </div>`).join('')}</div>` : ''}
-      </div>
-    </section></div>`;
+  atas.innerHTML = htmlKepala({
+    crumb: 'Testimoni', label: S.testimoni ? angka(jumlah) + ' Ulasan Terverifikasi' : 'Testimoni', judul: 'Pengalaman Nyata <em>Tinggal di Kost AB6</em>',
+    kanan: `<p class="muted">Simak cerita autentik dan pengalaman sehari-hari dari mahasiswa dan profesional yang memilih Kost AB6 sebagai rumah kedua mereka.</p>
+      ${stat.length ? `<div class="stat-grid">${stat.slice(0, 2).map(s => `<div class="stat"><span class="lbl-abu">${esc(s.label)}</span><strong>${esc(s.nilai)}</strong></div>`).join('')}</div>` : ''}`
+  });
   if (!S.testimoni) {
-    daftar.innerHTML = `<section class="${WADAH} py-space-md"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-space-lg">${kerangkaBlok('h-64')}${kerangkaBlok('h-64')}${kerangkaBlok('h-64')}</div></section>`;
+    daftar.innerHTML = `<div class="wrap"><div class="tgrid">${kerangkaBlok('h-64')}${kerangkaBlok('h-64')}${kerangkaBlok('h-64')}</div></div>`;
     return;
   }
   const items = semuaTestiPublik();
-  daftar.innerHTML = `<section class="${WADAH} py-space-md">
-    ${items.length ? `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-space-lg">${items.map(kartuTestiPenuh).join('')}</div>`
-      : `<div class="text-center py-space-xl flex flex-col items-center gap-space-md"><div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-outline">${ikon('rate_review', 'text-[32px]')}</div><p class="font-body-md text-body-md text-on-surface-variant">Belum ada testimoni. Jadilah yang pertama berbagi pengalaman.</p><button type="button" data-aksi="ke-form-testi" class="px-space-lg py-3 rounded-full bg-primary-container text-on-primary font-headline-sm text-body-md">Tulis Testimoni</button></div>`}
-    ${S.testiDaftar.adaLagi ? `<div class="mt-space-xl flex justify-center"><button type="button" data-aksi="muat-testimoni" class="group inline-flex items-center gap-space-sm px-space-xl py-space-sm min-h-[44px] rounded-full bg-surface-container-lowest text-primary-container shadow-sm hover:bg-surface-container hover:shadow-md transition-all duration-200"><span class="font-headline-sm text-body-md font-semibold">Muat Lebih Banyak Testimoni</span>${ikon('expand_more', 'text-[20px] group-hover:translate-y-0.5 transition-transform')}</button></div>` : ''}
-  </section>`;
+  daftar.innerHTML = `<div class="wrap">
+    <div class="list-head"><h2 class="h3">Semua Testimoni <span class="badge">${angka(jumlah)} ulasan</span></h2><span class="xs muted">Terbaru lebih dulu</span></div>
+    ${items.length ? `<div class="tgrid">${items.map(kartuTestiPenuh).join('')}</div>`
+      : `<div class="center"><p class="muted">Belum ada testimoni. Jadilah yang pertama berbagi pengalaman.</p><button type="button" data-aksi="ke-form-testi" class="btn btn-primary mt-16">Tulis Testimoni</button></div>`}
+    ${S.testiDaftar.adaLagi ? `<div class="center mt-24"><button type="button" data-aksi="muat-testimoni" class="btn btn-outline">${ikon('add')}<span>Muat lebih banyak testimoni</span></button></div>` : ''}
+  </div>`;
 }
 
-const KELAS_INPUT_PUBLIK = 'w-full px-space-md h-11 rounded-lg bg-surface-container-low text-on-surface placeholder:text-outline-variant font-body-md text-body-md focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary-container transition-all';
-
 function galatKolom(nama) {
-  return `<p data-galat="${nama}" class="font-body-sm text-body-sm text-error flex items-center gap-1" hidden></p>`;
+  return `<p data-galat="${nama}" class="xs" style="color:var(--on-err-c)" hidden></p>`;
 }
 
 function renderFormTesti() {
   const wadah = $('#testi-form');
   wadah.dataset.siap = '1';
   S.formTesti = { dibukaPada: Date.now(), profil: null, bukti: null };
-  wadah.innerHTML = `<section class="${WADAH} py-space-xl" id="bagian-form-testi">
-    <div class="max-w-[720px] mx-auto bg-surface-container-lowest rounded-2xl shadow-md overflow-hidden relative">
-      <div class="h-1 w-full bg-gradient-to-r from-gradient-start via-gradient-mid to-gradient-end"></div>
-      <div class="p-space-lg sm:p-space-xl space-y-space-lg">
-        <div class="text-center space-y-space-xs">
-          <h2 class="font-headline-lg text-headline-md sm:text-headline-lg text-on-surface">Bagikan Pengalaman Anda</h2>
-          <p class="font-body-md text-body-md text-on-surface-variant max-w-lg mx-auto">Cerita jujur Anda sangat berharga bagi kami untuk terus menyempurnakan kenyamanan hunian Kost AB6.</p>
-        </div>
-        <div class="bg-primary-fixed/20 p-space-md rounded-xl flex items-start gap-space-sm text-on-surface">
-          ${ikon('info', 'text-[20px] text-primary-container shrink-0 mt-0.5')}
-          <p class="font-body-sm text-body-sm leading-relaxed text-on-surface-variant"><strong class="font-semibold text-on-surface">Kebijakan Privasi:</strong> Nomor WhatsApp hanya digunakan oleh tim pengelola untuk verifikasi keaslian ulasan dan tidak akan pernah ditampilkan secara publik di situs web.</p>
-        </div>
-        <form class="space-y-space-md" data-kirim="testimoni" novalidate>
-          <div class="absolute -left-[9999px] w-px h-px overflow-hidden" aria-hidden="true">
-            <label for="testi-website">Website</label><input id="testi-website" name="website" type="text" tabindex="-1" autocomplete="off">
-          </div>
-          <div class="space-y-space-xs">
-            <label class="block font-label-md text-label-md text-on-surface" for="testi-nama">Nama Lengkap <span class="text-error">*</span></label>
-            <input id="testi-nama" name="nama" type="text" maxlength="60" autocomplete="name" required placeholder="Contoh: Dimas Aditya Pratama" class="${KELAS_INPUT_PUBLIK}">
+  wadah.innerHTML = `<div class="wrap" id="bagian-form-testi">
+    <form class="tform" data-gs-panel data-kirim="testimoni" novalidate>
+      <div class="tform-kepala">
+        <h2 class="h2">Bagikan <em>Pengalaman Anda</em></h2>
+        <p class="muted small">Cerita jujur Anda sangat berharga bagi kami untuk terus menyempurnakan kenyamanan hunian Kost AB6.</p>
+      </div>
+      <div class="absolute -left-[9999px] w-px h-px overflow-hidden" aria-hidden="true">
+        <label for="testi-website">Website</label><input id="testi-website" name="website" type="text" tabindex="-1" autocomplete="off">
+      </div>
+      <div class="tform-grid">
+        <div class="tform-kolom">
+          <div class="field">
+            <label for="testi-nama">Nama Lengkap <span class="req">*</span></label>
+            <input id="testi-nama" name="nama" type="text" maxlength="60" autocomplete="name" required placeholder="Contoh: Dimas Aditya Pratama" class="inp">
             ${galatKolom('nama')}
           </div>
-          <div class="space-y-space-xs">
-            <div class="flex items-center justify-between">
-              <label class="block font-label-md text-label-md text-on-surface" for="testi-wa">Nomor WhatsApp <span class="font-body-sm text-body-sm text-outline font-normal">(Opsional)</span></label>
-              <span class="font-body-sm text-body-sm text-outline">Privat &amp; Terproteksi</span>
-            </div>
-            <input id="testi-wa" name="wa" type="tel" inputmode="tel" maxlength="20" autocomplete="tel" placeholder="0812-xxxx-xxxx (Privat)" class="${KELAS_INPUT_PUBLIK}">
+          <div class="field">
+            <div class="field-baris"><label for="testi-wa">Nomor WhatsApp <span class="opt">(Opsional)</span></label><span class="opt">Privat &amp; Terproteksi</span></div>
+            <input id="testi-wa" name="wa" type="tel" inputmode="tel" maxlength="20" autocomplete="tel" placeholder="0812-xxxx-xxxx (Privat)" class="inp">
             ${galatKolom('wa')}
           </div>
-          <div class="space-y-space-xs">
-            <div class="flex items-center justify-between">
-              <label class="block font-label-md text-label-md text-on-surface" for="testi-isi">Isi Testimoni <span class="text-error">*</span></label>
-              <span class="font-body-sm text-body-sm text-outline" id="testi-hitung">0 / 500 karakter</span>
-            </div>
-            <textarea id="testi-isi" name="isi" maxlength="500" rows="4" required data-masukan="hitung-testi" placeholder="Ceritakan pengalaman Anda selama tinggal di Kost AB6..." class="w-full p-space-md rounded-lg bg-surface-container-low text-on-surface placeholder:text-outline-variant font-body-md text-body-md focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary-container transition-all resize-none leading-relaxed"></textarea>
+          <div class="field">
+            <div class="field-baris"><label for="testi-isi">Isi Testimoni <span class="req">*</span></label><span class="counter" id="testi-hitung">0 / 500 karakter</span></div>
+            <textarea id="testi-isi" name="isi" maxlength="500" rows="5" required data-masukan="hitung-testi" placeholder="Ceritakan pengalaman Anda selama tinggal di Kost AB6..." class="inp"></textarea>
             ${galatKolom('isi')}
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-space-md pt-space-xs">
-            <div class="space-y-space-xs">
-              <span class="block font-label-md text-label-md text-on-surface">Foto Profil <span class="text-error">*</span></span>
-              <label class="p-space-md bg-surface-container-low rounded-xl flex flex-col items-center justify-center text-center group cursor-pointer hover:bg-surface-container transition-all relative focus-within:ring-2 focus-within:ring-primary-container">
-                <input type="file" accept="image/png, image/jpeg, image/webp" data-ubah="testi-foto" data-jenis="profil" class="absolute inset-0 opacity-0 cursor-pointer" aria-label="Unggah foto profil">
-                <div id="pratinjau-profil" class="w-16 h-16 rounded-full bg-surface-container-lowest shadow-sm flex items-center justify-center text-outline group-hover:text-primary-container transition-colors mb-2 overflow-hidden">${ikon('account_circle', 'text-[28px]')}</div>
-                <p class="font-label-md text-label-md text-primary-container">Unggah Foto Profil</p>
-                <p class="font-body-sm text-body-sm text-outline mt-1 leading-snug">JPG, PNG, atau WebP. Maks 2MB, otomatis dikompres</p>
-              </label>
-              ${galatKolom('fotoProfil')}
-            </div>
-            <div class="space-y-space-xs">
-              <span class="block font-label-md text-label-md text-on-surface">Foto Bukti Suasana / Fasilitas <span class="font-body-sm text-body-sm text-outline font-normal">(Opsional)</span></span>
-              <label class="p-space-md bg-surface-container-low rounded-xl flex flex-col items-center justify-center text-center group cursor-pointer hover:bg-surface-container transition-all relative focus-within:ring-2 focus-within:ring-primary-container">
-                <input type="file" accept="image/png, image/jpeg, image/webp" data-ubah="testi-foto" data-jenis="bukti" class="absolute inset-0 opacity-0 cursor-pointer" aria-label="Unggah foto bukti">
-                <div id="pratinjau-bukti" class="w-24 h-16 rounded-lg bg-surface-container-lowest shadow-sm flex items-center justify-center text-outline group-hover:text-primary-container transition-colors mb-2 overflow-hidden">${ikon('add_a_photo', 'text-[28px]')}</div>
-                <p class="font-label-md text-label-md text-primary-container">Unggah Foto Suasana (Opsional)</p>
-                <p class="font-body-sm text-body-sm text-outline mt-1 leading-snug">Tunjukkan kamar atau sudut favorit Anda</p>
-              </label>
-              ${galatKolom('fotoBukti')}
-            </div>
+          <div class="privasi">${ikon('info')}<p><strong>Kebijakan Privasi:</strong> Nomor WhatsApp hanya digunakan oleh tim pengelola untuk verifikasi keaslian ulasan dan tidak akan pernah ditampilkan secara publik di situs web.</p></div>
+        </div>
+        <div class="tform-kolom">
+          <div class="field">
+            <span class="label-like">Foto Profil <span class="req">*</span></span>
+            <label class="dropzone">
+              <input type="file" accept="image/png, image/jpeg, image/webp" data-ubah="testi-foto" data-jenis="profil" aria-label="Unggah foto profil">
+              <span id="pratinjau-profil" class="drop-pratinjau">${ikon('account_circle', 'text-[28px]')}</span>
+              <strong class="small">Unggah Foto Profil</strong>
+              <small>JPG, PNG, atau WebP. Maks 2MB, otomatis dikompres</small>
+            </label>
+            ${galatKolom('fotoProfil')}
           </div>
-          <div class="pt-space-md">
-            <button type="submit" id="testi-kirim" class="w-full h-[48px] rounded-xl bg-primary-container hover:bg-[#153022] text-on-primary font-headline-sm text-headline-sm flex items-center justify-center gap-space-sm shadow-md hover:shadow-lg active:scale-[0.99] transition-all"><span>Kirim Testimoni Sekarang</span>${ikon('send', 'text-[20px]')}</button>
+          <div class="field">
+            <span class="label-like">Foto Bukti Suasana / Fasilitas <span class="opt">(Opsional)</span></span>
+            <label class="dropzone">
+              <input type="file" accept="image/png, image/jpeg, image/webp" data-ubah="testi-foto" data-jenis="bukti" aria-label="Unggah foto bukti">
+              <span id="pratinjau-bukti" class="drop-pratinjau lebar">${ikon('add_a_photo', 'text-[28px]')}</span>
+              <strong class="small">Unggah Foto Suasana (Opsional)</strong>
+              <small>Tunjukkan kamar atau sudut favorit Anda</small>
+            </label>
+            ${galatKolom('fotoBukti')}
           </div>
-          <p class="text-center font-body-sm text-body-sm text-outline mt-space-xs">Ulasan Anda akan langsung tampil di halaman ini. Tim Kost AB6 dapat menyembunyikan ulasan yang tidak sesuai ketentuan.</p>
-        </form>
+          <button type="submit" id="testi-kirim" class="btn btn-primary btn-lg btn-block"><span>Kirim Testimoni Sekarang</span>${ikon('send')}</button>
+          <p class="xs muted">Ulasan Anda akan langsung tampil di halaman ini. Tim Kost AB6 dapat menyembunyikan ulasan yang tidak sesuai ketentuan.</p>
+        </div>
       </div>
-    </div>
-  </section>`;
+    </form>
+  </div>`;
 }
 
 /** Tampilkan/bersihkan pesan galat per kolom */
@@ -1740,120 +1717,65 @@ function urlPeta(t) {
 RENDER.tentang = function (el) {
   const t = S.tentang;
   if (!t) { el.innerHTML = kerangkaHalaman(); return; }
-  const warnaChip = ['text-secondary', 'text-primary', 'text-tertiary'];
-  const kartuArea = a => `<article class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col group">
-      <div class="relative h-52 overflow-hidden">
-        ${gambar(a.foto, 800, 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-300', a.nama)}
-        ${a.label ? `<div class="absolute top-3 left-3 bg-surface-container-lowest/90 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm">${ikon(a.ikon || 'verified', 'text-[16px] text-secondary')}<span class="font-label-md text-body-sm text-on-surface">${esc(a.label)}</span></div>` : ''}
-      </div>
-      <div class="p-space-lg flex-1 flex flex-col justify-between">
-        <div><h3 class="font-headline-md text-headline-sm text-on-surface mb-2">${esc(a.nama)}</h3><p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">${esc(a.deskripsi)}</p></div>
-        ${a.catatan ? `<div class="mt-space-md pt-space-sm flex items-center gap-2 ${a.penting ? 'text-error' : 'text-secondary'} font-label-md text-body-sm">${ikon('check_circle', 'text-[18px]')}<span>${esc(a.catatan)}</span></div>` : ''}
+  const kartuArea = a => `<article class="acard${a.penting ? ' penting' : ''}">
+      <div class="pimg"><div class="gp-frame">${gambar(a.foto, 800, '', a.nama)}</div>${a.label ? `<span class="pstatus">${esc(a.label)}</span>` : ''}</div>
+      <div class="pbody">
+        <h3 class="ptitle">${esc(a.nama)}</h3>
+        <p class="pdesc">${esc(a.deskripsi)}</p>
+        ${a.catatan ? `<p class="pmeta">${ikon('check_circle', 'text-[16px]')}<span>${esc(a.catatan)}</span></p>` : ''}
       </div>
     </article>`;
-  const kartuBerbayar = a => `<article class="col-span-1 md:col-span-2 lg:col-span-3 bg-surface-container-lowest rounded-xl overflow-hidden shadow-md group">
-      <div class="grid grid-cols-1 lg:grid-cols-12 items-stretch">
-        <div class="lg:col-span-5 h-64 lg:h-auto lg:min-h-[300px] relative overflow-hidden">
-          ${gambar(a.foto, 1000, 'absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500', a.nama)}
-          <div class="absolute top-4 left-4 bg-amber-500 text-white font-label-md text-body-sm px-3 py-1 rounded-full shadow-sm flex items-center gap-1.5">${ikon('price_change', 'text-[16px]')}<span>${esc(a.label)}</span></div>
-        </div>
-        <div class="lg:col-span-7 p-space-lg lg:p-space-xl flex flex-col justify-between">
-          <div>
-            ${a.eyebrow ? `<div class="flex items-center gap-2 mb-2"><span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-secondary-fixed text-on-secondary-fixed">${ikon(a.ikon || 'local_laundry_service', 'text-[18px]')}</span><span class="text-body-sm font-label-md text-secondary uppercase tracking-wider">${esc(a.eyebrow)}</span></div>` : ''}
-            <h3 class="font-headline-lg text-headline-md text-on-surface mb-space-sm">${esc(a.nama)}</h3>
-            <p class="font-body-lg text-body-md text-on-surface-variant leading-relaxed mb-space-md">${esc(a.deskripsi)}</p>
-          </div>
-          ${(a.harga || []).length ? `<div class="grid grid-cols-1 sm:grid-cols-3 gap-space-sm pt-space-sm">${a.harga.map((h, i) => `
-            <div class="p-space-sm rounded-lg bg-surface-subtle"><span class="font-headline-sm text-label-md ${i === a.harga.length - 1 && a.harga.length === 3 ? 'text-secondary' : 'text-primary'} block">${esc(h.nama)}</span><span class="font-body-sm text-body-sm text-on-surface-variant">${esc(h.harga)}${h.keterangan ? ' (' + esc(h.keterangan) + ')' : ''}</span></div>`).join('')}</div>` : ''}
-        </div>
+  const kartuBerbayar = a => `<article class="acard acard-lebar">
+      <div class="pimg"><div class="gp-frame">${gambar(a.foto, 1000, '', a.nama)}</div><span class="pstatus">${esc(a.label)}</span></div>
+      <div class="pbody">
+        ${a.eyebrow ? `<span class="lbl">${esc(a.eyebrow)}</span>` : ''}
+        <h3 class="ptitle">${esc(a.nama)}</h3>
+        <p class="pdesc">${esc(a.deskripsi)}</p>
+        ${(a.harga || []).length ? `<div class="harga-grid">${a.harga.map(h => `<div><strong>${esc(h.nama)}</strong><span>${esc(h.harga)}${h.keterangan ? ' (' + esc(h.keterangan) + ')' : ''}</span></div>`).join('')}</div>` : ''}
       </div>
     </article>`;
   const k = t.kontak || {};
   const koor = t.koordinat || {};
   const linkPeta = koor.lat !== null && koor.lat !== undefined ? 'https:\/\/www.google.com/maps?q=' + koor.lat + ',' + koor.lng : 'https:\/\/www.google.com/maps/search/' + encodeURIComponent(k.alamat || 'Kost AB6');
+  const barisKontak = (ik, label, isi) => `<li>${ik}<div><span class="lbl-abu">${label}</span>${isi}</div></li>`;
 
-  el.innerHTML = `<div class="flex flex-col w-full">
-    <section class="w-full bg-surface-bright py-space-xl"><div class="${WADAH}">
-      <nav aria-label="Breadcrumb" class="flex items-center gap-space-xs text-on-surface-variant font-body-sm text-body-sm mb-space-md"><a href="#" data-nav="beranda" class="hover:text-primary transition-colors">Beranda</a>${ikon('chevron_right', 'text-[14px] text-outline')}<span class="text-primary font-medium">Tentang Kami</span></nav>
-      <div class="grid grid-cols-12 gap-gutter items-end">
-        <div class="col-span-12 lg:col-span-7">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed text-body-sm font-label-md mb-space-sm"><span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>Profil Resmi &amp; Fasilitas Kost AB6</div>
-          <h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface tracking-tight mb-space-xs">Tentang Kost AB6</h1>
-          <div class="h-1 w-32 rounded-full bg-gradient-to-r from-gradient-start via-gradient-mid to-gradient-end mb-space-md"></div>
-          <p class="font-body-lg text-body-md md:text-body-lg text-on-surface-variant leading-relaxed">${esc(t.intro)}</p>
-        </div>
-        <div class="col-span-12 lg:col-span-5 flex flex-col gap-space-sm"><div class="flex flex-wrap gap-space-sm">${(t.chip || []).map((c, i) => `
-          <div class="flex items-center gap-space-xs px-4 py-3 rounded-xl bg-surface-container-lowest shadow-sm">${ikon(c.ikon || 'verified', 'text-[22px] ' + warnaChip[i % 3])}<div><p class="font-headline-sm text-label-md text-on-surface">${esc(c.judul)}</p><p class="font-body-sm text-body-sm text-on-surface-variant">${esc(c.sub)}</p></div></div>`).join('')}</div></div>
-      </div>
+  el.innerHTML = `${htmlKepala({
+      crumb: 'Tentang Kami', label: 'Profil Resmi & Fasilitas', judul: 'Tentang <em>Kost AB6</em>',
+      kanan: `<p class="muted">${esc(t.intro)}</p>${(t.chip || []).length ? `<div class="stat-grid">${t.chip.map(c => `<div class="stat"><span class="lbl-abu">${esc(c.sub)}</span><strong>${esc(c.judul)}</strong></div>`).join('')}</div>` : ''}`
+    })}
+    <section class="sec"><div class="wrap">
+      <div class="sec-head"><span class="lbl">Infrastruktur Lengkap</span><h2 class="h2">Fasilitas &amp; <em>Area Umum</em></h2><p class="muted">${esc(t.fasilitasIntro)}</p></div>
+      <div class="agrid">${(t.area || []).map(kartuArea).join('')}${(t.berbayar || []).map(kartuBerbayar).join('')}</div>
+      ${!(t.area || []).length && !(t.berbayar || []).length ? '<p class="muted center">Informasi fasilitas segera hadir.</p>' : ''}
     </div></section>
-
-    <section class="w-full bg-surface-subtle py-space-xl"><div class="${WADAH}">
-      <div class="flex flex-col md:flex-row md:items-end justify-between mb-space-xl">
-        <div><span class="text-body-sm font-label-md tracking-wider uppercase text-primary mb-1 block">Infrastruktur Lengkap</span><h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface tracking-tight">Fasilitas &amp; Area Umum</h2><div class="h-1 w-20 rounded-full bg-gradient-to-r from-gradient-start to-gradient-mid mt-2"></div></div>
-        <p class="font-body-md text-body-md text-on-surface-variant max-w-md mt-4 md:mt-0">${esc(t.fasilitasIntro)}</p>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
-        ${(t.area || []).map(kartuArea).join('')}
-        ${(t.berbayar || []).map(kartuBerbayar).join('')}
-      </div>
-      ${!(t.area || []).length && !(t.berbayar || []).length ? `<p class="text-center font-body-md text-body-md text-on-surface-variant">Informasi fasilitas segera hadir.</p>` : ''}
-    </div></section>
-
-    <section class="w-full bg-surface-bright py-space-xl"><div class="${WADAH}">
-      <div class="mb-space-xl"><span class="text-body-sm font-label-md tracking-wider uppercase text-primary mb-1 block">Akses &amp; Lokasi</span><h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface tracking-tight">Hubungi &amp; Kunjungi Kami</h2><div class="h-1 w-20 rounded-full bg-gradient-to-r from-gradient-start to-gradient-mid mt-2"></div></div>
-      <div class="grid grid-cols-12 gap-gutter items-stretch">
-        <div class="col-span-12 lg:col-span-5 flex flex-col justify-between p-space-lg md:p-space-xl rounded-xl bg-surface-container-lowest shadow-sm">
-          <div>
-            <h3 class="font-headline-md text-headline-md text-on-surface mb-1">Alamat &amp; Kontak Pengelola</h3>
-            <p class="font-body-md text-body-md text-on-surface-variant mb-space-lg">Silakan jadwalkan kunjungan survei fisik atau ajukan pertanyaan ketersediaan kamar kepada staf kami.</p>
-            <div class="space-y-space-md">
-              <div class="flex items-start gap-space-sm"><div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center shrink-0">${ikon('location_on', 'text-primary text-[20px]')}</div><div><h4 class="font-headline-sm text-label-md text-on-surface">Alamat Lengkap</h4><p class="font-body-md text-body-md text-on-surface-variant">${esc(k.alamat)}</p>${k.patokan ? `<p class="font-body-sm text-body-sm text-outline mt-0.5">${esc(k.patokan)}</p>` : ''}</div></div>
-              <div class="flex items-start gap-space-sm"><div class="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center shrink-0">${ikon('chat', 'text-secondary text-[20px]')}</div><div><h4 class="font-headline-sm text-label-md text-on-surface">WhatsApp Admin &amp; CS</h4><a ${waAttr(PesanWA.umum())} class="font-body-md text-body-md text-on-surface font-semibold hover:text-primary">${esc(k.waTampil)}</a><p class="font-body-sm text-body-sm text-secondary mt-0.5">Respon cepat dalam jam kerja</p></div></div>
-              <div class="flex items-start gap-space-sm"><div class="w-10 h-10 rounded-full bg-tertiary-fixed flex items-center justify-center shrink-0">${ikon('mail', 'text-tertiary text-[20px]')}</div><div><h4 class="font-headline-sm text-label-md text-on-surface">Surel Resmi</h4><a href="mailto:${esc(k.email)}" target="_blank" rel="noopener noreferrer" class="font-body-md text-body-md text-on-surface-variant hover:text-primary">${esc(k.email)}</a></div></div>
-              <div class="p-space-md rounded-xl bg-surface-subtle mt-space-md">
-                <div class="flex items-center gap-2 mb-2 text-on-surface font-headline-sm text-label-md">${ikon('schedule', 'text-primary text-[18px]')}<span>Jam Operasional Resepsionis &amp; Survei</span></div>
-                <div class="grid grid-cols-2 gap-2 text-body-sm">${(t.jadwal || []).map(j => `<div><span class="font-medium text-on-surface block">${esc(j.label)}:</span><span class="text-on-surface-variant">${esc(j.teks)}</span></div>`).join('')}</div>
-              </div>
-            </div>
-          </div>
-          <div class="pt-space-lg mt-space-lg"><a ${waAttr(PesanWA.umum())} class="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-lg bg-whatsapp-green text-on-primary font-headline-sm text-body-md shadow-sm hover:opacity-95 transition-all group">${ikon('chat', 'text-[20px] group-hover:scale-110 transition-transform')}<span>Hubungi Pengelola via WhatsApp</span></a></div>
+    <section class="sec"><div class="wrap">
+      <div class="sec-head"><span class="lbl">Akses &amp; Lokasi</span><h2 class="h2">Hubungi &amp; <em>Kunjungi Kami</em></h2></div>
+      <div class="kontak-grid">
+        <div class="kontak-kiri" data-gs-naik>
+          <h3 class="h3">Alamat &amp; Kontak Pengelola</h3>
+          <p class="muted">Silakan jadwalkan kunjungan survei fisik atau ajukan pertanyaan ketersediaan kamar kepada staf kami.</p>
+          <ul class="kontak-list">
+            ${barisKontak(ikon('location_on'), 'Alamat Lengkap', `<span>${esc(k.alamat)}</span>${k.patokan ? `<span class="xs muted">${esc(k.patokan)}</span>` : ''}`)}
+            ${barisKontak(ikon('chat'), 'WhatsApp Admin &amp; CS', `<span><a ${waAttr(PesanWA.umum())}>${esc(k.waTampil)}</a></span><span class="xs muted">Respon cepat dalam jam kerja</span>`)}
+            ${barisKontak(ikon('mail'), 'Surel Resmi', `<span><a href="mailto:${esc(k.email)}" target="_blank" rel="noopener noreferrer">${esc(k.email)}</a></span>`)}
+            ${(t.jadwal || []).length ? barisKontak(ikon('schedule'), 'Jam Operasional Resepsionis &amp; Survei', `<div class="jadwal-grid">${t.jadwal.map(j => `<div><strong>${esc(j.label)}</strong>${esc(j.teks)}</div>`).join('')}</div>`) : ''}
+          </ul>
+          <a ${waAttr(PesanWA.umum())} class="btn btn-wa btn-lg btn-block">${IKON_WA}<span>Hubungi Pengelola via WhatsApp</span></a>
         </div>
-        <div class="col-span-12 lg:col-span-7 flex flex-col justify-between p-space-lg md:p-space-xl rounded-xl bg-surface-container-lowest shadow-sm">
-          <div>
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-space-md">
-              <h3 class="font-headline-md text-headline-md text-on-surface">Peta Lokasi Interaktif</h3>
-              <a href="${esc(linkPeta)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-fixed text-primary font-label-md text-body-sm hover:bg-primary-fixed-dim transition-colors">${ikon('open_in_new', 'text-[16px]')}<span>Buka di Google Maps</span></a>
-            </div>
-            ${(t.poi || []).length ? `<div class="grid grid-cols-1 sm:grid-cols-3 gap-space-xs mb-space-md">${t.poi.map((p, i) => `<div class="flex items-center gap-2 p-2.5 rounded-lg bg-surface-subtle">${ikon(p.ikon || 'place', 'text-[20px] ' + ['text-secondary', 'text-primary', 'text-error'][i % 3])}<span class="font-label-md text-body-sm text-on-surface">${esc(p.teks)}</span></div>`).join('')}</div>` : ''}
-            <div class="relative w-full h-[360px] rounded-xl overflow-hidden shadow-inner group bg-surface-container">
-              ${urlPeta(t) ? `<div class="bingkai-media absolute inset-0"><iframe src="${esc(urlPeta(t))}" title="Peta lokasi Kost AB6" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>`
-                : `<div class="absolute inset-0 flex items-center justify-center text-outline-variant">${ikon('map', 'text-[64px]')}</div>`}
-              ${koor.teks ? `<div class="absolute bottom-3 left-3 bg-surface-container-lowest/90 px-2.5 py-1 rounded text-body-sm text-on-surface-variant font-label-md shadow-sm">Koordinat Presisi: ${esc(koor.teks)}</div>` : ''}
-            </div>
-          </div>
-          ${(t.catatan || []).length ? `<div class="mt-space-md flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-body-sm text-on-surface-variant"><span class="flex items-center gap-1.5">${ikon('local_parking', 'text-[16px] text-secondary')}${esc(t.catatan[0])}</span>${t.catatan[1] ? `<span class="text-outline">${esc(t.catatan[1])}</span>` : ''}</div>` : ''}
+        <div class="peta-kartu" data-gs-naik>
+          <div class="peta-kepala"><h3>Peta Lokasi Interaktif</h3><a href="${esc(linkPeta)}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">${ikon('open_in_new')}<span>Buka di Google Maps</span></a></div>
+          ${(t.poi || []).length ? `<div class="poi-grid">${t.poi.map(p => `<span>${ikon(p.ikon || 'place')}${esc(p.teks)}</span>`).join('')}</div>` : ''}
+          <div class="peta">${urlPeta(t) ? `<iframe src="${esc(urlPeta(t))}" title="Peta lokasi Kost AB6" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>` : ''}</div>
+          ${koor.teks ? `<p class="xs muted">Koordinat Presisi: ${esc(koor.teks)}</p>` : ''}
+          ${(t.catatan || []).length ? `<div class="peta-catatan"><span>${esc(t.catatan[0])}</span>${t.catatan[1] ? `<span>${esc(t.catatan[1])}</span>` : ''}</div>` : ''}
         </div>
       </div>
     </div></section>
-
-    <section class="w-full bg-surface-subtle py-space-xl"><div class="${WADAH}">
-      <div class="relative overflow-hidden rounded-xl p-space-lg md:p-space-xl bg-gradient-to-r from-[#1e3a2b]/10 via-[#10b981]/10 to-[#a3d4b6]/15 shadow-sm">
-        <div class="absolute -right-12 -bottom-12 w-64 h-64 rounded-full bg-secondary-fixed/30 blur-2xl pointer-events-none"></div>
-        <div class="absolute right-40 -top-10 w-48 h-48 rounded-full bg-primary-fixed/40 blur-xl pointer-events-none"></div>
-        <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-space-lg">
-          <div class="max-w-2xl text-center lg:text-left">
-            <span class="px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed font-label-md text-body-sm mb-space-xs inline-block">Layanan Konsultasi Langsung</span>
-            <h3 class="font-headline-lg text-headline-md md:text-headline-lg text-on-surface tracking-tight mb-space-xs">Punya pertanyaan seputar tipe kamar &amp; fasilitas?</h3>
-            <p class="font-body-lg text-body-md md:text-body-lg text-on-surface-variant leading-relaxed">Konsultasikan langsung jadwal survei lokasi Anda bersama tim admin kami. Kami siap menemani Anda berkeliling melihat kamar secara langsung maupun video call.</p>
-          </div>
-          <div class="flex flex-col sm:flex-row items-center gap-space-sm w-full lg:w-auto shrink-0">
-            <a ${waAttr(PesanWA.survei(null))} class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-space-lg py-3 rounded-full bg-whatsapp-green text-on-primary font-headline-sm text-body-md shadow-md hover:scale-105 transition-all">${ikon('chat', 'text-[20px]')}<span>Jadwalkan Survei via WhatsApp</span></a>
-            <a href="#" data-nav="kamar" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-space-lg py-3 rounded-full bg-surface-container-lowest text-primary font-headline-sm text-body-md shadow-sm hover:bg-surface-container transition-all">${ikon('meeting_room', 'text-[20px]')}<span>Lihat Katalog Kamar</span></a>
-          </div>
-        </div>
-      </div>
-    </div></section>
-  </div>`;
+    ${htmlAjakan({
+      label: 'Layanan Konsultasi Langsung', judul: 'Punya pertanyaan seputar <em>tipe kamar &amp; fasilitas?</em>',
+      teks: 'Konsultasikan langsung jadwal survei lokasi Anda bersama tim admin kami. Kami siap menemani Anda berkeliling melihat kamar secara langsung maupun video call.',
+      tombol: `<a ${waAttr(PesanWA.survei(null))} class="btn btn-wa btn-lg">${IKON_WA}<span>Jadwalkan Survei via WhatsApp</span></a><a href="#" data-nav="kamar" class="btn btn-outline btn-lg">${ikon('meeting_room')}<span>Lihat Katalog Kamar</span></a>`
+    })}`;
 };
 
 RENDER['404'] = function (el) {
@@ -2714,6 +2636,32 @@ AKSI['pv-geser'] = el => {
 
 const LINK_CEPAT = [['', 'Pilih tujuan cepat…'], ['/', 'Beranda'], ['/kamar', 'Katalog Kamar'], ['/testimoni', 'Testimoni'], ['/tentang-kami', 'Tentang Kami'], ['wa', 'WhatsApp Admin']];
 
+/** Kolom video di formulir banner: opsional, maks. 5 detik, sampulnya otomatis dari cuplikan video */
+function htmlFieldVideoBanner() {
+  const K = S.adm.konten;
+  const f = K.form.data;
+  const v = K.form.videoInfo;
+  const bisa = window.VideoBanner;
+  if (!bisa) return '';
+  return `<div class="flex flex-col gap-1.5">
+    <span class="${KELAS.label}">Video Banner <span class="text-outline font-normal">(opsional, maks ${VideoBanner.MAKS_DETIK} detik)</span></span>
+    <label class="relative group rounded-xl p-4 bg-surface-container-low hover:bg-surface-container transition-all flex flex-col items-center justify-center text-center cursor-pointer shadow-inner focus-within:ring-2 focus-within:ring-primary">
+      <input type="file" accept="video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov" data-ubah="banner-video" class="absolute inset-0 opacity-0 cursor-pointer" aria-label="Unggah video banner">
+      <div class="flex items-center gap-4 w-full">
+        <div class="w-20 h-14 rounded-lg overflow-hidden shrink-0 shadow bg-surface-container-highest flex items-center justify-center text-outline">${v && v.url ? `<video src="${esc(v.url)}" muted loop autoplay playsinline class="w-full h-full object-cover"></video>` : ikon('videocam', 'text-[24px]')}</div>
+        <div class="flex flex-col text-left flex-1 min-w-0">
+          <span class="font-label-md text-label-md text-on-surface truncate">${f.video ? (v ? esc(v.nama) : 'Video banner tersimpan') : 'Belum ada video'}</span>
+          <span class="font-body-sm text-body-sm text-on-surface-variant">Otomatis dikecilkan ke 1080p tanpa suara agar ringan di HP</span>
+          <span class="font-label-md text-[11px] text-primary mt-0.5 group-hover:underline">${f.video ? 'Ganti Video...' : 'Pilih Video...'}</span>
+        </div>
+        <div class="p-2 rounded-full bg-surface-page text-on-surface-variant group-hover:text-primary transition-colors shadow-sm">${ikon('cloud_upload', 'text-[20px]')}</div>
+      </div>
+    </label>
+    ${f.video ? '<button type="button" data-aksi="banner-hapus-video" class="self-start font-label-md text-label-md text-error hover:underline">Hapus video</button>' : ''}
+    ${galatKolom('video')}
+  </div>`;
+}
+
 function htmlFormBanner() {
   const K = S.adm.konten;
   const f = K.form.data;
@@ -2762,6 +2710,7 @@ function htmlFormBanner() {
         </label>
         ${galatKolom('foto')}
       </div>
+      ${htmlFieldVideoBanner()}
       <div class="flex items-center justify-between gap-3 p-3.5 rounded-xl bg-surface-container-low">
         <div class="flex flex-col"><span class="${KELAS.label}">Status Publikasi Slide</span><span class="font-body-sm text-body-sm text-on-surface-variant">Tayangkan langsung di slider publik</span></div>
         ${sakelar(`data-ubah="konten-isian" data-kunci="status" data-nyala="Aktif" data-mati="Nonaktif" aria-label="Status publikasi"`, f.status === 'Aktif')}
@@ -2844,6 +2793,37 @@ UBAH['konten-foto-tunggal'] = async el => {
     toastGalat(e, 'Foto gagal diunggah');
     renderKonten();
   }
+};
+
+UBAH['banner-video'] = async el => {
+  const file = el.files && el.files[0];
+  el.value = '';
+  if (!file || !window.VideoBanner) return;
+  const K = S.adm.konten;
+  const f = K.form.data;
+  try {
+    const h = await VideoBanner.pilih(file, 1920);
+    toast('Mengunggah video', 'Tunggu sebentar, jangan tutup halaman ini.', 'info');
+    const hv = await panggil('adminUnggahVideo', tokenAdmin(), { mime: h.video.mime, base64: h.video.base64 });
+    const hf = await panggil('adminUnggahFoto', tokenAdmin(), { modul: 'banner', dataUrl: 'data:image/jpeg;base64,' + h.base64, nama: file.name });
+    f.video = hv.id;
+    f.foto = hf.id;
+    K.form.videoInfo = { nama: file.name, url: h.video.url };
+    K.form.fotoInfo = null;
+    tandaiKotor();
+    renderKonten();
+    toast('Video siap', 'Tekan Simpan untuk menayangkan video di Beranda.');
+  } catch (e) {
+    toastGalat(e, 'Video gagal diunggah');
+  }
+};
+
+AKSI['banner-hapus-video'] = () => {
+  const K = S.adm.konten;
+  K.form.data.video = '';
+  K.form.videoInfo = null;
+  tandaiKotor();
+  renderKonten();
 };
 
 UBAH['banner-status'] = async el => {
@@ -4699,7 +4679,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) kirim
 setInterval(() => { if (S.rute.nama === 'beranda') kirimStatBanner(); }, 120000);
 
 /** Penanda versi frontend — muncul di konsol agar mudah memastikan versi terbaru sudah terpasang */
-const VERSI_FRONTEND = '3.3.0';
+const VERSI_FRONTEND = '3.4.0';
 
 function mulaiAplikasi() {
   console.info('[Kost AB6] Frontend v' + VERSI_FRONTEND + ' siap');

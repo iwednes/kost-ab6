@@ -15,7 +15,7 @@
  */
 
 /** Harus sama dengan AKSI_GET di Kode.gs */
-const AKSI_GET = ['ambilAwal', 'ambilPrefetch', 'ambilKegiatan', 'ambilTestimoni', 'ambilDetailKamar'];
+const AKSI_GET = ['ambilAwal', 'ambilPrefetch', 'ambilKegiatan', 'ambilTestimoni', 'ambilDetailKamar', 'ambilVideoBanner'];
 
 function buatGalat(kode, pesan, detail) {
   const e = new Error(pesan || 'Terjadi kesalahan.');

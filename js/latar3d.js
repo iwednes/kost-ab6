@@ -1,9 +1,9 @@
 /* ============================================================
-   KOST AB6 — Latar 3D Beranda
-   Partikel bergerak dan berubah bentuk sendiri di belakang isi Beranda,
+   KOST AB6 — Latar 3D seluruh halaman
+   Partikel bergerak dan berubah bentuk sendiri di belakang isi halaman,
    tanpa suara. Kursor membuat butir menghindar; klik membuat riak.
    Objek berputar terus dengan mulus dan ikut berputar saat digulir.
-   Hanya berjalan selama Beranda terbuka (LatarAB6.aktif dipanggil dari app.js),
+   Bentuknya mengikuti halaman (LatarAB6.bentuk dipanggil dari app.js),
    mulai setelah halaman siap, dan resolusinya turun sendiri bila perangkat kewalahan.
    Bila gagal dimuat, website tetap berjalan seperti biasa.
    ============================================================ */
@@ -19,7 +19,9 @@
   var LAJU_PUTAR = 0.6;        // radian per detik: satu putaran penuh sekitar 10 detik
   var PUTAR_GULIR = 0.0006;    // tambahan putaran per piksel digulir
 
-  var nyala = false, dijadwalkan = false, lanjutkan = null;
+  // Bentuk pembuka tiap halaman: 0 gedung, 1 kunci, 2 kasur, 3 meja, 4 wifi, 5 pintu, 6 tulisan.
+  var BENTUK_HALAMAN = { beranda: 0, kamar: 2, detail: 3, testimoni: 5, tentang: 6, login: 1 };
+  var rute = 'beranda', gantiBentuk = null;
 
   function muatSkrip(src, lalu) {
     var s = document.createElement('script');
@@ -36,16 +38,13 @@
   }
 
   window.LatarAB6 = {
-    aktif: function (on) {
-      nyala = on;
-      if (on && !dijadwalkan) {
-        dijadwalkan = true;
-        if (document.readyState === 'complete') saatLuang();
-        else window.addEventListener('load', saatLuang);
-      }
-      if (on && lanjutkan) lanjutkan();
+    bentuk: function (nama) {
+      rute = nama;
+      if (gantiBentuk) gantiBentuk(nama);
     }
   };
+  if (document.readyState === 'complete') saatLuang();
+  else window.addEventListener('load', saatLuang);
 
   function easeInOut(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
 
@@ -54,7 +53,7 @@
     var A;
     try {
       A = AB63D.buatAdegan(kanvas, {
-        pelangi: false, diam: diam, kuat: false, lembut: 0.16, lembutCincin: 0.5, dorong: 0.3, jangkau: 0.85, riak: true, cahaya: 0, tintMaks: 0.62
+        pelangi: false, diam: diam, kuat: false, lembut: 0.42, lembutCincin: 0.6, dorong: 0.3, jangkau: 0.85, riak: true, cahaya: 0, tintMaks: 0.62
       });
     } catch (e) { return; }
 
@@ -104,11 +103,11 @@
     });
     var jagaMulus = AB63D.penjagaMulus(function () { return dpr; }, function (v) { dpr = v; tata(true); }, 24);
 
-    /* ---------- Putaran utama: berhenti sendiri saat Beranda ditinggalkan ---------- */
-    var lalu = performance.now(), berjalan = false;
+    /* ---------- Putaran utama ---------- */
+    var lalu = performance.now();
     function bingkai(now) {
-      if (!nyala) { berjalan = false; return; }
       requestAnimationFrame(bingkai);
+      if (document.body.classList.contains('modal-terbuka') && kanvas.classList.contains('siap')) { lalu = now; return; }   // tertutup jendela modal
       var ms = now - lalu;
       lalu = now;
       jagaMulus(ms);
@@ -134,25 +133,25 @@
       A.gambar();
       kanvas.classList.add('siap');
     }
-    function mulaiPutar() {
-      if (berjalan || !nyala) return;
-      berjalan = true;
-      lalu = performance.now();
-      requestAnimationFrame(bingkai);
+    function bentukHalaman(nama) {
+      var k = BENTUK_HALAMAN[nama];
+      if (k === undefined || !bentuk[k]) return;
+      if (diam) tampilkanLangsung(k); else pindahKe(k);
     }
 
     var gulirLalu = window.scrollY;
     window.addEventListener('scroll', function () {
-      if (nyala && ke !== TULISAN) putaran.tambah((window.scrollY - gulirLalu) * PUTAR_GULIR);
+      if (ke !== TULISAN) putaran.tambah((window.scrollY - gulirLalu) * PUTAR_GULIR);
       gulirLalu = window.scrollY;
     }, { passive: true });
     AB63D.muatBentuk(function (k, s) {
       bentuk[k] = s;
-      if (k !== 0) return;
-      if (diam) { tampilkanLangsung(0); return; }
-      A.pasang(s, s);
-      lanjutkan = mulaiPutar;
-      mulaiPutar();
+      if (k === 0) {
+        A.pasang(s, s);
+        gantiBentuk = bentukHalaman;
+        if (diam) tampilkanLangsung(0); else requestAnimationFrame(bingkai);
+      }
+      if (k === BENTUK_HALAMAN[rute]) bentukHalaman(rute);
     }, { gedung: true });
   }
 })();

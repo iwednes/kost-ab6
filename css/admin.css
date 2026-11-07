@@ -1,0 +1,77 @@
+/* ============================================================
+ * KOST AB6 — css/admin.css
+ * Wajah halaman login dan panel admin mengikuti panel Mixmax Souvenir:
+ * menu samping gelap berkunang-kunang, judul serif, label huruf mono,
+ * kartu putih bergaris tipis. Susunan dan fungsi admin tidak berubah.
+ * Warna memakai token css/situs.css.
+ * ============================================================ */
+#lapisan-login, #lapisan-admin { font-family: var(--sans); color: var(--ink); -webkit-font-smoothing: antialiased; }
+
+/* ---------- Huruf ---------- */
+#lapisan-login [class*="font-display"], #lapisan-login .font-headline-lg, #lapisan-login .font-headline-lg-mobile, #lapisan-login .font-headline-md,
+#lapisan-admin [class*="font-display"], #lapisan-admin .font-headline-lg, #lapisan-admin .font-headline-lg-mobile, #lapisan-admin .font-headline-md { font-family: var(--serif); font-style: normal; font-weight: 500; letter-spacing: -0.005em; }
+#lapisan-login .font-headline-sm, #lapisan-admin .font-headline-sm { font-family: var(--sans); font-style: normal; font-weight: 600; letter-spacing: 0; }
+#lapisan-login [class*="font-body"], #lapisan-admin [class*="font-body"] { font-family: var(--sans); letter-spacing: 0; }
+#lapisan-login .font-label-md, #lapisan-admin .font-label-md { font-family: var(--sans); font-weight: 600; letter-spacing: 0; }
+#lapisan-admin .font-label-numeric { font-family: var(--mono); font-style: normal; letter-spacing: -0.01em; }
+#lapisan-admin .text-label-md, #lapisan-login .text-label-md { font-size: 13px; line-height: 18px; }
+#lapisan-admin .text-body-md { font-size: 14px; line-height: 21px; }
+#lapisan-admin .text-body-sm { font-size: 12.5px; line-height: 18px; }
+
+/* ---------- Login ---------- */
+#lapisan-login .blur-3xl { display: none; }
+#lapisan-login .h-1\.5 { display: none; }
+#lapisan-login .bg-surface-page { background: var(--card); border: 1px solid var(--line); border-radius: var(--r2); box-shadow: var(--sh-lg); }
+#lapisan-login .max-w-\[420px\] { max-width: 560px; }
+#lapisan-login h1 { font-size: 30px; line-height: 1.2; }
+#lapisan-login input { background: var(--card); border: 1px solid var(--line-kuat); border-radius: var(--r); min-height: 44px; }
+#lapisan-login input[type=checkbox] { min-height: 0; }
+#lapisan-login button[type=submit], #lapisan-login #login-tombol { background: var(--ink-800); border-radius: var(--r); min-height: 50px; font: 600 12.5px/20px var(--sans); letter-spacing: 0.1em; text-transform: uppercase; }
+#lapisan-login button[type=submit]:hover { background: var(--sec); }
+#lapisan-login .bg-gradient-to-br { background: var(--ink-800); border-radius: var(--r); }
+#lapisan-login .text-outline, #lapisan-login > main > div > .mt-8 { color: var(--ink2); }
+
+/* ---------- Menu samping ---------- */
+#sidebar-admin { background: #16291F; color: var(--ink-200); overflow-y: auto; }
+.kunang-sisi { position: absolute; inset: 0; z-index: 0; display: block; width: 100%; height: 100%; pointer-events: none; }
+#sidebar-admin > div { position: relative; z-index: 1; }
+#sidebar-admin .border-b, #sidebar-admin .border-t { border-color: #1E3A2B; }
+#sidebar-admin nav { gap: 2px; padding: 18px 12px; }
+#sidebar-admin nav a { display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 10px 12px; border: 0; border-radius: var(--r); background: none; color: var(--ink-200); font: 500 14px/20px var(--sans); letter-spacing: 0; transition: background var(--t), color var(--t); }
+#sidebar-admin nav a .material-symbols-outlined { color: var(--ink-400); font-size: 20px; }
+#sidebar-admin nav a:hover { background: #1E3A2B; color: var(--terang); }
+#sidebar-admin nav a[aria-current="page"] { background: var(--terang); color: var(--ink); font-weight: 600; }
+#sidebar-admin nav a[aria-current="page"] .material-symbols-outlined { color: var(--aksen); }
+
+/* ---------- Bilah atas ---------- */
+#lapisan-admin > div > header { background: rgba(244, 246, 241, 0.97); box-shadow: none; border-bottom: 1px solid var(--line); }
+
+/* ---------- Kartu & panel ---------- */
+#lapisan-admin .bg-surface-page, #lapisan-admin .bg-surface-container-lowest { background: var(--card); }
+#lapisan-admin main .rounded-xl.bg-surface-container-lowest, #lapisan-admin main .rounded-2xl.bg-surface-container-lowest,
+#lapisan-admin main .rounded-xl.bg-surface-page, #lapisan-admin main .rounded-2xl.bg-surface-page { border: 1px solid var(--line); border-radius: var(--r2); box-shadow: var(--sh-sm); }
+#lapisan-admin main { background: transparent; }
+#lapisan-admin h1, #lapisan-admin h2 { color: var(--ink); }
+#lapisan-admin main > section > div:first-child h1 { font-size: 30px; line-height: 1.2; }
+
+/* ---------- Tabel ---------- */
+#lapisan-admin table { font-size: 14px; }
+#lapisan-admin table th { background: var(--low); color: var(--ink2); font: 600 11px/16px var(--mono); letter-spacing: 0.1em; text-transform: uppercase; }
+#lapisan-admin table td { border-color: var(--mid); }
+#lapisan-admin table tbody tr:hover { background: #F4F6F1; }
+
+/* ---------- Tombol & isian ---------- */
+#lapisan-admin button.bg-primary-container, #lapisan-admin a.bg-primary-container, #lapisan-admin button.bg-primary, #lapisan-admin a.bg-primary { background: var(--ink-800); color: var(--terang); border-radius: var(--r); }
+#lapisan-admin button.bg-primary-container:hover, #lapisan-admin a.bg-primary-container:hover { background: var(--sec); }
+#lapisan-admin .bg-whatsapp-green { background: var(--ink-800); }
+#lapisan-admin input:not([type=checkbox]):not([type=radio]):not([type=file]), #lapisan-admin select, #lapisan-admin textarea { font-family: var(--sans); font-size: 14px; border-radius: var(--r); }
+#lapisan-admin .bg-gradient-to-r.from-gradient-start { background: var(--line-kuat); }
+.font-label-numeric { font-style: normal; }
+
+/* ---------- Jendela modal & notifikasi di admin ---------- */
+#akar-modal, #akar-toast { font-family: var(--sans); }
+#akar-modal h2, #akar-modal h3 { font-family: var(--serif); font-style: normal; font-weight: 500; }
+#akar-modal [class*="font-body"], #akar-modal [class*="font-label"] { font-family: var(--sans); letter-spacing: 0; }
+
+/* Panel berwarna transparan diberi dasar padat supaya terbaca di atas objek 3D */
+#lapisan-admin main [class*="bg-primary-fixed/"], #lapisan-admin main [class*="bg-tertiary-fixed/"], #lapisan-admin main [class*="bg-secondary-fixed/"], #lapisan-admin main [class*="bg-surface-container/"] { background-color: var(--aksen-c); }
