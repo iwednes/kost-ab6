@@ -2544,7 +2544,7 @@ function formBaru(jenis, item) {
   if (jenis === 'kegiatan') return { jenis, data: salin || { id: '', tanggal: hariIniIso(), judul: '', ringkas: '', deskripsi: '', foto: [], status: 'Tampil' } };
   if (jenis === 'area') return { jenis, data: salin || { id: '', jenis: 'Fasilitas', nama: '', label: '', ikon: 'verified', deskripsi: '', catatan: '', penting: false, foto: '', eyebrow: '', harga: [], status: 'Tampil' } };
   const p = S.adm.data.pengaturan;
-  return { jenis: 'visi', data: { VISI: p.VISI, MISI: String(p.MISI || ''), VISI_LABEL: p.VISI_LABEL, TAHUN_BERDIRI: p.TAHUN_BERDIRI, MISI_LABEL: p.MISI_LABEL } };
+  return { jenis: 'visi', data: { VISI: p.VISI, MISI: String(p.MISI || ''), VISI_LABEL: p.VISI_LABEL, TAHUN_BERDIRI: p.TAHUN_BERDIRI, MISI_LABEL: p.MISI_LABEL, TENTANG_INTRO: String(p.TENTANG_INTRO || '') } };
 }
 
 function bannerUrut() { return S.adm.data.banner.slice().sort((a, b) => a.urutan - b.urutan); }
@@ -3453,6 +3453,7 @@ function htmlTabVisi() {
           <div class="flex flex-col gap-1.5"><label class="${KELAS.label}" for="vm-tahun">Tahun Berdiri</label><input id="vm-tahun" inputmode="numeric" maxlength="4" data-masukan="konten-isian" data-kunci="TAHUN_BERDIRI" value="${esc(f.TAHUN_BERDIRI)}" class="${KELAS.inputAdm}">${galatKolom('TAHUN_BERDIRI')}</div>
           <div class="flex flex-col gap-1.5 sm:col-span-2"><label class="${KELAS.label}" for="vm-mlabel">Label Komitmen</label><input id="vm-mlabel" maxlength="80" data-masukan="konten-isian" data-kunci="MISI_LABEL" value="${esc(f.MISI_LABEL)}" class="${KELAS.inputAdm}"></div>
         </div>
+        <div class="flex flex-col gap-1.5"><div class="flex items-center justify-between"><label class="${KELAS.label}" for="vm-intro">Teks Pembuka Halaman Tentang Kami <span class="text-error">*</span></label><span class="font-body-sm text-body-sm text-outline">Maks. 600 karakter</span></div><textarea id="vm-intro" rows="5" maxlength="600" data-masukan="konten-isian" data-kunci="TENTANG_INTRO" class="${KELAS.inputAdm} resize-none">${esc(f.TENTANG_INTRO)}</textarea>${galatKolom('TENTANG_INTRO')}</div>
         <div class="flex items-center justify-end gap-3 pt-3"><button type="button" data-aksi="konten-batal" class="${KELAS.tombolKedua}">Batal</button><button type="submit" class="${KELAS.tombolUtama}">${ikon('save', 'text-[18px]')}<span>Simpan Perubahan</span></button></div>
       </form>
     </div>
@@ -3470,6 +3471,7 @@ KIRIM.visi = async form => {
   const misi = String(f.MISI).split('\n').filter(s => s.trim());
   if (!misi.length || misi.length > 6) galat.MISI = 'Isi 1–6 poin misi (satu baris satu poin).';
   if (f.TAHUN_BERDIRI && !/^\d{4}$/.test(f.TAHUN_BERDIRI)) galat.TAHUN_BERDIRI = 'Tahun 4 digit.';
+  if ('TENTANG_INTRO' in f && !String(f.TENTANG_INTRO).trim()) galat.TENTANG_INTRO = 'Teks pembuka Tentang Kami wajib diisi.';
   if (Object.keys(galat).length) { aturGalatKolom(form, galat); return; }
   aturGalatKolom(form, null);
   const tombol = form.querySelector('[type=submit]');
@@ -3477,10 +3479,12 @@ KIRIM.visi = async form => {
   try {
     const r = await panggil('adminSimpanPengaturan', tokenAdmin(), f);
     S.adm.data.pengaturan = r.pengaturan;
+    const introTersimpan = String(r.pengaturan.TENTANG_INTRO || '').trim() === String(f.TENTANG_INTRO || '').trim();
     bersihkanKotor();
     S.adm.konten.form = formBaru('visi');
     renderKonten();
-    toast('Visi & Misi disimpan', 'Beranda publik ikut diperbarui.');
+    if (introTersimpan) toast('Visi & Misi disimpan', 'Beranda dan halaman Tentang Kami ikut diperbarui.');
+    else toast('Teks Tentang Kami belum tersimpan', 'Visi & Misi sudah disimpan, tetapi server belum mengenal kolom ini. Pasang Kode.gs v3.1.1 lalu Deploy → New version.', 'info');
   } catch (e) {
     tombolSibuk(tombol, false);
     if (e.kode === 'VALIDASI' && e.detail) aturGalatKolom(form, e.detail);
@@ -4781,7 +4785,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) kirim
 setInterval(() => { if (S.rute.nama === 'beranda') kirimStatBanner(); }, 120000);
 
 /** Penanda versi frontend — muncul di konsol agar mudah memastikan versi terbaru sudah terpasang */
-const VERSI_FRONTEND = '3.5.0';
+const VERSI_FRONTEND = '3.5.1';
 
 function mulaiAplikasi() {
   console.info('[Kost AB6] Frontend v' + VERSI_FRONTEND + ' siap');

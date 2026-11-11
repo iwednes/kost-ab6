@@ -34,7 +34,7 @@ git commit -m "Deskripsi perubahan"
 git push
 ```
 
-GitHub Pages memperbarui situs dalam 1–2 menit. Jika masih tampil versi lama, tekan Ctrl+Shift+R. Versi yang aktif tercetak di konsol browser: `[Kost AB6] Frontend v3.5.0 siap`.
+GitHub Pages memperbarui situs dalam 1–2 menit. Jika masih tampil versi lama, tekan Ctrl+Shift+R. Versi yang aktif tercetak di konsol browser: `[Kost AB6] Frontend v3.5.1 siap`.
 
 ## Tailwind
 
@@ -44,4 +44,4 @@ Panduan lengkap: [PANDUAN-INSTALASI.md](PANDUAN-INSTALASI.md).
 
 ## Video banner
 
-Video banner butuh `Kode.gs` v3.1.0 (tempel ke Apps Script, lalu Deploy → Manage deployments → New version). Di panel admin: Konten → Banner → ubah banner → Video Banner. Video maksimal 5 detik, otomatis dikecilkan ke 1080p tanpa suara, dan cuplikannya menjadi gambar sampul. ID video tersimpan di Script Properties (`VIDEO_BANNER`), jadi sheet Banner tidak berubah. Untuk memeriksa pemutaran dari HP, buka situs dengan `/?cekvideo`.
+Video banner butuh `Kode.gs` v3.1.0 atau lebih baru (tempel ke Apps Script, lalu Deploy → Manage deployments → New version). Di panel admin: Konten → Banner → ubah banner → Video Banner. Video maksimal 5 detik, otomatis dikecilkan ke 1080p tanpa suara, dan cuplikannya menjadi gambar sampul. ID video tersimpan di Script Properties (`VIDEO_BANNER`), jadi sheet Banner tidak berubah. Untuk memeriksa pemutaran dari HP, buka situs dengan `/?cekvideo`.
