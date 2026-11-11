@@ -3,7 +3,10 @@
 Situs publik + panel pengelola Kost AB6. Frontend statis (HTML/CSS/JS vanilla + Tailwind yang sudah dikompilasi) yang di-host di **GitHub Pages**, dengan **Google Apps Script** sebagai REST API (JSON) dan Google Sheets/Drive sebagai database.
 
 ```
-index.html        ← kerangka halaman (publik, login, admin)
+index.html        ← kerangka halaman (publik, login, admin) + data usaha untuk Google
+vercel.json       ← alamat /kamar, /kamar/tipe-a, /testimoni, /tentang-kami dibuka oleh index.html
+robots.txt        ← izin baca untuk mesin pencari + letak sitemap
+sitemap.xml       ← daftar halaman untuk Google
 css/style.css     ← CSS tambahan di atas Tailwind
 css/tailwind.css  ← Tailwind v3.4.16 hasil kompilasi (JANGAN diedit manual)
 css/situs.css     ← tampilan seluruh halaman publik (mengikuti website Mixmax Souvenir)
@@ -31,7 +34,7 @@ git commit -m "Deskripsi perubahan"
 git push
 ```
 
-GitHub Pages memperbarui situs dalam 1–2 menit. Jika masih tampil versi lama, tekan Ctrl+Shift+R. Versi yang aktif tercetak di konsol browser: `[Kost AB6] Frontend v3.4.0 siap`.
+GitHub Pages memperbarui situs dalam 1–2 menit. Jika masih tampil versi lama, tekan Ctrl+Shift+R. Versi yang aktif tercetak di konsol browser: `[Kost AB6] Frontend v3.5.0 siap`.
 
 ## Tailwind
 

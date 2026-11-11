@@ -313,7 +313,7 @@
       if (cand) terima(TEKS, pack(textPoints(cand)));
     }
     try {
-      worker = new Worker('js/bentuk3d.js');
+      worker = new Worker('/js/bentuk3d.js');
       worker.onmessage = function (e) {
         terima(e.data.k, e.data);
         if (e.data.k === TEKS) { worker.terminate(); worker = null; }

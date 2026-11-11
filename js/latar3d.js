@@ -12,6 +12,7 @@
   if (!kanvas) return;
   // Mode hemat data atau perangkat sangat terbatas: website tampil tanpa latar 3D.
   if ((navigator.connection && navigator.connection.saveData) || (navigator.deviceMemory && navigator.deviceMemory <= 2)) return;
+  if (/bot|crawler|spider|slurp|lighthouse|inspectiontool|googleother/i.test(navigator.userAgent)) return;   // mesin pencari tidak perlu objek 3D
 
   var THREE_URL = 'https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js';   // versi yang sama dengan cover, jadi sudah tersimpan di browser
   var TAHAN = 6, MORF = 2.2;   // detik diam pada satu bentuk; detik perpindahan bentuk
@@ -29,7 +30,7 @@
     s.onload = lalu;
     document.head.appendChild(s);
   }
-  function mulai() { muatSkrip(THREE_URL, function () { muatSkrip('js/bentuk3d.js', bangun); }); }
+  function mulai() { muatSkrip(THREE_URL, function () { muatSkrip('/js/bentuk3d.js', bangun); }); }
   function saatLuang() {
     setTimeout(function () {
       if (window.requestIdleCallback) requestIdleCallback(mulai, { timeout: 2000 });

@@ -20,7 +20,8 @@
   var g = window.gsap, ST = window.ScrollTrigger, Split = window.SplitText, LenisKelas = window.Lenis;
   var reduksi = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
   var halus = !!(window.matchMedia && matchMedia('(hover: hover) and (pointer: fine)').matches);
-  var gerak = !!(g && ST && Split) && !reduksi;
+  var mesinPencari = /bot|crawler|spider|slurp|lighthouse|inspectiontool|googleother/i.test(navigator.userAgent);
+  var gerak = !!(g && ST && Split) && !reduksi && !mesinPencari;   // mesin pencari membaca isi tanpa menunggu animasi
   if (gerak) g.registerPlugin(ST, Split);
 
   var BERSIH = 'opacity,visibility,transform';
@@ -143,7 +144,7 @@
 
   /* ---------- Menu samping layar penuh ---------- */
   var menu = null;
-  var DAFTAR_MENU = [['beranda', 'Beranda'], ['kamar', 'Kamar'], ['testimoni', 'Testimoni'], ['tentang', 'Tentang Kami']];
+  var DAFTAR_MENU = [['beranda', 'Beranda', '/'], ['kamar', 'Kamar', '/kamar'], ['testimoni', 'Testimoni', '/testimoni'], ['tentang', 'Tentang Kami', '/tentang-kami']];
   function siapMenu() {
     var burger = $('[data-aksi=buka-menu-hp]');
     if (!g || !burger) return;
@@ -154,13 +155,13 @@
     el.setAttribute('role', 'dialog');
     el.setAttribute('aria-modal', 'true');
     el.setAttribute('aria-label', 'Menu utama');
-    function baris1(atr, label) {
-      return '<li class="gs-menu-baris"><span class="gs-menu-garis" aria-hidden="true"></span><a href="#" class="gs-menu-link"' + atr + '><span class="gs-menu-topeng"><span class="gs-menu-label">' + esc(label) + '</span></span>' +
+    function baris1(atr, label, alamat) {
+      return '<li class="gs-menu-baris"><span class="gs-menu-garis" aria-hidden="true"></span><a href="' + (alamat || '#') + '" class="gs-menu-link"' + atr + '><span class="gs-menu-topeng"><span class="gs-menu-label">' + esc(label) + '</span></span>' +
         '<span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a></li>';
     }
     el.innerHTML = '<div class="gs-menu-dalam"><div class="gs-menu-atas"><span class="gs-menu-logo">Kost AB6</span>' +
       '<button type="button" class="gs-menu-tutup" aria-label="Tutup menu"><span class="material-symbols-outlined" aria-hidden="true">close</span></button></div>' +
-      '<ul class="gs-menu-daftar">' + DAFTAR_MENU.map(function (m) { return baris1(' data-nav="' + m[0] + '" data-gs-nav="' + m[0] + '"', m[1]); }).join('') +
+      '<ul class="gs-menu-daftar">' + DAFTAR_MENU.map(function (m) { return baris1(' data-nav="' + m[0] + '" data-gs-nav="' + m[0] + '"', m[1], m[2]); }).join('') +
       baris1(' data-aksi="ke-admin"', 'Masuk Admin') + '<li class="gs-menu-garis-akhir" aria-hidden="true"><span class="gs-menu-garis"></span></li></ul>' +
       '<div class="gs-menu-kaki"></div></div>';
     document.body.appendChild(latar);

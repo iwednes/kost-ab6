@@ -3,7 +3,12 @@
 <head>
   <script>
     // Kunjungan baru melihat cover 3D dulu, sekali per sesi browser. ?dari=cover = baru saja melewati cover.
+    // Mesin pencari, dan pengunjung yang datang lewat alamat halaman dalam (misalnya /kamar dari Google), langsung ke isi.
     (function () {
+      var kanon = document.createElement('link');   // alamat utama halaman ini untuk Google
+      kanon.rel = 'canonical';
+      kanon.href = 'https://kost-ab6.vercel.app' + (location.pathname.replace(/\/index\.html$/, '/').replace(/(.)\/+$/, '$1') || '/');
+      document.head.appendChild(kanon);
       try {
         var q = new URLSearchParams(location.search);
         if (q.get('dari') === 'cover') {
@@ -17,15 +22,65 @@
         // hanya beranda yang dialihkan; /kamar, /tentang-kami, dan halaman admin tetap langsung terbuka
         if (location.pathname !== '/' && !/\/index\.html$/.test(location.pathname)) return;
         // pratinjau tautan (WhatsApp, Facebook, Google) tetap membaca beranda
-        if (/bot|crawl|spider|slurp|facebookexternalhit|whatsapp|telegram/i.test(navigator.userAgent)) return;
-        location.replace('cover.html');
+        if (/bot|crawl|spider|slurp|lighthouse|inspectiontool|googleother|facebookexternalhit|whatsapp|telegram/i.test(navigator.userAgent)) return;
+        location.replace('/cover.html');
       } catch (e) { /* jika browser memblokir penyimpanan, beranda tetap tampil */ }
     })();
   </script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kost AB6</title>
-  <meta name="description" content="Kost AB6 — hunian kost modern, tenang, dan strategis di Siwalankerto, Surabaya untuk mahasiswa dan profesional muda. Cek ketersediaan kamar dan hubungi kami via WhatsApp.">
+  <title>Kost AB6 - Kost Siwalankerto Surabaya, Kamar Bersih &amp; Nyaman</title>
+  <meta name="description" content="Kost AB6 di Jl. Siwalankerto VIII, Gayungan, Surabaya: kamar bersih dan nyaman untuk mahasiswa dan profesional muda, Wi-Fi 100 Mbps, CCTV 24 jam. Cek kamar tersedia dan tanya lewat WhatsApp.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Kost AB6">
+  <meta property="og:locale" content="id_ID">
+  <meta property="og:url" content="https://kost-ab6.vercel.app/">
+  <meta property="og:title" content="Kost AB6 - Kost Siwalankerto Surabaya, Kamar Bersih &amp; Nyaman">
+  <meta property="og:description" content="Kost AB6 di Jl. Siwalankerto VIII, Gayungan, Surabaya: kamar bersih dan nyaman untuk mahasiswa dan profesional muda, Wi-Fi 100 Mbps, CCTV 24 jam. Cek kamar tersedia dan tanya lewat WhatsApp.">
+  <meta property="og:image" content="https://kost-ab6.vercel.app/cover/img/fasad.jpg">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "LodgingBusiness",
+        "@id": "https://kost-ab6.vercel.app/#kost",
+        "name": "Kost AB6",
+        "description": "Kost di Siwalankerto, Surabaya dengan kamar bersih dan nyaman untuk mahasiswa dan profesional muda.",
+        "url": "https://kost-ab6.vercel.app/",
+        "image": "https://kost-ab6.vercel.app/cover/img/fasad.jpg",
+        "telephone": "+62 822-2908-3481",
+        "priceRange": "Rp950.000 - Rp1.200.000 per bulan",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Jl. Siwalankerto VIII No. AB-6, Dukuh Menanggal, Kec. Gayungan",
+          "addressLocality": "Surabaya",
+          "addressRegion": "Jawa Timur",
+          "postalCode": "60234",
+          "addressCountry": "ID"
+        },
+        "geo": { "@type": "GeoCoordinates", "latitude": -7.340602, "longitude": 112.734488 },
+        "openingHoursSpecification": [
+          { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"], "opens": "08:00", "closes": "20:00" },
+          { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "09:00", "closes": "17:00" }
+        ],
+        "amenityFeature": [
+          { "@type": "LocationFeatureSpecification", "name": "Wi-Fi 100 Mbps", "value": true },
+          { "@type": "LocationFeatureSpecification", "name": "CCTV 24 jam", "value": true },
+          { "@type": "LocationFeatureSpecification", "name": "AC", "value": true }
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://kost-ab6.vercel.app/#situs",
+        "name": "Kost AB6",
+        "url": "https://kost-ab6.vercel.app/",
+        "inLanguage": "id-ID",
+        "publisher": { "@id": "https://kost-ab6.vercel.app/#kost" }
+      }
+    ]
+  }
+  </script>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231e3a2b'/%3E%3Ctext x='16' y='21' font-family='Arial' font-size='13' font-weight='700' fill='white' text-anchor='middle'%3EAB6%3C/text%3E%3C/svg%3E">
   <!-- Sambungan dibuka lebih awal: font Google + API Apps Script (GET dialihkan ke script.googleusercontent.com) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -35,11 +90,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
   <!-- Ikon: sumbu dikunci ke nilai yang dipakai style.css (opsz 24, wght 400, GRAD 0; FILL 0–1) → ±450 KB, bukan 3,9 MB -->
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&display=block" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="/css/style.css">
   <!-- Tailwind v3.4.16 yang sudah dikompilasi (bukan Play CDN) — lihat README.md bagian Tailwind -->
-  <link rel="stylesheet" href="css/tailwind.css">
-  <link rel="stylesheet" href="css/situs.css">
-  <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="/css/tailwind.css">
+  <link rel="stylesheet" href="/css/situs.css">
+  <link rel="stylesheet" href="/css/admin.css">
 </head>
 <body class="bg-surface font-body-md text-on-surface antialiased selection:bg-primary selection:text-on-primary">
   <a href="#konten-utama" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[1300] focus:bg-surface-page focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-md">Lewati ke konten utama</a>
@@ -50,15 +105,15 @@
   <div id="lapisan-publik">
     <header class="hdr">
       <div class="wrap hdr-in">
-        <a href="#" data-nav="beranda" class="brand" aria-label="Kost AB6 — Beranda">
+        <a href="/" data-nav="beranda" class="brand" aria-label="Kost AB6 — Beranda">
           <span id="logo-publik" class="logo-wadah"></span>
           <span class="brand-teks"><strong>Kost AB6</strong><small>Residence Living</small></span>
         </a>
         <nav class="nav" aria-label="Menu utama">
-          <a href="#" data-nav="beranda" data-menu-publik="beranda">Beranda</a>
-          <a href="#" data-nav="kamar" data-menu-publik="kamar">Kamar</a>
-          <a href="#" data-nav="testimoni" data-menu-publik="testimoni">Testimoni</a>
-          <a href="#" data-nav="tentang" data-menu-publik="tentang">Tentang Kami</a>
+          <a href="/" data-nav="beranda" data-menu-publik="beranda">Beranda</a>
+          <a href="/kamar" data-nav="kamar" data-menu-publik="kamar">Kamar</a>
+          <a href="/testimoni" data-nav="testimoni" data-menu-publik="testimoni">Testimoni</a>
+          <a href="/tentang-kami" data-nav="tentang" data-menu-publik="tentang">Tentang Kami</a>
         </nav>
         <div class="hdr-aksi">
           <a href="#" data-aksi="cek-ketersediaan" class="btn btn-primary btn-sm hdr-cek">Cek Ketersediaan</a>
@@ -81,10 +136,10 @@
         </div>
         <div class="h-[3px] w-full bg-gradient-to-r from-gradient-start via-gradient-mid to-gradient-end"></div>
         <div class="flex flex-col p-space-md gap-1">
-          <a href="#" data-nav="beranda" data-menu-hp="beranda" class="flex items-center gap-3 px-3 py-3 rounded-lg font-headline-sm text-body-lg"><span class="material-symbols-outlined text-[20px]">home</span>Beranda</a>
-          <a href="#" data-nav="kamar" data-menu-hp="kamar" class="flex items-center gap-3 px-3 py-3 rounded-lg font-headline-sm text-body-lg"><span class="material-symbols-outlined text-[20px]">bed</span>Kamar</a>
-          <a href="#" data-nav="testimoni" data-menu-hp="testimoni" class="flex items-center gap-3 px-3 py-3 rounded-lg font-headline-sm text-body-lg"><span class="material-symbols-outlined text-[20px]">rate_review</span>Testimoni</a>
-          <a href="#" data-nav="tentang" data-menu-hp="tentang" class="flex items-center gap-3 px-3 py-3 rounded-lg font-headline-sm text-body-lg"><span class="material-symbols-outlined text-[20px]">apartment</span>Tentang Kami</a>
+          <a href="/" data-nav="beranda" data-menu-hp="beranda" class="flex items-center gap-3 px-3 py-3 rounded-lg font-headline-sm text-body-lg"><span class="material-symbols-outlined text-[20px]">home</span>Beranda</a>
+          <a href="/kamar" data-nav="kamar" data-menu-hp="kamar" class="flex items-center gap-3 px-3 py-3 rounded-lg font-headline-sm text-body-lg"><span class="material-symbols-outlined text-[20px]">bed</span>Kamar</a>
+          <a href="/testimoni" data-nav="testimoni" data-menu-hp="testimoni" class="flex items-center gap-3 px-3 py-3 rounded-lg font-headline-sm text-body-lg"><span class="material-symbols-outlined text-[20px]">rate_review</span>Testimoni</a>
+          <a href="/tentang-kami" data-nav="tentang" data-menu-hp="tentang" class="flex items-center gap-3 px-3 py-3 rounded-lg font-headline-sm text-body-lg"><span class="material-symbols-outlined text-[20px]">apartment</span>Tentang Kami</a>
         </div>
         <div class="mt-auto p-space-md flex flex-col gap-space-sm">
           <a href="#" data-aksi="cek-ketersediaan" class="inline-flex items-center justify-center h-12 rounded-full bg-primary-container text-on-primary font-headline-sm text-body-md shadow-sm">Cek Ketersediaan</a>
@@ -118,10 +173,10 @@
         <div>
           <h2 class="ftr-judul">Navigasi</h2>
           <ul class="ftr-list">
-            <li><a href="#" data-nav="beranda">Beranda</a></li>
-            <li><a href="#" data-nav="kamar">Daftar Kamar</a></li>
-            <li><a href="#" data-nav="testimoni">Testimoni Penghuni</a></li>
-            <li><a href="#" data-nav="tentang">Tentang Kost AB6</a></li>
+            <li><a href="/" data-nav="beranda">Beranda</a></li>
+            <li><a href="/kamar" data-nav="kamar">Daftar Kamar</a></li>
+            <li><a href="/testimoni" data-nav="testimoni">Testimoni Penghuni</a></li>
+            <li><a href="/tentang-kami" data-nav="tentang">Tentang Kost AB6</a></li>
           </ul>
         </div>
         <div>
@@ -146,13 +201,13 @@
   </div>
 
   <!-- ═══════════════ LAPISAN LOGIN ═══════════════ -->
-  <div id="lapisan-login" class="bg-surface-subtle" hidden>
+  <div id="lapisan-login" class="bg-surface-subtle" hidden data-nosnippet>
     <main class="min-h-screen w-full flex items-center justify-center p-space-md">
       <div class="flex flex-col w-full items-center justify-center relative overflow-hidden py-10 px-4">
         <div class="absolute -top-32 -left-20 w-96 h-96 rounded-full bg-gradient-to-br from-primary/10 via-secondary/10 to-transparent blur-3xl pointer-events-none"></div>
         <div class="absolute -bottom-32 -right-20 w-96 h-96 rounded-full bg-gradient-to-tl from-gradient-end/20 via-gradient-mid/10 to-transparent blur-3xl pointer-events-none"></div>
         <div class="w-full max-w-[420px] flex flex-col items-start mb-6 z-10">
-          <a href="#" data-nav="beranda" class="inline-flex items-center gap-2 font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-200 group">
+          <a href="/" data-nav="beranda" class="inline-flex items-center gap-2 font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-200 group">
             <span class="material-symbols-outlined text-[18px] group-hover:-translate-x-1 transition-transform duration-200">arrow_back</span>
             <span>Kembali ke Halaman Utama</span>
           </a>
@@ -238,7 +293,7 @@
         </nav>
       </div>
       <div class="p-space-md flex flex-col gap-space-xs border-t border-[#24452f]">
-        <a href="#" data-nav="beranda" class="flex items-center justify-between px-3 py-2 rounded-lg font-label-md text-label-md text-outline-variant hover:bg-[#24452f] hover:text-on-primary transition-colors"><span>Lihat Situs Publik</span><span class="material-symbols-outlined text-[18px]">open_in_new</span></a>
+        <a href="/" data-nav="beranda" class="flex items-center justify-between px-3 py-2 rounded-lg font-label-md text-label-md text-outline-variant hover:bg-[#24452f] hover:text-on-primary transition-colors"><span>Lihat Situs Publik</span><span class="material-symbols-outlined text-[18px]">open_in_new</span></a>
         <a href="#" data-aksi="keluar" class="flex items-center gap-2 px-3 py-2 rounded-lg font-label-md text-label-md text-error hover:bg-error-container hover:text-on-error-container transition-colors"><span class="material-symbols-outlined text-[18px]">logout</span><span>Keluar</span></a>
       </div>
     </aside>
@@ -293,17 +348,17 @@
   <div id="akar-toast" class="fixed bottom-6 right-6 left-6 sm:left-auto z-[1200] flex flex-col items-end gap-2 pointer-events-none" aria-live="polite"></div>
 
   <!-- Urutan wajib: config (GAS_URL) → api (fetch ke GAS) → app (SPA) -->
-  <script src="js/config.js"></script>
-  <script src="js/api.js"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
   <!-- Gerak situs: GSAP + ScrollTrigger + SplitText + gulir halus Lenis -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/SplitText.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.4/dist/lenis.min.js"></script>
-  <script src="js/gerak-situs.js"></script>
-  <script src="js/latar3d.js"></script>
-  <script src="js/kunang.js"></script>
-  <script src="js/video-banner.js"></script>
-  <script src="js/app.js"></script>
+  <script src="/js/gerak-situs.js"></script>
+  <script src="/js/latar3d.js"></script>
+  <script src="/js/kunang.js"></script>
+  <script src="/js/video-banner.js"></script>
+  <script src="/js/app.js"></script>
 </body>
 </html>

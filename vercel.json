@@ -1,0 +1,7 @@
+{
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/:halaman(kamar|testimoni|tentang-kami)", "destination": "/index.html" },
+    { "source": "/kamar/:tipe", "destination": "/index.html" }
+  ]
+}

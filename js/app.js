@@ -458,6 +458,89 @@ function kunciTampilan(nama, param) {
   return [nama, JSON.stringify(param || {}), S.versiData].join('|');
 }
 
+// Tiap halaman publik punya alamat sendiri supaya bisa dibuka langsung, dibagikan, dan ditemukan Google.
+// Login dan panel admin tidak mengubah alamat dan tidak diindeks.
+const SITUS = 'https://kost-ab6.vercel.app';
+const JALUR_RUTE = { beranda: '/', kamar: '/kamar', testimoni: '/testimoni', tentang: '/tentang-kami' };
+
+function jalurRute(nama, param) {
+  if (nama === 'detail') {
+    const k = cariKamar(param && param.kode);
+    return k ? urlKamar(k) : '/kamar/' + encodeURIComponent((param && param.kode) || '');
+  }
+  return JALUR_RUTE[nama] || null;
+}
+
+function ruteDariAlamat() {
+  const p = location.pathname.replace(/\/index\.html$/, '/').replace(/(.)\/+$/, '$1');
+  if (p === '/kamar') return { nama: 'kamar', param: {} };
+  const m = /^\/kamar\/([^/]+)$/.exec(p);
+  if (m) return { nama: 'detail', param: { kode: decodeURIComponent(m[1]) } };
+  if (p === '/testimoni') return { nama: 'testimoni', param: {} };
+  if (p === '/tentang-kami') return { nama: 'tentang', param: {} };
+  return { nama: 'beranda', param: {} };
+}
+
+function catatAlamat(nama, param, opsi) {
+  if (opsi.dariRiwayat) return;
+  const jalur = jalurRute(nama, param);
+  if (!jalur) return;
+  const st = { nama, param: param || {} };
+  try {
+    if (opsi.awal) history.replaceState(st, '', jalur + location.search + location.hash);
+    else if (opsi.ganti || location.pathname === jalur) history.replaceState(st, '', jalur);
+    else history.pushState(st, '', jalur);
+  } catch (e) { /* abaikan */ }
+}
+
+const DESKRIPSI_AWAL = (document.querySelector('meta[name="description"]') || {}).content || '';
+const JUDUL_AWAL = document.title;
+
+function pasangMeta(atribut, nama, isi) {
+  let m = document.querySelector('meta[' + atribut + '="' + nama + '"]');
+  if (!isi) { if (m) m.remove(); return; }
+  if (!m) { m = document.createElement('meta'); m.setAttribute(atribut, nama); document.head.appendChild(m); }
+  m.setAttribute('content', isi);
+}
+
+/** Judul tab, deskripsi, dan alamat utama tiap halaman untuk hasil Google */
+function aturMeta(nama, param) {
+  const kamar = (S.kamar && S.kamar.items) || [];
+  const harga = kamar.map(k => Number(k.harga)).filter(n => n > 0);
+  const termurah = harga.length ? Math.min.apply(null, harga) : 0;
+  const termahal = harga.length ? Math.max.apply(null, harga) : 0;
+  const jalur = jalurRute(nama, param || {});
+  let judul = '', isi = '', indeks = !!jalur;
+  if (nama === 'beranda') { judul = JUDUL_AWAL; isi = DESKRIPSI_AWAL; }
+  else if (nama === 'kamar') {
+    judul = 'Katalog Kamar Kost AB6 Siwalankerto Surabaya' + (termurah ? ' - Mulai ' + rupiah(termurah) + '/Bulan' : '');
+    isi = 'Pilihan kamar Kost AB6 di Siwalankerto, Surabaya' + (kamar.length ? ': ' + kamar.slice().sort(urutNamaKamar).map(k => k.nama).join(', ') : '') +
+      (termurah ? ', harga ' + rupiah(termurah) + (termahal > termurah ? ' sampai ' + rupiah(termahal) : '') + ' per bulan' : '') + '. Lihat foto, ukuran, dan fasilitas tiap kamar, lalu tanya ketersediaan lewat WhatsApp.';
+  } else if (nama === 'detail') {
+    const k = cariKamar(param && param.kode);
+    if (k) {
+      judul = k.nama + ' - Kost AB6 Siwalankerto Surabaya | ' + rupiah(k.harga) + '/Bulan';
+      const fas = (k.fasilitas || []).map(f => f.ringkas).concat(k.kustom || []).filter(Boolean).slice(0, 6).join(', ');
+      isi = k.nama + ' di Kost AB6 Surabaya: kamar ' + desimal(k.panjang) + ' × ' + desimal(k.lebar) + ' m, kamar mandi ' + (k.kamarMandi === 'Dalam' ? 'dalam' : 'luar') +
+        (fas ? ', fasilitas ' + fas : '') + '. ' + rupiah(k.harga) + ' per bulan, ' + (k.status === 'Terisi' ? 'saat ini terisi' : 'tersedia sekarang') + '.';
+    } else { judul = 'Detail Kamar - Kost AB6 Surabaya'; if (S.kamar) indeks = false; }   // alamat kamar yang tidak ada: jangan diindeks
+  } else if (nama === 'testimoni') {
+    judul = 'Testimoni Penghuni Kost AB6 Surabaya - Ulasan Asli';
+    isi = 'Ulasan asli dari mahasiswa dan profesional muda yang tinggal di Kost AB6, Siwalankerto, Surabaya: kebersihan, keamanan, fasilitas, dan pelayanan pengelola.';
+  } else if (nama === 'tentang') {
+    judul = 'Tentang Kost AB6 - Fasilitas & Lokasi di Siwalankerto, Surabaya';
+    isi = 'Profil Kost AB6 di Jl. Siwalankerto VIII, Gayungan, Surabaya: fasilitas dan area umum, jam kunjungan, peta lokasi, dan kontak WhatsApp pengelola.';
+  } else { judul = (KONST.JUDUL[nama] || 'Kost AB6') + ' — Kost AB6'; indeks = false; }
+  document.title = judul;
+  pasangMeta('name', 'description', isi || DESKRIPSI_AWAL);
+  pasangMeta('name', 'robots', indeks ? '' : 'noindex, follow');
+  pasangMeta('property', 'og:title', judul);
+  pasangMeta('property', 'og:description', isi || DESKRIPSI_AWAL);
+  pasangMeta('property', 'og:url', SITUS + (indeks ? jalur : '/'));
+  const kanon = document.querySelector('link[rel="canonical"]');
+  if (kanon) kanon.href = SITUS + (indeks ? jalur : '/');
+}
+
 function lapisanUntuk(nama) {
   if (nama === 'login') return 'login';
   if (nama.indexOf('admin-') === 0) return 'admin';
@@ -534,7 +617,8 @@ async function navigasi(nama, param, opsi) {
   }
   perbaruiMenuAktif(nama);
   perbaruiWaMelayang();
-  document.title = (KONST.JUDUL[nama] || 'Kost AB6') + ' — Kost AB6';
+  catatAlamat(nama, param, opsi);
+  aturMeta(nama, param);
   if (!opsi.tanpaGulir) window.scrollTo(0, 0);
   if (window.GerakAB6) GerakAB6.halaman(nama);
   if (lapisan === 'admin') {
@@ -615,10 +699,25 @@ function linkEksternal(link) {
 // BAGIAN 7: DATA PUBLIK (instan dari cache lokal + prefetch)
 // ════════════════════════════════════════════════════════════
 
+/** Kamar dicari dari kodenya, atau dari alamatnya (/kamar/tipe-a) */
 function cariKamar(kode) {
   const items = (S.kamar && S.kamar.items) || [];
-  return items.filter(k => String(k.kode).toLowerCase() === String(kode || '').toLowerCase())[0] || null;
+  const q = String(kode || '').toLowerCase();
+  return items.filter(k => String(k.kode).toLowerCase() === q)[0] || items.filter(k => slugKamar(k) === q)[0] || null;
 }
+
+function bentukSlug(s) {
+  return String(s || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
+/** Bagian alamat kamar dari namanya (TIPE A → tipe-a); nama kembar ditambah kode supaya tetap unik */
+function slugKamar(k) {
+  const items = (S.kamar && S.kamar.items) || [];
+  const s = bentukSlug(k.nama) || bentukSlug(k.kode);
+  return items.filter(x => bentukSlug(x.nama) === s).length > 1 ? s + '-' + bentukSlug(k.kode) : s;
+}
+
+function urlKamar(k) { return '/kamar/' + slugKamar(k); }
 
 /** Menerapkan data baru; me-render ulang hanya jika isinya berubah */
 function terapkanData(d) {
@@ -650,6 +749,8 @@ function terapkanData(d) {
     else RENDER[nama]($('#hal-' + nama), S.rute.param);
     $('#hal-' + nama).dataset.kunci = kunciTampilan(nama, S.rute.param);
     perbaruiWaMelayang();
+    if (nama === 'detail') catatAlamat(nama, S.rute.param, { ganti: true });
+    aturMeta(nama, S.rute.param);
     if (window.GerakAB6) GerakAB6.halaman(nama);
   }
 }
@@ -807,7 +908,7 @@ function htmlKepala(o) {
   return `<div class="gs-kepala">
     <div class="gs-aksen" aria-hidden="true">Kost</div>
     <div class="wrap">
-      <div class="crumb"><a href="#" data-nav="beranda">Beranda</a> / <span>${esc(o.crumb)}</span></div>
+      <div class="crumb"><a href="/" data-nav="beranda">Beranda</a> / <span>${esc(o.crumb)}</span></div>
       <div class="page-head">
         <div><span class="lbl">${esc(o.label)}</span><h1 class="h1">${o.judul}</h1></div>
         <div class="gs-kanan">${o.kanan}</div>
@@ -835,7 +936,7 @@ function kerangkaHalaman() {
 
 function remah(teks) {
   return `<nav aria-label="Breadcrumb" class="flex items-center gap-space-xs text-on-surface-variant font-body-sm text-body-sm mb-space-md">
-    <a href="#" data-nav="beranda" class="hover:text-primary transition-colors flex items-center gap-1">${ikon('home', 'text-[16px]')}<span>Beranda</span></a>
+    <a href="/" data-nav="beranda" class="hover:text-primary transition-colors flex items-center gap-1">${ikon('home', 'text-[16px]')}<span>Beranda</span></a>
     ${ikon('chevron_right', 'text-[14px] text-outline-variant')}
     <span class="text-on-surface font-label-md text-label-md">${esc(teks)}</span>
   </nav>`;
@@ -942,7 +1043,7 @@ RENDER.beranda = function (el) {
     id: '', label: '', judul: 'Kost AB6', keterangan: 'Hunian modern, tenang, dan strategis untuk mahasiswa dan profesional muda.',
     teksTombol: 'Lihat Katalog Kamar', linkTombol: '/kamar', foto: (S.umum && S.umum.fotoCadangan) || ''
   }];
-  el.innerHTML = `<h1 class="sr-only">Beranda Kost AB6</h1>
+  el.innerHTML = `<h1 class="sr-only">Kost AB6, Kost Siwalankerto Surabaya</h1>
     ${htmlHero(banner)}
     ${htmlVisiMisi(b.visiMisi || {})}
     ${htmlPilar(b.sorotan || [])}
@@ -1008,7 +1109,7 @@ function htmlVisiMisi(v) {
         <div class="kartu-ikon hijau">${ikon('flag')}</div><span class="lbl">Misi</span>
         <ol class="misi-list">${misi}</ol>
         <div class="misi-bawah">
-          <a href="#" data-nav="tentang" class="btn btn-ghost"><span>Selengkapnya tentang kami</span>${ikon('arrow_forward')}</a>
+          <a href="/tentang-kami" data-nav="tentang" class="btn btn-ghost"><span>Selengkapnya tentang kami</span>${ikon('arrow_forward')}</a>
           ${v.misiLabel ? `<span class="pil">${esc(v.misiLabel)}</span>` : ''}
         </div>
       </div>
@@ -1054,7 +1155,7 @@ function htmlKataMereka() {
       <div class="gs-testi-panggung"><figure class="gs-testi-slide" aria-live="polite"><span class="gs-garis" aria-hidden="true"></span>
         <blockquote class="gs-testi-kutip"></blockquote><figcaption class="gs-testi-orang"></figcaption></figure></div>
     </div>
-    <div class="mt-24"><a href="#" data-nav="testimoni" class="btn btn-outline">${ikon('rate_review')}<span>Lihat Semua Testimoni</span></a></div>
+    <div class="mt-24"><a href="/testimoni" data-nav="testimoni" class="btn btn-outline">${ikon('rate_review')}<span>Lihat Semua Testimoni</span></a></div>
   </div></section>`;
 }
 
@@ -1139,7 +1240,7 @@ function htmlCtaBeranda() {
     <h2 class="h2">Jadwalkan Kunjungan <em>Survei Lokasi</em> <span class="h2-sub">Sekarang</span></h2>
     <p class="muted">Konsultasikan ketersediaan kamar, tipe ruangan, dan nikmati diskon khusus masa sewa tahunan bersama manajer operasional kami.</p>
     <div class="cta-btn">
-      <a href="#" data-nav="kamar" class="btn btn-primary btn-lg">${ikon('grid_view')}<span>Cek Katalog Kamar</span></a>
+      <a href="/kamar" data-nav="kamar" class="btn btn-primary btn-lg">${ikon('grid_view')}<span>Cek Katalog Kamar</span></a>
       <a ${waAttr(PesanWA.umum())} class="btn btn-outline btn-lg">${IKON_WA}<span>Hubungi Pengelola</span></a>
     </div>
     ${poin.length ? `<ul class="cta-poin">${poin.map(p => `<li>${ikon('check')}${esc(p)}</li>`).join('')}</ul>` : ''}
@@ -1212,14 +1313,14 @@ function kartuKamar(k) {
   const foto = (k.foto || [])[0];
   const pesan = terisi ? PesanWA.terisi(k) : PesanWA.tersedia(k);
   return `<article class="pcard${terisi ? ' terisi' : ''}">
-    <a href="#" data-nav="detail" data-kode="${esc(k.kode)}" class="pimg" aria-label="Lihat detail ${esc(k.nama)}">
+    <a href="${esc(urlKamar(k))}" data-nav="detail" data-kode="${esc(k.kode)}" class="pimg" aria-label="Lihat detail ${esc(k.nama)}">
       <div class="gp-frame">${gambar(foto && foto.id, 800, '', k.nama)}</div>
       <span class="pstatus${terisi ? ' terisi' : ''}">${esc(k.status)}</span>
       ${(k.foto || []).length ? `<span class="pjumlah">${k.foto.length} Foto</span>` : ''}
     </a>
     <div class="pbody">
       <div class="pmeta"><span class="muted">${esc(spekRingkas(k))}</span></div>
-      <h2 class="ptitle"><a href="#" data-nav="detail" data-kode="${esc(k.kode)}">${esc(k.nama)}</a></h2>
+      <h2 class="ptitle"><a href="${esc(urlKamar(k))}" data-nav="detail" data-kode="${esc(k.kode)}">${esc(k.nama)}</a></h2>
       <p class="pprice">${rupiah(k.harga)} <span>/bulan</span></p>
       <p class="pdesc">${esc(ringkasFasilitas(k))}</p>
       <div class="gp-aksi">
@@ -1247,10 +1348,11 @@ RENDER.detail = function (el, param) {
       <div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-outline">${ikon('search_off', 'text-[32px]')}</div>
       <h1 class="font-headline-md text-headline-md text-on-surface">Kamar tidak ditemukan</h1>
       <p class="font-body-md text-body-md text-on-surface-variant">Kamar mungkin sudah tidak tersedia di katalog.</p>
-      <a href="#" data-nav="kamar" class="btn btn-primary">Kembali ke Katalog Kamar</a></div>`;
+      <a href="/kamar" data-nav="kamar" class="btn btn-primary">Kembali ke Katalog Kamar</a></div>`;
     return;
   }
   el.innerHTML = kerangkaHalaman();
+  if (!/^[A-Za-z0-9]{1,10}$/.test(String(kode || ''))) return;   // alamat seperti tipe-a: ditampilkan setelah data kamar termuat
   panggil('ambilDetailKamar', kode).then(kamar => {
     if (S.rute.nama === 'detail' && S.rute.param.kode === kode && !S.kamar) renderDetailIsi(el, kamar);
   }).catch(() => { /* prefetch akan merender ulang */ });
@@ -1280,27 +1382,27 @@ function renderDetailIsi(el, k) {
   const htmlLainnya = lainnya.length ? `<section class="mt-space-xl pt-space-md flex flex-col gap-space-md">
       <div class="flex items-end justify-between gap-3">
         <div><h2 class="font-headline-sm text-headline-md text-on-surface">Tipe Kamar Lainnya</h2><p class="font-body-sm text-body-sm text-on-surface-variant">Pilihan alternatif dengan ketersediaan aktif di Kost AB6</p></div>
-        <a href="#" data-nav="kamar" class="hidden sm:inline-flex items-center gap-1 font-label-md text-body-sm text-primary-container hover:underline">Lihat Semua Kamar${ikon('arrow_forward', 'text-[16px]')}</a>
+        <a href="/kamar" data-nav="kamar" class="hidden sm:inline-flex items-center gap-1 font-label-md text-body-sm text-primary-container hover:underline">Lihat Semua Kamar${ikon('arrow_forward', 'text-[16px]')}</a>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">${lainnya.map(x => `
         <div class="flex flex-col bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group">
-          <a href="#" data-nav="detail" data-kode="${esc(x.kode)}" class="relative block w-full aspect-[16/10] overflow-hidden bg-surface-container">
+          <a href="${esc(urlKamar(x))}" data-nav="detail" data-kode="${esc(x.kode)}" class="relative block w-full aspect-[16/10] overflow-hidden bg-surface-container">
             ${gambar((x.foto[0] || {}).id, 600, 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500', x.nama)}
             <span class="absolute top-2 left-2 px-2 py-0.5 rounded-full ${x.status === 'Terisi' ? 'bg-primary-container' : 'bg-status-available'} text-on-primary font-label-md text-body-sm">${esc(x.status)}</span>
           </a>
           <div class="p-space-md flex flex-col flex-1 justify-between gap-space-sm">
             <div><h3 class="font-headline-sm text-body-lg font-bold text-on-surface group-hover:text-primary transition-colors">${esc(x.nama)}</h3><p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">${esc(spekRingkas(x))}</p></div>
             <div class="pt-space-xs flex flex-wrap items-center justify-between gap-2"><div class="whitespace-nowrap"><span class="font-headline-sm text-headline-sm text-primary-container font-bold">${rupiah(x.harga)}</span><span class="font-body-sm text-body-sm text-outline"> / bln</span></div>
-              <a href="#" data-nav="detail" data-kode="${esc(x.kode)}" class="shrink-0 px-3 py-1.5 rounded-lg bg-surface-subtle hover:bg-primary hover:text-on-primary text-primary-container font-label-md text-body-sm transition-colors">Detail</a></div>
+              <a href="${esc(urlKamar(x))}" data-nav="detail" data-kode="${esc(x.kode)}" class="shrink-0 px-3 py-1.5 rounded-lg bg-surface-subtle hover:bg-primary hover:text-on-primary text-primary-container font-label-md text-body-sm transition-colors">Detail</a></div>
           </div>
         </div>`).join('')}</div>
     </section>` : '';
 
   el.innerHTML = `<div class="flex flex-col w-full"><div class="${WADAH} py-space-lg">
     <div class="flex items-center justify-between mb-space-lg gap-3">
-      <a href="#" data-nav="kamar" class="inline-flex items-center gap-space-xs font-label-md text-label-md text-primary-container hover:opacity-80 transition-opacity group">${ikon('arrow_back', 'text-[18px] group-hover:-translate-x-0.5 transition-transform')}<span>Kembali ke Katalog Kamar</span></a>
+      <a href="/kamar" data-nav="kamar" class="inline-flex items-center gap-space-xs font-label-md text-label-md text-primary-container hover:opacity-80 transition-opacity group">${ikon('arrow_back', 'text-[18px] group-hover:-translate-x-0.5 transition-transform')}<span>Kembali ke Katalog Kamar</span></a>
       <div class="hidden sm:flex items-center gap-space-sm text-on-surface-variant font-body-sm text-body-sm">
-        <a href="#" data-nav="kamar" class="hover:text-primary">Katalog</a><span>/</span><span class="text-on-surface font-semibold">${esc(namaKamarPendek(k.nama))}</span>
+        <a href="/kamar" data-nav="kamar" class="hover:text-primary">Katalog</a><span>/</span><span class="text-on-surface font-semibold">${esc(namaKamarPendek(k.nama))}</span>
       </div>
     </div>
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-start">
@@ -1774,7 +1876,7 @@ RENDER.tentang = function (el) {
     ${htmlAjakan({
       label: 'Layanan Konsultasi Langsung', judul: 'Punya pertanyaan seputar <em>tipe kamar &amp; fasilitas?</em>',
       teks: 'Konsultasikan langsung jadwal survei lokasi Anda bersama tim admin kami. Kami siap menemani Anda berkeliling melihat kamar secara langsung maupun video call.',
-      tombol: `<a ${waAttr(PesanWA.survei(null))} class="btn btn-wa btn-lg">${IKON_WA}<span>Jadwalkan Survei via WhatsApp</span></a><a href="#" data-nav="kamar" class="btn btn-outline btn-lg">${ikon('meeting_room')}<span>Lihat Katalog Kamar</span></a>`
+      tombol: `<a ${waAttr(PesanWA.survei(null))} class="btn btn-wa btn-lg">${IKON_WA}<span>Jadwalkan Survei via WhatsApp</span></a><a href="/kamar" data-nav="kamar" class="btn btn-outline btn-lg">${ikon('meeting_room')}<span>Lihat Katalog Kamar</span></a>`
     })}`;
 };
 
@@ -1782,7 +1884,7 @@ RENDER['404'] = function (el) {
   el.innerHTML = `<div class="${WADAH} py-space-xl text-center flex flex-col items-center gap-space-md min-h-[50vh] justify-center">
     <span class="font-display-hero text-display-hero text-primary-container">404</span>
     <h1 class="font-headline-md text-headline-md text-on-surface">Halaman tidak ditemukan</h1>
-    <a href="#" data-nav="beranda" class="px-space-lg py-3 rounded-full bg-primary-container text-on-primary font-headline-sm text-body-md">Kembali ke Beranda</a></div>`;
+    <a href="/" data-nav="beranda" class="px-space-lg py-3 rounded-full bg-primary-container text-on-primary font-headline-sm text-body-md">Kembali ke Beranda</a></div>`;
 };
 
 // ── Aksi publik ──
@@ -4679,14 +4781,20 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) kirim
 setInterval(() => { if (S.rute.nama === 'beranda') kirimStatBanner(); }, 120000);
 
 /** Penanda versi frontend — muncul di konsol agar mudah memastikan versi terbaru sudah terpasang */
-const VERSI_FRONTEND = '3.4.0';
+const VERSI_FRONTEND = '3.5.0';
 
 function mulaiAplikasi() {
   console.info('[Kost AB6] Frontend v' + VERSI_FRONTEND + ' siap');
   $$('.tahun-berjalan').forEach(x => { x.textContent = String(new Date().getFullYear()); });
   muatSesiTersimpan();
   perbaruiKerangkaPublik();
-  navigasi('beranda', {}, { paksa: true });
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  window.addEventListener('popstate', e => {   // tombol Back / Forward browser
+    const r = (e.state && e.state.nama) ? e.state : ruteDariAlamat();
+    navigasi(r.nama, r.param || {}, { dariRiwayat: true });
+  });
+  const awal = ruteDariAlamat();
+  navigasi(awal.nama, awal.param, { paksa: true, awal: true });
   muatPublik();
 }
 
