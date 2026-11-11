@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /halaman/
 
 Sitemap: https://kost-ab6.vercel.app/sitemap.xml

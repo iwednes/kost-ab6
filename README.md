@@ -4,9 +4,11 @@ Situs publik + panel pengelola Kost AB6. Frontend statis (HTML/CSS/JS vanilla + 
 
 ```
 index.html        ← kerangka halaman (publik, login, admin) + data usaha untuk Google
-vercel.json       ← alamat /kamar, /kamar/tipe-a, /testimoni, /tentang-kami dibuka oleh index.html
+vercel.json       ← alamat /kamar, /kamar/tipe-a, /testimoni, /tentang-kami dibuka oleh index.html;
+                    /kost-dekat-petra, /kost-murah-surabaya, /kost-karyawan-surabaya dibuka dari folder halaman/
 robots.txt        ← izin baca untuk mesin pencari + letak sitemap
 sitemap.xml       ← daftar halaman untuk Google
+halaman/          ← halaman khusus pencarian Google (HTML statis, dibuat oleh generator; jangan diedit manual)
 css/style.css     ← CSS tambahan di atas Tailwind
 css/tailwind.css  ← Tailwind v3.4.16 hasil kompilasi (JANGAN diedit manual)
 css/situs.css     ← tampilan seluruh halaman publik (mengikuti website Mixmax Souvenir)
@@ -45,3 +47,19 @@ Panduan lengkap: [PANDUAN-INSTALASI.md](PANDUAN-INSTALASI.md).
 ## Video banner
 
 Video banner butuh `Kode.gs` v3.1.0 atau lebih baru (tempel ke Apps Script, lalu Deploy → Manage deployments → New version). Di panel admin: Konten → Banner → ubah banner → Video Banner. Video maksimal 5 detik, otomatis dikecilkan ke 1080p tanpa suara, dan cuplikannya menjadi gambar sampul. ID video tersimpan di Script Properties (`VIDEO_BANNER`), jadi sheet Banner tidak berubah. Untuk memeriksa pemutaran dari HP, buka situs dengan `/?cekvideo`.
+
+## Halaman khusus pencarian Google
+
+Tiga halaman untuk pencarian seperti "kost dekat Petra", "kost murah Surabaya", dan "kost karyawan Surabaya", mengikuti halaman khusus Mixmax Souvenir:
+
+- https://kost-ab6.vercel.app/kost-dekat-petra
+- https://kost-ab6.vercel.app/kost-murah-surabaya
+- https://kost-ab6.vercel.app/kost-karyawan-surabaya
+
+Isinya dibuat oleh `migrasi-api/alat-dev/buat-halaman.js` (di luar repository ini). Harga, fasilitas, foto kamar, dan testimoni diambil dari database saat generator dijalankan, jadi **jalankan ulang setiap kali harga atau kamar berubah**, lalu push:
+
+```bash
+node ../alat-dev/buat-halaman.js
+```
+
+Teks tetap (judul, paragraf, tanya-jawab) diubah di daftar halaman dalam fungsi `daftarHalaman` di berkas yang sama. Halaman baru perlu ditambahkan juga ke `vercel.json` dan `sitemap.xml`.

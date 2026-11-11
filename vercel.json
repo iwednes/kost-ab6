@@ -2,6 +2,7 @@
   "trailingSlash": false,
   "rewrites": [
     { "source": "/:halaman(kamar|testimoni|tentang-kami)", "destination": "/index.html" },
-    { "source": "/kamar/:tipe", "destination": "/index.html" }
+    { "source": "/kamar/:tipe", "destination": "/index.html" },
+    { "source": "/:khusus(kost-dekat-petra|kost-murah-surabaya|kost-karyawan-surabaya)", "destination": "/halaman/:khusus.html" }
   ]
 }
